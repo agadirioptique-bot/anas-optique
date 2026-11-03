@@ -835,7 +835,20 @@
     "historyStock": "Stock {location} : {qty} {product}",
     "notFound": "Cette commande n'existe pas ou n'est pas visible avec votre rôle.",
     "backToOrders": "Retour aux commandes",
-    "currentStep": "étape en cours"
+    "currentStep": "étape en cours",
+    "addPhoto": "Ajouter la photo",
+    "replacePhoto": "Remplacer la photo",
+    "noPhoto": "Pas de photo d’ordonnance.",
+    "openPhoto": "Ouvrir le PDF",
+    "epRe": "EP œil droit",
+    "epLe": "EP œil gauche",
+    "fittingHeight": "Hauteur de montage",
+    "visionType": "Type de vision",
+    "doctor": "Médecin",
+    "prescriptionDate": "Date de l’ordonnance",
+    "freeDiscount": "Remise libre",
+    "discountFree": "dont remise libre −{amount}",
+    "discountClient": "dont remise client −{amount}"
   },
   "collect": {
     "title": "Encaisser le reste",

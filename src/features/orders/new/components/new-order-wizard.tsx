@@ -13,10 +13,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Link } from "@/i18n/navigation";
 import type { ErrorCode } from "@/lib/errors";
-import { createClient } from "@/lib/supabase/client";
 import { useFormat } from "@/lib/use-format";
 import { cn } from "@/lib/utils";
-import { attachPrescriptionPhoto, createOrder } from "../actions";
+import { uploadPrescriptionPhoto } from "@/features/orders/lib/photo-upload";
+import { createOrder } from "../actions";
 import type { NewOrderData } from "../data";
 import { buildOrderSchema, defaultValues, discountAmount, STEP_FIELDS, STEPS, toPayload, type OrderFormValues } from "../form";
 import { NewOrderProvider, useNewOrder } from "./context";
@@ -105,16 +105,6 @@ function SuccessScreen({ created, onAnother }: { created: Created; onAnother: ()
   );
 }
 
-/** Uploads the photo under prescriptions/{orderId}/ then records its path on the order. */
-async function uploadPhoto(orderId: string, file: File): Promise<boolean> {
-  const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 5) || "jpg";
-  const path = `prescriptions/${orderId}/${Date.now()}.${ext}`;
-  const { error } = await createClient().storage.from("private").upload(path, file, { contentType: file.type, upsert: false });
-  if (error) return false;
-  const result = await attachPrescriptionPhoto({ orderId, path });
-  return result.ok;
-}
-
 /** Which step holds the field an error refers to. */
 const STEP_OF_ERROR: Partial<Record<ErrorCode, number>> = {
   phoneExists: 0,
@@ -187,7 +177,7 @@ function Wizard() {
         setCreated(base);
         window.scrollTo({ top: 0, behavior: "smooth" });
         if (photo) {
-          const uploaded = await uploadPhoto(result.orderId, photo);
+          const uploaded = await uploadPrescriptionPhoto(result.orderId, photo);
           setCreated({ ...base, photo: uploaded ? "done" : "failed" });
         }
       },

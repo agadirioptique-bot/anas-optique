@@ -835,7 +835,20 @@
     "historyStock": "Stock {location}: {qty} {product}",
     "notFound": "This order does not exist or is not visible with your role.",
     "backToOrders": "Back to orders",
-    "currentStep": "current step"
+    "currentStep": "current step",
+    "addPhoto": "Add the photo",
+    "replacePhoto": "Replace the photo",
+    "noPhoto": "No prescription photo.",
+    "openPhoto": "Open the PDF",
+    "epRe": "PD right eye",
+    "epLe": "PD left eye",
+    "fittingHeight": "Fitting height",
+    "visionType": "Vision type",
+    "doctor": "Doctor",
+    "prescriptionDate": "Prescription date",
+    "freeDiscount": "Free discount",
+    "discountFree": "incl. free discount −{amount}",
+    "discountClient": "incl. client discount −{amount}"
   },
   "collect": {
     "title": "Collect the balance",
