@@ -12,7 +12,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "db:new": "supabase migration new",
-    "db:push": "supabase db push",
+    "db:push": "supabase db push --linked",
     "db:types": "supabase gen types typescript --linked --schema public > src/types/database.ts"
   },
   "dependencies": {

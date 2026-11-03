@@ -106,7 +106,8 @@ app_settings (key text primary key, value jsonb)
   -- 'slip_number_padding'    → { "digits": 5 }
 
 settings_list_items           -- every editable dropdown
-  id, list_key text, label_fr, label_en, sort int, is_archived bool, meta jsonb
+  id, list_key text, code text null (unique per list_key; stable key, e.g. 'supplier_purchase'),
+  label_fr, label_en, sort int, is_archived bool, meta jsonb
   list_key ∈ 'lens_types' | 'treatments' | 'payment_methods' | 'charge_categories'
            | 'cancel_reasons' | 'adjustment_reasons' | 'vision_types'
   -- archived items stay referenced by old rows; hidden from new choices
@@ -114,8 +115,8 @@ settings_list_items           -- every editable dropdown
 
 custom_fields
   id, key, label_fr, label_en, field_type ('text'|'number'|'select'|'date'),
-  options jsonb, visibility ('hidden'|'optional'|'required'), applies_to ('order'), sort
-  -- built-in measurement fields are ALSO controlled here by visibility:
+  options jsonb, visibility ('hidden'|'optional'|'required'), applies_to ('order'), is_builtin bool, sort
+  -- built-in measurement fields are ALSO controlled here by visibility (seeded, is_builtin = true):
   -- ep_re, ep_le, fitting_height, vision_type, doctor_name, prescription_date, prescription_photo
 
 charge_locations              -- dropdown on charges, editable by super admin
@@ -143,7 +144,9 @@ category_thresholds (store_id, category_id, low_stock_min int default 0, primary
 stock_movements                       -- the only source of stock quantities
   id, store_id, category_id, qty_delta int (≠ 0),
   kind ('purchase' | 'sale' | 'sale_cancel' | 'transfer_out' | 'transfer_in' | 'damage' | 'adjustment'),
-  ref_table text null, ref_id uuid null, reason text null, created_by, created_at
+  ref_table text null, ref_id uuid null, reason text null,
+  reason_id uuid null (settings_list_items 'adjustment_reasons'), created_by, created_at
+  -- CHECK: sign matches kind (purchase / sale_cancel / transfer_in > 0; sale / transfer_out / damage < 0)
 
 view stock_levels (store_id, category_id, quantity = sum(qty_delta))
   -- invariant: quantity never < 0 (enforced inside every RPC that removes stock, with row locks)
@@ -184,9 +187,10 @@ orders
   subtotal numeric(12,2),        -- what the secretary typed as total before discount
   discount_amount numeric(12,2) default 0,
   discount_source ('none' | 'client_pending' | 'admin_free') default 'none',
-  total numeric(12,2),           -- = subtotal − discount_amount  (CA uses this)
+  total numeric(12,2),           -- GENERATED = subtotal − discount_amount  (CA uses this)
   frame_revenue numeric(12,2),   -- snapshot of frame/product items sum
-  lens_revenue numeric(12,2),    -- = total − frame_revenue, must be ≥ 0
+  lens_revenue numeric(12,2),    -- GENERATED = total − frame_revenue, CHECK ≥ 0
+  source ('app' | 'legacy') default 'app',   -- see §12
   client_own_frame bool default false,   -- when true: no frame-type order_item allowed; frame_revenue = other items only
   -- lifecycle
   cancelled_at, cancelled_by, cancel_reason_id, cancel_note,
@@ -195,6 +199,9 @@ orders
 display number (computed in a view / helper, not stored):
   prefix || '-' || (booklet || '-' if booklet ≠ '') || lpad(slip_number, padding, '0')
   → 'CNT-00832', 'CNT-B-00001'
+  -- helper format_order_number(prefix, booklet, slip, digits) + view order_numbers(order_id, store_id, display_number)
+
+view order_balances (order_id, store_id, status, total, paid, balance = total − sum(payments))
 
 order_items                    -- frame (max 1 item of a frame type), contact lenses, accessories
   id, order_id, category_id, qty int > 0, unit_price numeric(12,2)   -- price snapshot
@@ -225,7 +232,7 @@ purchase_lines
   category_id null (required for 'stock'), description text null (required for 'lens'),
   unit_price numeric(12,2), qty int > 0, line_total generated always as (unit_price * qty) stored
 
-view purchase_balances (purchase_id, total, paid, remaining)
+view purchase_balances (purchase_id, supplier_id, total, paid, remaining)
 
 supplier_payments
   id, purchase_id, amount numeric(12,2) > 0, paid_at date, method_id, note, created_by
@@ -258,7 +265,8 @@ audit_log  id, table_name, row_id, action ('insert'|'update'|'delete'), old json
   --              stock_movements, product_categories (price changes), clients (discount fields)
 
 notifications
-  id, user_id (recipient), kind, title_key, params jsonb, link text, read_at null, created_at
+  id, user_id (recipient), kind, title_key, params jsonb, link text,
+  dedupe_key text null (unique per user_id — makes "notify once" idempotent), read_at null, created_at
   -- fan-out at insert time to the right users (helper notify_super_admins(), notify_store(store_id))
   -- Realtime subscription on the user's own rows
 
@@ -412,6 +420,13 @@ Bell shows unread count; list page `/notifications`; clicking marks read and nav
 - **Transfers**: dedicated page `/[locale]/stock/transfers` (super admin; history + new transfer), opened from the Stock "Transfers" button.
 - **Phase 1 dev fixtures**: a fake role switch and a hard-coded store list (2 stores + lab) exist only behind a dev env flag; both are removed in Phase 3.
 - **Git**: branch per phase (`phase-01-shell`, …), merged to `main` when green.
+
+Phase 2 schema additions (2026-11-03):
+- `orders.total` / `orders.lens_revenue` are generated columns; `lens_revenue ≥ 0` is a CHECK (enforces the discount rule).
+- `settings_list_items.code`, `custom_fields.is_builtin`, `stock_movements.reason_id`, `notifications.dedupe_key` added (see §5).
+- Views `order_numbers` and `order_balances` added; all views are `security_invoker`.
+- `profiles.role` is enum `app_role`; `role_permissions.role` stays text (custom roles later). Permission keys are `domain.action` (e.g. `order.cancel`, `costs.read`), seeded in `supabase/seed.sql`.
+- Cross-table rules (store kind checks, one frame per order, prefix lock…) are triggers/RPCs in phase 4, not phase 2.
 
 ---
 
