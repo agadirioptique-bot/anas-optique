@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect as baseExpect, test, type Locator, type Page } from "@playwright/test";
 
 /**
  * Stock page against the DEV project (SPEC §8, phase 7): the secretary sees her store read only
@@ -17,7 +17,9 @@ const accounts = existsSync(file)
   : null;
 
 test.skip(!accounts, "run `npm run e2e:accounts` first");
-test.describe.configure({ mode: "serial" });
+// A dev server (next dev) can take several seconds per page or action on a busy machine.
+test.describe.configure({ mode: "serial", timeout: 180_000 });
+const expect = baseExpect.configure({ timeout: 30_000 });
 
 const STORE_A = "Test Succursale A";
 const STORE_B = "Test Succursale B";
@@ -30,7 +32,19 @@ async function signIn(page: Page, who: "secretary" | "admin") {
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(password);
   await page.locator("form").getByRole("button").click();
-  await expect(page).toHaveURL(who === "admin" ? /\/fr\/dashboard$/ : /\/fr\/orders$/);
+  await expect(page).toHaveURL(who === "admin" ? /\/fr\/dashboard$/ : /\/fr\/orders$/, { timeout: 60_000 });
+}
+
+/** Collects React hydration errors (e.g. server and browser formatting a time differently). */
+function watchHydration(page: Page): string[] {
+  const errors: string[] = [];
+  page.on("console", (msg) => {
+    if (msg.type() === "error" && /hydrat/i.test(msg.text())) errors.push(msg.text().slice(0, 300));
+  });
+  page.on("pageerror", (err) => {
+    if (/hydrat/i.test(err.message)) errors.push(err.message.slice(0, 300));
+  });
+  return errors;
 }
 
 const frameRow = (page: Page) => page.getByRole("row").filter({ hasText: accounts!.frameName });
@@ -48,6 +62,7 @@ async function quantity(row: Locator): Promise<number> {
 }
 
 test("secretary: her store only, read only, history drawer", async ({ page }) => {
+  const hydration = watchHydration(page);
   await signIn(page, "secretary");
   await page.goto("/fr/stock");
   await expect(page.getByRole("heading", { level: 1, name: "Stock" })).toBeVisible();
@@ -69,9 +84,11 @@ test("secretary: her store only, read only, history drawer", async ({ page }) =>
   await page.setViewportSize({ width: 375, height: 812 });
   await page.keyboard.press("Escape");
   await shot(page, "stock-secretary-mobile");
+  expect(hydration).toEqual([]);
 });
 
 test("super admin: adjust to a count, then transfer between stores", async ({ page }) => {
+  const hydration = watchHydration(page);
   await signIn(page, "admin");
   await page.goto("/fr/stock");
   await page.getByRole("tab", { name: STORE_A }).click();
@@ -109,7 +126,13 @@ test("super admin: adjust to a count, then transfer between stores", async ({ pa
 
   await page.goto("/fr/stock/transfers");
   await expect(page.getByRole("heading", { level: 1, name: "Transferts" })).toBeVisible();
-  await expect(page.getByRole("row").filter({ hasText: accounts!.frameName }).first()).toBeVisible();
+  const latest = page.getByRole("row").filter({ hasText: accounts!.frameName }).first();
+  await expect(latest).toBeVisible();
+  // Times are formatted in the browser only (Node's bundled tz data may be out of date).
+  await expect(latest.getByRole("cell").first()).toHaveText(/\d{2}:\d{2}/);
+  await page.reload();
+  await expect(latest.getByRole("cell").first()).toHaveText(/\d{2}:\d{2}/);
+  expect(hydration).toEqual([]);
   await shot(page, "stock-transfers");
 
   await page.setViewportSize({ width: 375, height: 812 });

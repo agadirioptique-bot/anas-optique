@@ -469,6 +469,7 @@ Phase 7 — Stock (2026-11-03):
 - History drawer is available to secretaries too (decision 2026-11-03; read only, own store, no transfer / purchase links).
 - Defence in depth: trigger `stock_movements_not_negative` raises `OPTICOR:NO_STOCK` if any insert leaves a level below 0, whoever inserts it (RPCs still lock and check first).
 - Tabs: stores first, then the lab; default tab = top-bar store when one is selected. The transfer dialog (multi-line, source levels shown) opens from `/stock/transfers` and from a stock row (source + category prefilled).
+- Dates are formatted **in the browser only** (`useFormat` returns "" on the server and during hydration). Node bundles its own time-zone data (2025b / 2026a) that still puts Africa/Casablanca at UTC+1, while the OS, browsers and Postgres (tz 2026f) say UTC+0 — server-rendered times were an hour off and broke hydration. Business dates stay computed in Postgres.
 - Migration `20261103200423_stock_guard_definer.sql` was applied empty by mistake (CLI hang); the change is in `20261103201000_stock_guard_security_definer.sql`.
 
 ## 12. Later (design for it, don't build it)
