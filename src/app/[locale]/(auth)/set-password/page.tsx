@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { AuthCard } from "@/components/auth/auth-card";
+import { Button } from "@/components/ui/button";
+import { SetPasswordForm } from "@/features/auth/components/set-password-form";
+import { getSessionUser } from "@/features/auth/session";
+import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/set-password">): Promise<Metadata> {
@@ -10,11 +13,19 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/set-pass
   return { title: t("setPasswordTitle") };
 }
 
-export default function Page() {
-  const t = useTranslations("auth");
+/** Reached from an invite or reset link (/auth/confirm opened the session). */
+export default async function Page() {
+  const t = await getTranslations("auth");
+  const user = await getSessionUser();
   return (
-    <AuthCard title={t("setPasswordTitle")} subtitle={t("setPasswordSubtitle")}>
-      <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">{t("comingSoon")}</p>
+    <AuthCard title={t("setPasswordTitle")} subtitle={user ? t("setPasswordSubtitle") : t("setPasswordNoSession")}>
+      {user ? (
+        <SetPasswordForm email={user.email} />
+      ) : (
+        <Button asChild size="lg" className="w-full">
+          <Link href="/forgot-password">{t("setPasswordNoSessionCta")}</Link>
+        </Button>
+      )}
     </AuthCard>
   );
 }

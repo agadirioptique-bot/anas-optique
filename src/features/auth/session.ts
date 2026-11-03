@@ -1,24 +1,43 @@
 import "server-only";
-import { cookies } from "next/headers";
 import { cache } from "react";
-import { DEV_STORES, DEV_USERS } from "@/features/dev/fixtures";
-import { DEV_ROLE_COOKIE, DEV_SIGNED_OUT, isDevFakeAuth } from "@/features/dev/flags";
-import { isAppRole } from "@/lib/permissions";
+import { createClient } from "@/lib/supabase/server";
 import type { SessionUser, StoreSummary } from "./types";
 
 /**
- * The signed-in user, or null. Phase 1: fake user from a dev cookie (only with OPTICOR_DEV_FAKE_AUTH=1).
- * Phase 3 replaces the body with Supabase Auth + profiles; callers stay the same.
+ * The signed-in user, or null (no session, no profile, or deactivated).
+ * The JWT is verified by `getClaims()`; role/store come from the live profile row.
  */
 export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
-  if (!isDevFakeAuth()) return null;
-  const value = (await cookies()).get(DEV_ROLE_COOKIE)?.value;
-  if (value === DEV_SIGNED_OUT) return null;
-  return DEV_USERS[isAppRole(value) ? value : "super_admin"];
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const userId = data?.claims?.sub;
+  if (!userId) return null;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, full_name, email, role, store_id, is_active")
+    .eq("id", userId)
+    .maybeSingle();
+  if (!profile || !profile.is_active) return null;
+
+  return {
+    id: profile.id,
+    fullName: profile.full_name,
+    email: profile.email,
+    role: profile.role,
+    storeId: profile.store_id,
+  };
 });
 
-/** Active stores and lab the user can see (secretary: only her store). */
+/** Active stores and lab the user can see (secretary: only her store). RLS scopes the query too. */
 export const getVisibleStores = cache(async (user: SessionUser): Promise<StoreSummary[]> => {
-  if (!isDevFakeAuth()) return [];
-  return user.role === "super_admin" ? DEV_STORES : DEV_STORES.filter((s) => s.id === user.storeId);
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("stores")
+    .select("id, name, kind, prefix")
+    .eq("is_active", true)
+    .order("kind")
+    .order("name");
+  const stores = data ?? [];
+  return user.role === "super_admin" ? stores : stores.filter((s) => s.id === user.storeId);
 });

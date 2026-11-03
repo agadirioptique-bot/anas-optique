@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { AuthCard } from "@/components/auth/auth-card";
-import { DevSignIn } from "@/features/dev/dev-sign-in";
-import { isDevFakeAuth } from "@/features/dev/flags";
+import { LoginForm } from "@/features/auth/components/login-form";
 import type { AppLocale } from "@/i18n/routing";
+import { ERROR_CODES, type ErrorCode } from "@/lib/errors";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/login">): Promise<Metadata> {
   const { locale } = await params;
@@ -12,16 +11,14 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/login">)
   return { title: t("loginTitle") };
 }
 
-export default function LoginPage() {
-  const t = useTranslations("auth");
+export default async function LoginPage({ searchParams }: PageProps<"/[locale]/login">) {
+  const t = await getTranslations("auth");
+  const { error } = await searchParams;
+  // e.g. ?error=linkInvalid from /auth/confirm
+  const initialError = (ERROR_CODES as readonly string[]).includes(String(error)) ? (error as ErrorCode) : undefined;
   return (
     <AuthCard title={t("loginTitle")} subtitle={t("loginSubtitle")}>
-      <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">{t("comingSoon")}</p>
-      {isDevFakeAuth() && (
-        <div className="mt-6">
-          <DevSignIn />
-        </div>
-      )}
+      <LoginForm initialError={initialError} />
     </AuthCard>
   );
 }
