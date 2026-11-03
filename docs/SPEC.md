@@ -445,6 +445,15 @@ Phase 4 (2026-11-03):
 
 ---
 
+Phase 5 — Settings (2026-11-03):
+- One lab only (unique partial index `stores_single_lab`). A store's kind never changes after creation; prefix editable until the first order (then locked by trigger).
+- Product types are fixed (Montures / Lentilles / Accessoires): rename FR/EN + archive only. Categories: name, sale price (new orders only), archive, sort. Categories and types are archived, never deleted.
+- List items: delete only when unused and not a system item (`code` set, used by triggers/RPCs); otherwise archive. Custom fields: the key is generated once from the French label (`slugify`, unique, immutable); type cannot change after creation; delete only when no order filled it; built-in fields: labels + visibility only. Select options are stored as `[{ value, label_fr, label_en }]`.
+- Charge locations: store/lab rows come from the stores trigger; extra locations can be added; 'Général' cannot be archived.
+- Loyalty threshold: `set_loyalty_threshold(n)` saves it and immediately marks clients with ≥ n delivered orders loyal, with one summary notification (`clients_became_loyal`).
+- Drag-to-sort: `reorder_rows(table, ids)` (security invoker, allow-listed tables, super admin).
+- Usage views (security invoker): `settings_list_usage`, `custom_field_usage`, `store_usage`, `client_delivery_counts`.
+
 ## 12. Later (design for it, don't build it)
 
 - Excel history import (~2,270 orders 2021–2023, prescriptions as text like `-1.75(-2 a 69)`, treatments like AR / BL / BLEU CAT / PGX / PROG / DF / LENTILLE): imported orders get `source = 'legacy'` column (add now, default `'app'`), status delivered, no stock movements, count toward loyalty when phone matches.
