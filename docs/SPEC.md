@@ -472,6 +472,12 @@ Phase 7 — Stock (2026-11-03):
 - Dates are formatted **in the browser only** (`useFormat` returns "" on the server and during hydration). Node bundles its own time-zone data (2025b / 2026a) that still puts Africa/Casablanca at UTC+1, while the OS, browsers and Postgres (tz 2026f) say UTC+0 — server-rendered times were an hour off and broke hydration. Business dates stay computed in Postgres.
 - Migration `20261103200423_stock_guard_definer.sql` was applied empty by mistake (CLI hang); the change is in `20261103201000_stock_guard_security_definer.sql`.
 
+Phase 8 — Purchasing (2026-11-03):
+- Views (security_invoker, super admin only through RLS, money summed in SQL): `purchase_overview` (one row per purchase with supplier, receive location, total / paid / remaining, line count, stock quantity), `supplier_balances` (purchases, total bought, paid, owed per supplier, archived included), `purchasing_summary` (owed to suppliers, unpaid purchases, total purchased).
+- Suppliers: config table written directly by the super admin; two **active** suppliers can't share a name (case/spaces ignored, unique partial index → `duplicateName`); delete only when the supplier has no purchase (`inUse` → archive instead); archived suppliers can't receive new purchases.
+- New purchase is a dialog on `/purchases` (supplier with inline "+ new supplier", "Reçu à" store or lab, date, supplier ref, stock lines by category — unit price × qty — and lens lines — description + amount —, live total). First payment chips: 100 % / 50 % / 30 % / custom / nothing (default nothing), amounts rounded to the cent, 100 % = exactly the total. Dates can't be in the future (UI `max` = browser's today; server allows one day of slack for time zones). Saving opens `/purchases/[id]`.
+- Purchase detail: lines, total / paid / remaining, payments (each one created a read-only charge), "Add payment" with "Pay in full" / 50 % / custom, ≤ remaining (checked again under lock by `add_supplier_payment`).
+
 ## 12. Later (design for it, don't build it)
 
 - Excel history import (~2,270 orders 2021–2023, prescriptions as text like `-1.75(-2 a 69)`, treatments like AR / BL / BLEU CAT / PGX / PROG / DF / LENTILLE): imported orders get `source = 'legacy'` column (add now, default `'app'`), status delivered, no stock movements, count toward loyalty when phone matches.
