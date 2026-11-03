@@ -280,6 +280,13 @@ export type Database = {
             foreignKeyName: "charges_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -522,6 +529,13 @@ export type Database = {
             foreignKeyName: "order_items_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -578,6 +592,13 @@ export type Database = {
             foreignKeyName: "order_status_history_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -610,6 +631,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "order_numbers"
             referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_treatments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_overview"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "order_treatments_order_id_fkey"
@@ -894,6 +922,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "order_numbers"
             referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_overview"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "payments_order_id_fkey"
@@ -1666,6 +1701,65 @@ export type Database = {
           },
         ]
       }
+      order_overview: {
+        Row: {
+          balance: number | null
+          booklet: string | null
+          cancelled_at: string | null
+          client_has_whatsapp: boolean | null
+          client_id: string | null
+          client_is_loyal: boolean | null
+          client_name: string | null
+          client_own_frame: boolean | null
+          client_phone: string | null
+          created_at: string | null
+          delivered_at: string | null
+          discount_amount: number | null
+          display_number: string | null
+          frame_name: string | null
+          id: string | null
+          le_add: number | null
+          le_axis: number | null
+          le_cyl: number | null
+          le_sph: number | null
+          paid: number | null
+          re_add: number | null
+          re_axis: number | null
+          re_cyl: number | null
+          re_sph: number | null
+          slip_number: number | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          status_since: string | null
+          store_id: string | null
+          store_name: string | null
+          store_prefix: string | null
+          subtotal: number | null
+          total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "store_usage"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       purchase_balances: {
         Row: {
           paid: number | null
@@ -1830,6 +1924,16 @@ export type Database = {
         Args: { p_client_id: string }
         Returns: undefined
       }
+      client_directory: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_q?: string
+          p_segment?: string
+          p_sort?: string
+        }
+        Returns: Json
+      }
       client_order_stats: { Args: { p_client_id: string }; Returns: Json }
       create_order: { Args: { payload: Json }; Returns: Json }
       create_purchase: { Args: { payload: Json }; Returns: string }
@@ -1884,7 +1988,26 @@ export type Database = {
         Returns: undefined
       }
       set_loyalty_threshold: { Args: { p_orders: number }; Returns: number }
+      set_prescription_photo: {
+        Args: { p_order_id: string; p_path: string }
+        Returns: undefined
+      }
+      similar_clients: {
+        Args: { p_name: string }
+        Returns: {
+          full_name: string
+          id: string
+          phone_e164: string
+        }[]
+      }
       storage_order_id: { Args: { p_name: string }; Returns: string }
+      user_names: {
+        Args: { p_ids: string[] }
+        Returns: {
+          full_name: string
+          id: string
+        }[]
+      }
     }
     Enums: {
       app_locale: "fr" | "en"
