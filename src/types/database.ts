@@ -1547,6 +1547,30 @@ export type Database = {
       }
     }
     Functions: {
+      add_payment: {
+        Args: { p_amount: number; p_method_id: string; p_order_id: string }
+        Returns: string
+      }
+      add_supplier_payment: {
+        Args: {
+          p_amount: number
+          p_method_id?: string
+          p_note?: string
+          p_paid_at?: string
+          p_purchase_id: string
+        }
+        Returns: string
+      }
+      adjust_stock: {
+        Args: {
+          p_category_id: string
+          p_counted_qty: number
+          p_note?: string
+          p_reason_id: string
+          p_store_id: string
+        }
+        Returns: undefined
+      }
       admin_list_users: {
         Args: never
         Returns: {
@@ -1572,10 +1596,55 @@ export type Database = {
         }
         Returns: undefined
       }
+      apply_free_discount: {
+        Args: { p_amount: number; p_order_id: string }
+        Returns: undefined
+      }
+      approve_charge: {
+        Args: { p_amount?: number; p_charge_id: string }
+        Returns: undefined
+      }
       auth_role: { Args: never; Returns: string }
       auth_store_id: { Args: never; Returns: string }
       business_date: { Args: { ts: string }; Returns: string }
+      cancel_order: {
+        Args: {
+          p_note?: string
+          p_order_id: string
+          p_reason_id: string
+          p_refund_amount?: number
+          p_refund_method_id?: string
+        }
+        Returns: undefined
+      }
+      change_order_status: {
+        Args: {
+          p_order_id: string
+          p_to_status: Database["public"]["Enums"]["order_status"]
+        }
+        Returns: undefined
+      }
+      clear_client_discount: {
+        Args: { p_client_id: string }
+        Returns: undefined
+      }
+      client_order_stats: { Args: { p_client_id: string }; Returns: Json }
+      create_order: { Args: { payload: Json }; Returns: Json }
+      create_purchase: { Args: { payload: Json }; Returns: string }
+      create_transfer: {
+        Args: {
+          p_from_store_id: string
+          p_lines: Json
+          p_note?: string
+          p_to_store_id: string
+        }
+        Returns: string
+      }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      deliver_order: {
+        Args: { p_final_payment?: Json; p_order_id: string }
+        Returns: undefined
+      }
       format_order_number: {
         Args: {
           booklet: string
@@ -1585,8 +1654,30 @@ export type Database = {
         }
         Returns: string
       }
+      generate_recurring_charges: { Args: { p_date?: string }; Returns: number }
       is_super_admin: { Args: never; Returns: boolean }
       is_valid_diopter: { Args: { value: number }; Returns: boolean }
+      notify_stuck_orders: { Args: never; Returns: number }
+      record_damage: {
+        Args: {
+          p_category_id: string
+          p_qty: number
+          p_reason: string
+          p_store_id: string
+        }
+        Returns: undefined
+      }
+      search_global: { Args: { q: string }; Returns: Json }
+      set_client_discount: {
+        Args: {
+          p_client_id: string
+          p_note?: string
+          p_type: Database["public"]["Enums"]["discount_type"]
+          p_value: number
+        }
+        Returns: undefined
+      }
+      storage_order_id: { Args: { p_name: string }; Returns: string }
     }
     Enums: {
       app_locale: "fr" | "en"
