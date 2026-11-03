@@ -24,6 +24,23 @@ export const ERROR_CODES = [
   "selfChange",
   "lastSuperAdmin",
   "secretaryStoreInvalid",
+  "noStock",
+  "duplicateSlip",
+  "phoneExists",
+  "requiredFieldMissing",
+  "invalidPrescription",
+  "totalBelowItems",
+  "noPendingDiscount",
+  "discountTooHigh",
+  "discountAlreadyApplied",
+  "amountTooHigh",
+  "invalidStatusChange",
+  "balanceDue",
+  "prefixLocked",
+  "orderStoreInvalid",
+  "frameRule",
+  "chargeReadOnly",
+  "configMissing",
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];
