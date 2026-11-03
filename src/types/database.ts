@@ -1547,7 +1547,35 @@ export type Database = {
       }
     }
     Functions: {
+      admin_list_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          email_confirmed_at: string
+          full_name: string
+          id: string
+          invited_at: string
+          is_active: boolean
+          last_sign_in_at: string
+          locale: Database["public"]["Enums"]["app_locale"]
+          role: Database["public"]["Enums"]["app_role"]
+          store_id: string
+        }[]
+      }
+      admin_update_user_access: {
+        Args: {
+          p_is_active: boolean
+          p_role: Database["public"]["Enums"]["app_role"]
+          p_store_id: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      auth_role: { Args: never; Returns: string }
+      auth_store_id: { Args: never; Returns: string }
       business_date: { Args: { ts: string }; Returns: string }
+      custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       format_order_number: {
         Args: {
           booklet: string
@@ -1557,6 +1585,7 @@ export type Database = {
         }
         Returns: string
       }
+      is_super_admin: { Args: never; Returns: boolean }
       is_valid_diopter: { Args: { value: number }; Returns: boolean }
     }
     Enums: {
