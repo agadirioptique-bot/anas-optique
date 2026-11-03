@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Json } from "@/types/database";
 import { expectDbError, hasDbEnv, ownFrameOrder, setupFixtures, type Fixtures } from "./fixtures";
 
@@ -8,6 +8,10 @@ describe.skipIf(!hasDbEnv)("settings", () => {
 
   beforeAll(async () => {
     f = await setupFixtures();
+  });
+
+  afterAll(async () => {
+    await f?.cleanup();
   });
 
   it("secretary cannot change settings", async () => {

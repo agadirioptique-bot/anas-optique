@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Json } from "@/types/database";
 import { expectDbError, hasDbEnv, ownFrameOrder, setupFixtures, type Db, type Fixtures } from "./fixtures";
 
@@ -10,6 +10,10 @@ describe.skipIf(!hasDbEnv)("business rules (RPCs + triggers)", () => {
 
   beforeAll(async () => {
     f = await setupFixtures();
+  });
+
+  afterAll(async () => {
+    await f?.cleanup();
   });
 
   async function createOrder(client: Db, payload: ReturnType<typeof ownFrameOrder>): Promise<Created> {

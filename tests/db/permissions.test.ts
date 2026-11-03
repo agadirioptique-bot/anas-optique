@@ -1,4 +1,5 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { createClient } from "@supabase/supabase-js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { expectDbError, hasDbEnv, ownFrameOrder, setupFixtures, type Fixtures } from "./fixtures";
 
 /** SPEC §3 / §7: what a secretary can and cannot reach, enforced by Postgres. */
@@ -27,6 +28,10 @@ describe.skipIf(!hasDbEnv)("permissions (RLS + RPC checks)", () => {
     const { data: purchase } = await f.admin.from("purchases").select("id").order("created_at", { ascending: false }).limit(1).single();
     const pay = await f.admin.rpc("add_supplier_payment", { p_purchase_id: purchase!.id, p_amount: 10, p_method_id: f.ids.cash });
     if (pay.error) throw pay.error;
+  });
+
+  afterAll(async () => {
+    await f?.cleanup();
   });
 
   it("secretary reads her store's orders but never another store's", async () => {
@@ -166,6 +171,39 @@ describe.skipIf(!hasDbEnv)("permissions (RLS + RPC checks)", () => {
     expect((bySecretary.data as { orders: unknown[] }).orders).toHaveLength(0);
     const byAdmin = await f.admin.rpc("search_global", { q: `tsb ${String(slipB).padStart(10, "0")}` });
     expect((byAdmin.data as { orders: { id: string }[] }).orders.map((o) => o.id)).toContain(orderB);
+  });
+
+  it("client directory and names: counts and names only, never money", async () => {
+    const dir = await f.secretary.rpc("client_directory", { p_q: "Client Test", p_segment: "all", p_sort: "recent", p_limit: 5, p_offset: 0 });
+    expect(dir.error).toBeNull();
+    const rows = (dir.data as { rows: Record<string, unknown>[] }).rows;
+    expect(rows.length).toBeGreaterThan(0);
+    for (const key of ["total", "paid", "balance", "spent", "subtotal"]) expect(rows[0]).not.toHaveProperty(key);
+
+    const { data: order } = await f.admin.from("orders").select("client_id").eq("id", orderB).single();
+    const stats = await f.secretary.rpc("client_order_stats", { p_client_id: order!.client_id });
+    expect((stats.data as { spent: unknown }).spent).toBeNull();
+    const adminStats = await f.admin.rpc("client_order_stats", { p_client_id: order!.client_id });
+    expect((adminStats.data as { spent: number }).spent).toBe(400);
+
+    const names = await f.secretary.rpc("user_names", { p_ids: [f.adminId] });
+    expect(names.data).toEqual([{ id: f.adminId, full_name: "Test Super Admin" }]);
+    const anon = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { auth: { persistSession: false } });
+    expect((await anon.rpc("user_names", { p_ids: [f.adminId] })).error).not.toBeNull();
+  });
+
+  it("prescription photo path must be an uploaded file of that order, in the user's store", async () => {
+    expectDbError((await f.secretary.rpc("set_prescription_photo", { p_order_id: orderA, p_path: `prescriptions/${orderA}/missing.png` })).error, "INVALID_INPUT");
+    expectDbError((await f.secretary.rpc("set_prescription_photo", { p_order_id: orderA, p_path: `prescriptions/${orderB}/x.png` })).error, "INVALID_INPUT");
+    expectDbError((await f.secretary.rpc("set_prescription_photo", { p_order_id: orderB, p_path: `prescriptions/${orderB}/x.png` })).error, "FORBIDDEN");
+
+    const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
+    const path = `prescriptions/${orderA}/rx-${Date.now()}.png`;
+    expect((await f.secretary.storage.from("private").upload(path, png, { contentType: "image/png" })).error).toBeNull();
+    expect((await f.secretary.rpc("set_prescription_photo", { p_order_id: orderA, p_path: path })).error).toBeNull();
+    const { data } = await f.secretary.from("orders").select("prescription_photo_path").eq("id", orderA).single();
+    expect(data?.prescription_photo_path).toBe(path);
+    await f.admin.storage.from("private").remove([path]);
   });
 
   it("prescription photos: own store only", async () => {

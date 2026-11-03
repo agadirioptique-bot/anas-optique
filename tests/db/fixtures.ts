@@ -46,8 +46,10 @@ export interface Fixtures {
     frameType: string;
     supplier: string;
   };
-  /** A frame category created for this run (starts with 0 stock everywhere). */
+  /** A frame category created for this run (starts with 0 stock everywhere); archived by cleanup(). */
   newFrameCategory(label: string): Promise<string>;
+  /** Archives what the run created so it doesn't show up in the app on dev. */
+  cleanup(): Promise<void>;
   /** Unique slip number for this run. */
   nextSlip(): number;
   /** Random unused Moroccan mobile in E.164. */
@@ -63,7 +65,7 @@ function anonClient(): Db {
   });
 }
 
-async function ensureStore(service: Db, prefix: string, name: string): Promise<string> {
+export async function ensureStore(service: Db, prefix: string, name: string): Promise<string> {
   const { data } = await service.from("stores").select("id").eq("prefix", prefix).maybeSingle();
   if (data) return data.id;
   const { data: created, error } = await service.from("stores").insert({ prefix, name, kind: "store" }).select("id").single();
@@ -71,9 +73,9 @@ async function ensureStore(service: Db, prefix: string, name: string): Promise<s
   return created.id;
 }
 
-async function ensureUser(
+export async function ensureUser(
   service: Db,
-  user: (typeof TEST_USERS)[keyof typeof TEST_USERS],
+  user: { email: string; fullName: string; role: "secretary" | "super_admin" },
   storeId: string | null,
   password: string,
 ): Promise<string> {
@@ -94,7 +96,7 @@ async function ensureUser(
   return id;
 }
 
-async function signIn(email: string, password: string): Promise<Db> {
+export async function signIn(email: string, password: string): Promise<Db> {
   const client = anonClient();
   const { error } = await client.auth.signInWithPassword({ email, password });
   if (error) throw error;
@@ -143,6 +145,8 @@ export async function setupFixtures(): Promise<Fixtures> {
   // Seconds × 100 (cycle ≈ 11 days): unique per run, room for 100 orders, ≤ 9 digits like real slips.
   let slip = (Math.floor(Date.now() / 1000) % 1_000_000) * 100;
 
+  const created: string[] = [];
+
   const fixtures: Fixtures = {
     service,
     admin,
@@ -159,7 +163,12 @@ export async function setupFixtures(): Promise<Fixtures> {
         .select("id")
         .single();
       if (error) throw error;
+      created.push(data.id);
       return data.id;
+    },
+    async cleanup() {
+      if (created.length) await admin.from("product_categories").update({ is_archived: true }).in("id", created);
+      await admin.from("suppliers").update({ is_archived: true }).eq("id", ids.supplier);
     },
     nextSlip: () => ++slip,
     newPhone: () => `+2126${randomInt(10_000_000, 99_999_999)}`,

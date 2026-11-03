@@ -33,23 +33,30 @@ function SlipField() {
   const [checking, setChecking] = useState(false);
   const prefix = data.stores.find((s) => s.id === storeId)?.prefix ?? "";
   const error = form.formState.errors.slipNumber;
+  // The form object from useFormContext changes on every render; these functions don't.
+  const { setValue, setError, clearErrors } = form;
 
   // Live "already used" check, a moment after typing stops.
   useEffect(() => {
     setSlip(null);
-    form.setValue("slipTaken", false);
+    setValue("slipTaken", false);
     if (!slipNumber || !storeId) return;
+    let alive = true;
     const timer = setTimeout(async () => {
       setChecking(true);
       const result = await checkSlip({ storeId, booklet, slipNumber });
       setChecking(false);
+      if (!alive) return;
       setSlip(result);
-      form.setValue("slipTaken", result.taken);
-      if (result.taken) form.setError("slipNumber", { message: t("slipTakenShort") });
-      else form.clearErrors("slipNumber");
+      setValue("slipTaken", result.taken);
+      if (result.taken) setError("slipNumber", { message: t("slipTakenShort") });
+      else clearErrors("slipNumber");
     }, 400);
-    return () => clearTimeout(timer);
-  }, [storeId, booklet, slipNumber, setSlip, form, t]);
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
+  }, [storeId, booklet, slipNumber, setSlip, setValue, setError, clearErrors, t]);
 
   return (
     <div className="space-y-2">
