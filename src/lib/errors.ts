@@ -41,6 +41,11 @@ export const ERROR_CODES = [
   "frameRule",
   "chargeReadOnly",
   "configMissing",
+  // Postgres constraints (mapped per action)
+  "duplicateName",
+  "prefixTaken",
+  "labExists",
+  "inUse",
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];
@@ -54,8 +59,18 @@ function isErrorCode(value: string): value is ErrorCode {
   return (ERROR_CODES as readonly string[]).includes(value);
 }
 
-/** "OPTICOR:LAST_SUPER_ADMIN" anywhere in the message → "lastSuperAdmin". Unknown → "unexpected". */
-export function dbErrorCode(error: { message?: string } | null | undefined): ErrorCode {
+/**
+ * "OPTICOR:LAST_SUPER_ADMIN" anywhere in the message → "lastSuperAdmin". Constraint errors:
+ * unique violation → `onUnique` (e.g. "prefixTaken"), still referenced → "inUse", no privilege → "forbidden".
+ * Unknown → "unexpected".
+ */
+export function dbErrorCode(
+  error: { message?: string; code?: string } | null | undefined,
+  options: { onUnique?: ErrorCode } = {},
+): ErrorCode {
+  if (error?.code === "23505") return options.onUnique ?? "duplicateName";
+  if (error?.code === "23503") return "inUse";
+  if (error?.code === "42501") return "forbidden";
   const match = error?.message?.match(/OPTICOR:([A-Z_]+)/);
   if (!match) return "unexpected";
   const camel = match[1].toLowerCase().replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());

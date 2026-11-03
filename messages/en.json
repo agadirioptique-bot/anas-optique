@@ -12,7 +12,19 @@
     "locations": "Stores",
     "lab": "Lab",
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "save": "Save",
+    "saved": "Saved",
+    "delete": "Delete",
+    "restore": "Restore",
+    "add": "Add",
+    "edit": "Edit",
+    "create": "Create",
+    "archive": "Archive",
+    "archived": "Archived",
+    "active": "Active",
+    "yes": "Yes",
+    "no": "No"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -144,7 +156,11 @@
     "orderStoreInvalid": "An order must belong to an active store (not the lab).",
     "frameRule": "An order has at most one frame, and none when the client brings their own.",
     "chargeReadOnly": "This charge comes from a supplier payment: edit it from the purchase.",
-    "configMissing": "Incomplete configuration: check the settings (charge categories, locations)."
+    "configMissing": "Incomplete configuration: check the settings (charge categories, locations).",
+    "duplicateName": "This name already exists.",
+    "prefixTaken": "This prefix is already used by another store.",
+    "labExists": "There is already a lab.",
+    "inUse": "This item is in use: archive it instead of deleting it."
   },
   "placeholder": {
     "title": "Coming soon",
@@ -250,6 +266,49 @@
       "deactivated": "{name} deactivated",
       "activated": "{name} reactivated",
       "you": "you"
+    },
+    "lists": {
+      "title": "Dropdown lists",
+      "description": "Each list feeds the app’s menus. Renaming an item updates it everywhere; an item in use is archived instead of deleted.",
+      "names": {
+        "lens_types": "Lens types",
+        "treatments": "Treatments",
+        "payment_methods": "Payment methods",
+        "vision_types": "Vision types",
+        "cancel_reasons": "Cancellation reasons",
+        "adjustment_reasons": "Stock adjustment reasons",
+        "charge_categories": "Charge categories"
+      },
+      "showArchived": "Show archived",
+      "labelFr": "Label (FR)",
+      "labelEn": "Label (EN)",
+      "newPlaceholder": "New item…",
+      "added": "“{label}” added",
+      "renamed": "Renamed to “{label}” everywhere",
+      "usage": "{count, plural, =0 {not used} one {used # time} other {used # times}}",
+      "system": "System item",
+      "systemHint": "Used by the app’s rules: it can be renamed or archived, not deleted.",
+      "archived": "“{label}” archived",
+      "restored": "“{label}” restored",
+      "deleted": "“{label}” deleted",
+      "archiveTitle": "Archive “{label}”?",
+      "archiveBody": "It will no longer appear in menus. Existing orders and charges keep it, so history stays accurate. You can restore it.",
+      "deleteTitle": "Delete “{label}”?",
+      "deleteBody": "This item is not used anywhere: it will be deleted permanently.",
+      "drag": "Move “{label}”",
+      "reordered": "Order saved",
+      "empty": "No items in this list.",
+      "fixedTitle": "Fixed values",
+      "fixedBody": "Order statuses drive the tracking of each pair of glasses: they cannot be changed.",
+      "statuses": "Order statuses"
     }
+  },
+  "status": {
+    "confirmed": "Confirmed",
+    "in_workshop": "In workshop",
+    "prepared": "Prepared",
+    "in_store": "In store",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
   }
 }

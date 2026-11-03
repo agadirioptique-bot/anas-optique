@@ -1,10 +1,13 @@
 import { useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 import { EmptyState, PageHeader } from "@/components/shared/page";
 import { pageMetadata } from "@/components/shared/placeholder-page";
 import { Card } from "@/components/ui/card";
 import { requireUser, superAdminPage } from "@/features/auth/guards";
 import { getVisibleStores } from "@/features/auth/session";
 import { isSettingsTab, SettingsNav, type SettingsTab } from "@/features/settings/components/settings-nav";
+import { ListsTab } from "@/features/settings/lists/components/lists-tab";
+import { getListItems } from "@/features/settings/lists/queries";
 import { UsersTab } from "@/features/settings/users/components/users-tab";
 import { listUsers } from "@/features/settings/users/queries";
 
@@ -16,6 +19,10 @@ async function UsersSection() {
   return <UsersTab users={users} stores={stores} currentUserId={user.id} />;
 }
 
+async function ListsSection() {
+  return <ListsTab items={await getListItems()} />;
+}
+
 function ComingSoon() {
   const t = useTranslations("placeholder");
   return (
@@ -25,7 +32,13 @@ function ComingSoon() {
   );
 }
 
-function SettingsLayout({ tab, children }: { tab: SettingsTab; children: React.ReactNode }) {
+/** One server component per sub-page: each loads only its own data. */
+const SECTIONS: Partial<Record<SettingsTab, () => Promise<ReactNode>>> = {
+  lists: ListsSection,
+  users: UsersSection,
+};
+
+function SettingsLayout({ tab, children }: { tab: SettingsTab; children: ReactNode }) {
   const t = useTranslations("pages.settings");
   return (
     <>
@@ -40,7 +53,7 @@ function SettingsLayout({ tab, children }: { tab: SettingsTab; children: React.R
 
 export default superAdminPage(async function Page({ searchParams }: PageProps<"/[locale]/settings">) {
   const { tab: requested } = await searchParams;
-  // Users is the only section built so far (phase 3); the others arrive in phase 5.
-  const tab: SettingsTab = isSettingsTab(requested) ? requested : "users";
-  return <SettingsLayout tab={tab}>{tab === "users" ? <UsersSection /> : <ComingSoon />}</SettingsLayout>;
+  const tab: SettingsTab = isSettingsTab(requested) ? requested : "lists";
+  const Section = SECTIONS[tab];
+  return <SettingsLayout tab={tab}>{Section ? <Section /> : <ComingSoon />}</SettingsLayout>;
 });

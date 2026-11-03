@@ -11,6 +11,13 @@ describe("dbErrorCode", () => {
     expect(dbErrorCode({ message: "ERROR: OPTICOR:SECRETARY_STORE_INVALID (P0001)" })).toBe("secretaryStoreInvalid");
   });
 
+  it("maps constraint violations", () => {
+    expect(dbErrorCode({ code: "23505", message: "duplicate key" })).toBe("duplicateName");
+    expect(dbErrorCode({ code: "23505" }, { onUnique: "prefixTaken" })).toBe("prefixTaken");
+    expect(dbErrorCode({ code: "23503" })).toBe("inUse");
+    expect(dbErrorCode({ code: "42501" })).toBe("forbidden");
+  });
+
   it("never leaks unknown database messages", () => {
     expect(dbErrorCode({ message: 'duplicate key value violates unique constraint "profiles_email_key"' })).toBe("unexpected");
     expect(dbErrorCode({ message: "OPTICOR:SOMETHING_NEW" })).toBe("unexpected");

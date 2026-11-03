@@ -12,7 +12,19 @@
     "locations": "Succursales",
     "lab": "Laboratoire",
     "cancel": "Annuler",
-    "close": "Fermer"
+    "close": "Fermer",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "delete": "Supprimer",
+    "restore": "Restaurer",
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "create": "Créer",
+    "archive": "Archiver",
+    "archived": "Archivé",
+    "active": "Actif",
+    "yes": "Oui",
+    "no": "Non"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -144,7 +156,11 @@
     "orderStoreInvalid": "Une commande doit être rattachée à une succursale active (pas au laboratoire).",
     "frameRule": "Une commande contient au plus une monture, et aucune si le client apporte la sienne.",
     "chargeReadOnly": "Cette charge vient d’un paiement fournisseur : modifiez-la depuis l’achat.",
-    "configMissing": "Configuration incomplète : vérifiez les paramètres (catégories de charges, lieux)."
+    "configMissing": "Configuration incomplète : vérifiez les paramètres (catégories de charges, lieux).",
+    "duplicateName": "Ce nom existe déjà.",
+    "prefixTaken": "Ce préfixe est déjà utilisé par une autre succursale.",
+    "labExists": "Il existe déjà un laboratoire.",
+    "inUse": "Cet élément est utilisé : archivez-le plutôt que de le supprimer."
   },
   "placeholder": {
     "title": "Bientôt disponible",
@@ -250,6 +266,49 @@
       "deactivated": "{name} désactivé",
       "activated": "{name} réactivé",
       "you": "vous"
+    },
+    "lists": {
+      "title": "Listes déroulantes",
+      "description": "Chaque liste alimente les menus de l’application. Renommer un élément le met à jour partout ; un élément utilisé s’archive au lieu d’être supprimé.",
+      "names": {
+        "lens_types": "Types de verres",
+        "treatments": "Traitements",
+        "payment_methods": "Modes de paiement",
+        "vision_types": "Types de vision",
+        "cancel_reasons": "Motifs d’annulation",
+        "adjustment_reasons": "Motifs d’ajustement de stock",
+        "charge_categories": "Catégories de charges"
+      },
+      "showArchived": "Afficher les archivés",
+      "labelFr": "Libellé (FR)",
+      "labelEn": "Libellé (EN)",
+      "newPlaceholder": "Nouvel élément…",
+      "added": "« {label} » ajouté",
+      "renamed": "Renommé en « {label} » partout",
+      "usage": "{count, plural, =0 {non utilisé} one {utilisé # fois} other {utilisé # fois}}",
+      "system": "Élément système",
+      "systemHint": "Utilisé par les règles de l’application : il peut être renommé ou archivé, pas supprimé.",
+      "archived": "« {label} » archivé",
+      "restored": "« {label} » restauré",
+      "deleted": "« {label} » supprimé",
+      "archiveTitle": "Archiver « {label} » ?",
+      "archiveBody": "Il n’apparaîtra plus dans les menus. Les commandes et charges existantes le gardent : l’historique reste exact. Vous pourrez le restaurer.",
+      "deleteTitle": "Supprimer « {label} » ?",
+      "deleteBody": "Cet élément n’est utilisé nulle part : il sera supprimé définitivement.",
+      "drag": "Déplacer « {label} »",
+      "reordered": "Ordre enregistré",
+      "empty": "Aucun élément dans cette liste.",
+      "fixedTitle": "Valeurs fixes",
+      "fixedBody": "Les statuts de commande pilotent le suivi des lunettes : ils ne sont pas modifiables.",
+      "statuses": "Statuts des commandes"
     }
+  },
+  "status": {
+    "confirmed": "Confirmée",
+    "in_workshop": "À l’atelier",
+    "prepared": "Préparée",
+    "in_store": "En succursale",
+    "delivered": "Livrée",
+    "cancelled": "Annulée"
   }
 }
