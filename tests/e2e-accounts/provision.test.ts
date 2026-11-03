@@ -9,7 +9,8 @@ import { ensureStore, ensureUser, hasDbEnv, signIn } from "../db/fixtures";
  * `npm run e2e:accounts` — DEV only. Resets the Playwright users (TSA secretary + super admin, and a
  * second TSA secretary that e2e/session.spec.ts moves between stores) with a
  * fresh random password and writes them to the git-ignored e2e/.auth/accounts.json. Also makes sure
- * TSA has a stocked frame category for the order flow. Nobody types or sees the passwords.
+ * TSA has a stocked frame category for the order flow, and creates a pending recurring charge for
+ * the charges flow. Nobody types or sees the passwords.
  */
 it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   const service = createAdminClient();
@@ -32,6 +33,8 @@ it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   if (!category) {
     ({ data: category } = await adminDb.from("product_categories").insert({ product_type_id: frames!.id, name: frameName, sale_price: 600 }).select("id").single());
   }
+  // The order flow picks this frame: make sure nobody left it archived.
+  await adminDb.from("product_categories").update({ is_archived: false }).eq("id", category!.id);
   let { data: supplier } = await adminDb.from("suppliers").select("id").eq("name", "Fournisseur E2E").maybeSingle();
   if (!supplier) ({ data: supplier } = await adminDb.from("suppliers").insert({ name: "Fournisseur E2E" }).select("id").single());
   const purchase = await adminDb.rpc("create_purchase", {
@@ -39,9 +42,21 @@ it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   });
   expect(purchase.error).toBeNull();
 
+  // A pending recurring charge for e2e/charges.spec.ts to approve (a new one each run; older ones deactivated).
+  const { data: rent } = await adminDb.from("settings_list_items").select("id").eq("list_key", "charge_categories").eq("code", "rent").single();
+  const { data: general } = await adminDb.from("charge_locations").select("id").eq("is_general", true).single();
+  await adminDb.from("recurring_charges").update({ is_active: false }).like("label", "E2E récurrente %");
+  const pendingCharge = `E2E récurrente ${Date.now().toString(36)}`;
+  const recurring = await adminDb
+    .from("recurring_charges")
+    .insert({ label: pendingCharge, amount: 1500, category_id: rent!.id, location_id: general!.id, day_of_month: 1 });
+  expect(recurring.error).toBeNull();
+  const { data: today } = await service.rpc("business_date", { ts: new Date().toISOString() });
+  expect((await service.rpc("generate_recurring_charges", { p_date: today! })).error).toBeNull();
+
   const dir = join(process.cwd(), "e2e/.auth");
   mkdirSync(dir, { recursive: true });
   const file = join(dir, "accounts.json");
-  writeFileSync(file, JSON.stringify({ secretary: { email: secretary.email, password }, admin: { email: admin.email, password }, mover: { email: mover.email, password }, storePrefix: "TSA", frameName }, null, 2));
+  writeFileSync(file, JSON.stringify({ secretary: { email: secretary.email, password }, admin: { email: admin.email, password }, mover: { email: mover.email, password }, pendingCharge, storePrefix: "TSA", frameName }, null, 2));
   chmodSync(file, 0o600);
 });
