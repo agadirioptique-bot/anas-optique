@@ -6,12 +6,16 @@ import { Card } from "@/components/ui/card";
 import { requireUser, superAdminPage } from "@/features/auth/guards";
 import { getVisibleStores } from "@/features/auth/session";
 import { isSettingsTab, SettingsNav, type SettingsTab } from "@/features/settings/components/settings-nav";
+import { ChargeLocationsTab } from "@/features/settings/charge-locations/components/charge-locations-tab";
+import { getChargeLocations } from "@/features/settings/charge-locations/queries";
 import { FieldsTab } from "@/features/settings/fields/components/fields-tab";
 import { getFieldsData } from "@/features/settings/fields/queries";
 import { ListsTab } from "@/features/settings/lists/components/lists-tab";
 import { getListItems } from "@/features/settings/lists/queries";
 import { ProductsTab } from "@/features/settings/products/components/products-tab";
 import { getProductsData } from "@/features/settings/products/queries";
+import { StoresTab } from "@/features/settings/stores/components/stores-tab";
+import { getStores } from "@/features/settings/stores/queries";
 import { UsersTab } from "@/features/settings/users/components/users-tab";
 import { listUsers } from "@/features/settings/users/queries";
 
@@ -35,6 +39,14 @@ async function FieldsSection() {
   return <FieldsTab data={await getFieldsData()} />;
 }
 
+async function StoresSection() {
+  return <StoresTab stores={await getStores()} />;
+}
+
+async function ChargeLocationsSection() {
+  return <ChargeLocationsTab locations={await getChargeLocations()} />;
+}
+
 function ComingSoon() {
   const t = useTranslations("placeholder");
   return (
@@ -49,7 +61,9 @@ const SECTIONS: Partial<Record<SettingsTab, () => Promise<ReactNode>>> = {
   lists: ListsSection,
   products: ProductsSection,
   fields: FieldsSection,
+  stores: StoresSection,
   users: UsersSection,
+  chargeLocations: ChargeLocationsSection,
 };
 
 function SettingsLayout({ tab, children }: { tab: SettingsTab; children: ReactNode }) {

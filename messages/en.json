@@ -373,6 +373,59 @@
       "choose": "Choose…",
       "requiredMark": "required",
       "photoHint": "Photo added after the order is saved"
+    },
+    "stores": {
+      "title": "Stores and lab",
+      "description": "The stores where clients order and the lab where glasses are prepared. The prefix appears in every order number.",
+      "add": "New store",
+      "createTitle": "New store or lab",
+      "editTitle": "Edit",
+      "name": "Name",
+      "namePlaceholder": "e.g. Agdal store",
+      "nameRequired": "Enter a name (at least 2 characters).",
+      "type": "Type",
+      "kinds": {
+        "store": "Store",
+        "lab": "Lab"
+      },
+      "oneLab": "There can only be one lab.",
+      "prefix": "Prefix",
+      "prefixHint": "2 to 5 capital letters. Example number: {example}",
+      "prefixLockedHint": "Orders already use this prefix: it can no longer change.",
+      "locked": "Locked",
+      "address": "Address",
+      "phone": "Phone",
+      "phoneInvalid": "Invalid number (e.g. 05 37 12 34 56).",
+      "orders": "{count, plural, =0 {no orders} one {# order} other {# orders}}",
+      "secretaries": "{count, plural, =0 {no secretary} one {# secretary} other {# secretaries}}",
+      "labHint": "Stock location, no orders",
+      "active": "Active",
+      "created": "“{name}” created",
+      "saved": "“{name}” saved",
+      "activated": "“{name}” reactivated",
+      "deactivated": "“{name}” deactivated",
+      "deactivateTitle": "Deactivate “{name}”?",
+      "deactivateBody": "It will no longer appear in selectors or accept new orders. Its history is kept.",
+      "deactivateSecretaries": "{count, plural, one {# secretary belongs to it: change her store in Users.} other {# secretaries belong to it: change their store in Users.}}",
+      "deactivate": "Deactivate"
+    },
+    "chargeLocations": {
+      "title": "Charge locations",
+      "description": "The locations offered when you enter a charge. Each store and the lab has its own; “General” holds shared charges.",
+      "labelFr": "Label (FR)",
+      "labelEn": "Label (EN)",
+      "newPlaceholder": "New location (e.g. Vehicle)…",
+      "kinds": {
+        "store": "Store",
+        "lab": "Lab",
+        "general": "General",
+        "other": "Other"
+      },
+      "added": "“{label}” added",
+      "archived": "“{label}” archived",
+      "restored": "“{label}” restored",
+      "drag": "Move “{label}”",
+      "hint": "Charges of “General” and other locations only count in the dashboard’s “All stores” view."
     }
   },
   "status": {

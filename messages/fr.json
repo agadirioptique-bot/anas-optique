@@ -373,6 +373,59 @@
       "choose": "Choisir…",
       "requiredMark": "obligatoire",
       "photoHint": "Photo ajoutée après l’enregistrement de la commande"
+    },
+    "stores": {
+      "title": "Succursales et laboratoire",
+      "description": "Les succursales où les clients commandent et le laboratoire où les lunettes sont préparées. Le préfixe apparaît dans chaque N° de commande.",
+      "add": "Nouvelle succursale",
+      "createTitle": "Nouvelle succursale ou laboratoire",
+      "editTitle": "Modifier",
+      "name": "Nom",
+      "namePlaceholder": "Ex. Succursale Agdal",
+      "nameRequired": "Saisissez un nom (2 caractères minimum).",
+      "type": "Type",
+      "kinds": {
+        "store": "Succursale",
+        "lab": "Laboratoire"
+      },
+      "oneLab": "Il ne peut y avoir qu’un laboratoire.",
+      "prefix": "Préfixe",
+      "prefixHint": "2 à 5 lettres majuscules. Exemple de N° : {example}",
+      "prefixLockedHint": "Des commandes utilisent déjà ce préfixe : il ne peut plus changer.",
+      "locked": "Verrouillé",
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "phoneInvalid": "Numéro invalide (ex. 05 37 12 34 56).",
+      "orders": "{count, plural, =0 {aucune commande} one {# commande} other {# commandes}}",
+      "secretaries": "{count, plural, =0 {aucune secrétaire} one {# secrétaire} other {# secrétaires}}",
+      "labHint": "Lieu de stock, sans commandes",
+      "active": "Active",
+      "created": "« {name} » créée",
+      "saved": "« {name} » enregistrée",
+      "activated": "« {name} » réactivée",
+      "deactivated": "« {name} » désactivée",
+      "deactivateTitle": "Désactiver « {name} » ?",
+      "deactivateBody": "Elle n’apparaîtra plus dans les sélecteurs et n’acceptera plus de nouvelles commandes. Son historique est conservé.",
+      "deactivateSecretaries": "{count, plural, one {# secrétaire y est rattachée : changez sa succursale dans Utilisateurs.} other {# secrétaires y sont rattachées : changez leur succursale dans Utilisateurs.}}",
+      "deactivate": "Désactiver"
+    },
+    "chargeLocations": {
+      "title": "Lieux de charges",
+      "description": "Les lieux proposés quand vous saisissez une charge. Chaque succursale et le labo ont le leur ; « Général » regroupe les charges communes.",
+      "labelFr": "Libellé (FR)",
+      "labelEn": "Libellé (EN)",
+      "newPlaceholder": "Nouveau lieu (ex. Véhicule)…",
+      "kinds": {
+        "store": "Succursale",
+        "lab": "Laboratoire",
+        "general": "Général",
+        "other": "Autre"
+      },
+      "added": "« {label} » ajouté",
+      "archived": "« {label} » archivé",
+      "restored": "« {label} » restauré",
+      "drag": "Déplacer « {label} »",
+      "hint": "Les charges « Général » et des autres lieux ne comptent que dans la vue « Toutes les succursales » du tableau de bord."
     }
   },
   "status": {
