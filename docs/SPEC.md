@@ -1,0 +1,421 @@
+# OPTICOR — Product & Architecture Spec
+
+> Source of truth for behaviour, data model and permissions.
+> UI look & feel lives in `docs/DESIGN.md`. If code and this file disagree, this file wins — or update it in the same PR.
+
+---
+
+## 1. What we are building
+
+A multi-store ERP + BI web app for one optician business in Morocco:
+
+- **N stores ("succursales")** + **1 lab** (stock location, where glasses are prepared).
+- Two roles: **super_admin** (the optician, sees everything) and **secretary** (front desk, one store).
+- Replaces a paper order slip ("bon") per client. The paper slip number stays the reference.
+- Cash-based finance model: **NET = CA − approved charges**. No per-order margin, no cost of goods.
+- Languages: **French (default) + English**. Currency: **DH (MAD)**. Time zone: **Africa/Casablanca**.
+
+Out of scope for v1: PDF/Excel export, invoices, per-order costs/margin, custom roles UI, Excel history import (planned later — keep schema compatible).
+
+---
+
+## 2. Stack (fixed decisions)
+
+| Layer | Choice |
+|---|---|
+| Frontend | Next.js 16 (same major as the demo, App Router, TypeScript strict), Tailwind CSS, shadcn/ui, lucide-react, Recharts, next-intl (`/fr`, `/en`), react-hook-form + zod, sonner, @dnd-kit (orders board) |
+| Backend | Supabase: Postgres, Auth (email invitations), Storage (private), Realtime (notifications), pg_cron (scheduled jobs) |
+| Data access | `@supabase/ssr` (server + browser clients), Server Components for reads, Server Actions for writes, **all multi-step writes = Postgres functions called with `supabase.rpc()`** |
+| Types | `supabase gen types typescript` → `src/types/database.ts` (never hand-edit) |
+| Hosting | Vercel. Preview deployments → **opticor-dev** Supabase project. Production → **opticor-prod** project |
+| Tests | Vitest (pure logic + RLS integration tests against dev project with test users), Playwright (critical flows) |
+
+Rules:
+- `SUPABASE_SERVICE_ROLE_KEY` is used **only** in server code for admin actions (inviting users). Never in the browser, never `NEXT_PUBLIC_`.
+- Security is enforced in the database (RLS + checks inside functions). Hiding things in the UI is cosmetic only.
+- Money: `numeric(12,2)` in DH. Never JS floats for sums — sum in SQL.
+- Dates: `timestamptz` everywhere. "Business day" = date in `Africa/Casablanca` (`(ts at time zone 'Africa/Casablanca')::date`).
+- Phones: stored normalized E.164 (`+2126XXXXXXXX`), displayed `06 XX XX XX XX`.
+
+---
+
+## 3. Roles & permissions
+
+| Capability | secretary | super_admin |
+|---|---|---|
+| Pages | Orders, Clients, Stock (+ New order, Notifications) | All pages |
+| Scope | Own store only (orders, stock). Clients are shared (read all, create) | All stores + lab |
+| Create order, add payment, move status, deliver | ✅ own store | ✅ |
+| Cancel order | ❌ | ✅ |
+| See frame **sale** price | ✅ | ✅ |
+| See any cost, purchase, supplier, charge | ❌ never | ✅ |
+| Apply a pre-approved client discount | ✅ | ✅ |
+| Set a client discount / free discount on order | ❌ | ✅ |
+| Stock: transfers, damage, adjustments | ❌ (read only, own store, quantities only) | ✅ |
+| Settings, users, dashboard, workshop, purchasing, charges | ❌ | ✅ |
+
+- Permissions are stored in table `role_permissions(role, permission)` seeded with the matrix above. v1 has **no UI** to edit roles; the table exists so custom roles can be added later.
+- Secretary visiting a forbidden route sees the **Access denied** page (see DESIGN.md).
+- A secretary account belongs to exactly **one** store. Deactivated users cannot sign in.
+
+---
+
+## 4. Authentication
+
+- **No public sign-up** (disable in Supabase Auth settings).
+- **Invitation by email only.** Super admin → Settings › Users → "Invite": full name, email, role, store (required for secretary).
+  - Server Action (service role) calls `auth.admin.inviteUserByEmail(email, { data: { full_name, role, store_id }, redirectTo: SITE_URL + '/auth/confirm?next=/set-password' })` and upserts `profiles`.
+  - Invite email template uses the SSR token-hash flow:
+    `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/{locale}/set-password`
+  - `/auth/confirm` route verifies the OTP (`verifyOtp`), then redirects to set-password; user chooses a password; then lands on their home (secretary → Orders, super admin → Dashboard).
+- Sign-in: email + password. "Forgot password" → reset email (same token-hash pattern, `type=recovery`).
+- Custom SMTP is required for real emails (e.g. Resend) — Supabase's built-in mailer is for testing only.
+- **Custom Access Token Hook** (`public.custom_access_token_hook`) adds claims `app_role` and `store_id` from `profiles` to the JWT. RLS reads them via helpers:
+  - `public.auth_role() returns text` → `auth.jwt() ->> 'app_role'`
+  - `public.auth_store_id() returns uuid` → `(auth.jwt() ->> 'store_id')::uuid`
+  - `public.is_super_admin() returns boolean`
+  - Also check `profiles.is_active` in the hook (inactive → no role claim → everything denied).
+- Session refresh in `src/proxy.ts` (Next.js 16 name for middleware) using `@supabase/ssr`; also handles locale routing (next-intl) and redirects unauthenticated users to `/{locale}/login`.
+- First super admin: bootstrap documented in SETUP-GUIDE (invite from Supabase dashboard, then one SQL update).
+
+---
+
+## 5. Data model
+
+All tables: `id uuid primary key default gen_random_uuid()`, `created_at timestamptz default now()`, `created_by uuid references profiles(id)` where relevant. RLS enabled on **every** table.
+
+### 5.1 Organisation & settings
+
+```
+stores
+  id, name, kind ('store' | 'lab'), prefix text (e.g. 'CNT', unique, ^[A-Z]{2,5}$),
+  address, phone, is_active bool default true, created_at
+  -- prefix is immutable once the store has at least one order (trigger)
+  -- deactivate, never delete
+
+profiles                      -- 1:1 with auth.users
+  id (= auth.users.id), full_name, email, role ('super_admin' | 'secretary'),
+  store_id uuid null references stores (required when role = 'secretary'; must be a kind = 'store' row, never the lab — checked in the invite action and by trigger),
+  is_active bool default true, locale ('fr' | 'en') default 'fr', created_at
+
+role_permissions (role text, permission text, primary key(role, permission))
+
+app_settings (key text primary key, value jsonb)
+  -- 'loyalty_threshold'      → { "orders": 5 }
+  -- 'stuck_order_days'       → { "confirmed": 3, "in_workshop": 5, "prepared": 3, "in_store": 10 }
+  -- 'slip_number_padding'    → { "digits": 5 }
+
+settings_list_items           -- every editable dropdown
+  id, list_key text, label_fr, label_en, sort int, is_archived bool, meta jsonb
+  list_key ∈ 'lens_types' | 'treatments' | 'payment_methods' | 'charge_categories'
+           | 'cancel_reasons' | 'adjustment_reasons' | 'vision_types'
+  -- archived items stay referenced by old rows; hidden from new choices
+  -- show "used in N orders" count in the UI
+
+custom_fields
+  id, key, label_fr, label_en, field_type ('text'|'number'|'select'|'date'),
+  options jsonb, visibility ('hidden'|'optional'|'required'), applies_to ('order'), sort
+  -- built-in measurement fields are ALSO controlled here by visibility:
+  -- ep_re, ep_le, fitting_height, vision_type, doctor_name, prescription_date, prescription_photo
+
+charge_locations              -- dropdown on charges, editable by super admin
+  id, label_fr, label_en, store_id uuid null references stores, is_general bool, is_archived, sort
+  -- seed: one row per store/lab (auto-created by trigger when a store is created) + 'Général'
+```
+
+### 5.2 Products & stock (by **category**, never by model name)
+
+```
+product_types
+  id, key ('frames' | 'contact_lenses' | 'accessories'), label_fr, label_en,
+  is_frame bool, sort, is_archived
+  -- lenses (verres) are NOT a product type: never stocked
+
+product_categories
+  id, product_type_id, name (e.g. 'Catégorie A'), sale_price numeric(12,2),
+  sort, is_archived
+  -- super admin can add categories at any time
+  -- changing sale_price affects only NEW orders (orders snapshot the price)
+
+category_thresholds (store_id, category_id, low_stock_min int default 0, primary key(store_id, category_id))
+  -- no row = no low-stock alert and a neutral quantity pill
+
+stock_movements                       -- the only source of stock quantities
+  id, store_id, category_id, qty_delta int (≠ 0),
+  kind ('purchase' | 'sale' | 'sale_cancel' | 'transfer_out' | 'transfer_in' | 'damage' | 'adjustment'),
+  ref_table text null, ref_id uuid null, reason text null, created_by, created_at
+
+view stock_levels (store_id, category_id, quantity = sum(qty_delta))
+  -- invariant: quantity never < 0 (enforced inside every RPC that removes stock, with row locks)
+
+transfers       id, from_store_id, to_store_id, note, created_by, created_at
+transfer_lines  id, transfer_id, category_id, qty int > 0
+  -- one-step: on create, stock leaves source and arrives at destination immediately
+```
+
+### 5.3 Clients & orders
+
+```
+clients
+  id, full_name, phone_e164 text UNIQUE NOT NULL, has_whatsapp bool default true,
+  first_store_id, notes,
+  is_loyal bool default false, loyal_since timestamptz null,
+  pending_discount_type ('percent' | 'amount') null, pending_discount_value numeric null,
+  pending_discount_note text null, pending_discount_set_by uuid null,
+  created_at, created_by
+  -- on create: warn if a similar name exists (trigram similarity); phone must be unique
+
+orders
+  id uuid,
+  store_id (kind must be 'store'), client_id,
+  booklet text not null default '',          -- '' normally; 'B','C'… only if a booklet restarts
+  slip_number int not null check (> 0),      -- number printed on the paper slip, typed by secretary
+  UNIQUE (store_id, booklet, slip_number),
+  status ('confirmed' | 'in_workshop' | 'prepared' | 'in_store' | 'delivered' | 'cancelled'),
+  -- prescription
+  re_sph, re_cyl, re_add, le_sph, le_cyl, le_add  numeric(5,2) null  (steps of 0.25, -30..+30)
+  re_axis, le_axis int null check (0..180)      -- required when cyl ≠ 0, else null
+  ep_re, ep_le, fitting_height numeric(4,1) null
+  vision_type_id null, doctor_name null, prescription_date date null, prescription_photo_path null,
+  custom_values jsonb default '{}',
+  -- lenses (instructions only, no price)
+  lens_type_id null, lens_details text null,
+  -- money
+  subtotal numeric(12,2),        -- what the secretary typed as total before discount
+  discount_amount numeric(12,2) default 0,
+  discount_source ('none' | 'client_pending' | 'admin_free') default 'none',
+  total numeric(12,2),           -- = subtotal − discount_amount  (CA uses this)
+  frame_revenue numeric(12,2),   -- snapshot of frame/product items sum
+  lens_revenue numeric(12,2),    -- = total − frame_revenue, must be ≥ 0
+  client_own_frame bool default false,   -- when true: no frame-type order_item allowed; frame_revenue = other items only
+  -- lifecycle
+  cancelled_at, cancelled_by, cancel_reason_id, cancel_note,
+  delivered_at, created_by, created_at
+
+display number (computed in a view / helper, not stored):
+  prefix || '-' || (booklet || '-' if booklet ≠ '') || lpad(slip_number, padding, '0')
+  → 'CNT-00832', 'CNT-B-00001'
+
+order_items                    -- frame (max 1 item of a frame type), contact lenses, accessories
+  id, order_id, category_id, qty int > 0, unit_price numeric(12,2)   -- price snapshot
+
+order_treatments (order_id, treatment_id, primary key(order_id, treatment_id))
+
+order_status_history  id, order_id, from_status, to_status, changed_by, changed_at
+
+payments
+  id, order_id, amount numeric(12,2) ≠ 0 (negative = refund), method_id,
+  kind ('deposit' | 'balance' | 'refund'), received_at default now(), received_by
+```
+
+### 5.4 Purchasing, suppliers, charges
+
+```
+suppliers      id, name, phone, note, is_archived
+
+purchases
+  id, supplier_id, receive_store_id (store or lab), supplier_ref text null,
+  purchase_date date, note, created_by, created_at
+  -- saving a purchase = goods received: stock movements created immediately for stock lines
+  -- (no draft/ordered statuses in v1)
+
+purchase_lines
+  id, purchase_id,
+  line_kind ('stock' | 'lens'),
+  category_id null (required for 'stock'), description text null (required for 'lens'),
+  unit_price numeric(12,2), qty int > 0, line_total generated always as (unit_price * qty) stored
+
+view purchase_balances (purchase_id, total, paid, remaining)
+
+supplier_payments
+  id, purchase_id, amount numeric(12,2) > 0, paid_at date, method_id, note, created_by
+  -- cannot exceed remaining balance
+  -- trigger: each insert creates exactly one charges row (status 'approved', category 'Achat fournisseur',
+  --   location = charge_location of purchase.receive_store_id, supplier_payment_id set)
+  -- that charge row is read-only on the Charges page (edit via the purchase)
+
+charges
+  id, amount numeric(12,2) > 0, charge_date date,
+  category_id (settings_list_items 'charge_categories'), location_id (charge_locations),
+  reason text NOT NULL, order_id uuid null,         -- optional link "CNT-00832", not used in KPIs
+  status ('approved' | 'pending') default 'approved',
+  approved_by, approved_at,
+  supplier_payment_id uuid null UNIQUE, recurring_charge_id uuid null,
+  is_deleted bool default false, deleted_by, deleted_at,   -- soft delete only
+  created_by, created_at, updated_at
+
+recurring_charges
+  id, label, amount, category_id, location_id, day_of_month int (1..28), is_active, created_by
+  -- pg_cron daily: on day_of_month, insert a charges row with status 'pending' (once per month, idempotent)
+  -- only APPROVED charges count in NET; super admin approves (can edit amount before approving)
+```
+
+### 5.5 Cross-cutting
+
+```
+audit_log  id, table_name, row_id, action ('insert'|'update'|'delete'), old jsonb, new jsonb, actor, at
+  -- triggers on: orders, payments, charges, purchases, purchase_lines, supplier_payments,
+  --              stock_movements, product_categories (price changes), clients (discount fields)
+
+notifications
+  id, user_id (recipient), kind, title_key, params jsonb, link text, read_at null, created_at
+  -- fan-out at insert time to the right users (helper notify_super_admins(), notify_store(store_id))
+  -- Realtime subscription on the user's own rows
+
+storage bucket 'private' (no public access):
+  prescriptions/{order_id}/...   -- read: super admin + secretaries of that order's store
+```
+
+---
+
+## 6. Business rules & Postgres functions (RPC)
+
+All are `security definer`, `set search_path = ''`, check `auth_role()` / `auth_store_id()` themselves, run in one transaction, and raise errors with stable codes (`OPTICOR:DUPLICATE_SLIP`, `OPTICOR:NO_STOCK`, …) that the UI maps to translated messages.
+
+| Function | Who | What it does |
+|---|---|---|
+| `create_order(payload jsonb)` | secretary (own store), super admin | Validates prescription, slip number uniqueness, stock ≥ qty for each item (lock rows), total ≥ frame_revenue, discount rules; inserts order, items, treatments, first payment (deposit, may be 0), stock movements (`sale`), status history; returns `{ order_id, display_number }`. On duplicate slip: returns `{ error: 'DUPLICATE_SLIP', existing: {display, client, date} }` **and** notifies super admins (do not raise, so the notification is kept). |
+| `change_order_status(order_id, to_status)` | secretary (own store), super admin | Allowed moves: forward one step, or back one step (super admin only; down to `confirmed`, never *from* `delivered`). `delivered` only if balance = 0. Writes history. Triggers loyalty check on delivered. |
+| `add_payment(order_id, amount, method_id)` | both | amount > 0 and ≤ balance. |
+| `deliver_order(order_id, final_payment jsonb null)` | both | Optional final payment + status delivered in one transaction. |
+| `cancel_order(order_id, reason_id, note, refund_amount, refund_method_id)` | super admin | Allowed from any status except `cancelled` (delivered included). Status cancelled, `sale_cancel` stock movements (frame/items back), optional refund as negative payment (≤ paid). Never delete. |
+| `set_client_discount(client_id, type, value, note)` / `clear_client_discount` | super admin | Pre-approve a discount for the client's next order. Consumed (cleared) by `create_order` when applied. |
+| `create_purchase(payload)` | super admin | Purchase + lines + `purchase` stock movements at receive location + optional initial supplier payment (100% / 30% / 50% / custom). |
+| `add_supplier_payment(purchase_id, amount, paid_at, method_id)` | super admin | ≤ remaining; trigger creates the charge row. |
+| `create_transfer(from, to, lines)` | super admin | Checks stock at source; `transfer_out` / `transfer_in` movements. |
+| `record_damage(store_id, category_id, qty, reason)` | super admin | reason required; `damage` movement; no charge. |
+| `adjust_stock(store_id, category_id, counted_qty, reason_id, note)` | super admin | Movement of (counted − current) kind `adjustment`. |
+| `approve_charge(charge_id, amount null)` | super admin | pending → approved (optionally fix amount). |
+| `generate_recurring_charges()` | pg_cron (daily 06:00 Africa/Casablanca) | Idempotent per (recurring_charge_id, month). |
+| `notify_stuck_orders()` | pg_cron (daily) | Orders in a status longer than `stuck_order_days` → notify super admins + that store (once per order+status). |
+| `search_global(q text)` | both | Clients (name / phone) + orders (display number in any form: `832`, `00832`, `cnt-832`, `CNT-00832`) respecting RLS scope. |
+
+Triggers:
+- `stores`: block prefix change if orders exist; auto-create `charge_locations` row on insert.
+- Loyalty: after an order becomes `delivered`, count the client's delivered orders across **all stores**; when it reaches `loyalty_threshold` and `is_loyal = false` → set `is_loyal`, `loyal_since`, notify super admins + secretaries of that order's store (once).
+- Low stock: after a stock movement, if the level crosses **down** to ≤ `low_stock_min` → notify super admins + that store.
+- Audit triggers (5.5).
+
+---
+
+## 7. Row Level Security (summary)
+
+- Default deny. Every table has RLS on; `anon` gets nothing.
+- `super_admin`: full access on all tables (still through RPCs for multi-step writes).
+- `secretary`:
+  - `stores`: select active stores (names/prefix only).
+  - `profiles`: select own row.
+  - `clients`: select all, insert, update contact fields (not discount fields — column privileges or RPC).
+  - `orders`, `order_items`, `order_treatments`, `order_status_history`, `payments`: select where `store_id = auth_store_id()` (via join for child tables). Writes only through RPCs.
+  - `product_types`, `product_categories`, `settings_list_items`, `custom_fields`, `app_settings` (non-sensitive keys): select.
+  - `stock_levels` / `stock_movements`: select own store only.
+  - `notifications`: select/update own rows.
+  - **No access at all**: `suppliers`, `purchases`, `purchase_lines`, `supplier_payments`, `charges`, `recurring_charges`, `charge_locations`, `audit_log`, `transfers`, `category_thresholds` (write).
+- Use `(select auth.uid())` / `(select public.auth_store_id())` pattern in policies for performance; index every `store_id`, `client_id`, `order_id` foreign key.
+- After each migration: run Supabase **security + performance advisors** (MCP `get_advisors`) and fix findings.
+
+---
+
+## 8. Pages (what changes vs the demo UI)
+
+Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes:
+
+**Shell**: remove DEMO switcher / Reset demo / Settings › Demo. Top bar: store selector (super admin: All stores / each store / lab, persisted in a cookie; it filters Orders, Workshop, the Stock tab and is the default Dashboard store filter; secretary: fixed pill with her store), global search (Ctrl K → `search_global`), notifications bell (Realtime), avatar menu (language FR/EN, theme, sign out).
+
+**Orders** (both roles) — keep as in demo: Board (5 columns + drag & drop + "Next step" button) / List, search, "Balance due > 0", "Show cancelled". Card shows display number `CNT-00832`.
+
+**New order** (3 steps, sticky summary on the right):
+1. *Client*: store (secretary: fixed), **"N° du bon" (required, integer, shows the prefix before the input: `CNT-` [00832])**, existing client search (name/phone) or new client (name, phone required + unique, WhatsApp toggle). Loyal client → yellow banner; pending discount → banner "Remise approuvée : 10 %" with "Appliquer".
+2. *Measurements*: SPH/CYL/AXIS/ADD per eye with ±0.25 steppers, Copy RE → LE, "Reuse last measurements", then built-in + custom fields according to visibility.
+3. *Products & payment*: product type tabs from `product_types`. **Frames: grid of category cards** (name, sale price, "N in stock" in this store; disabled when 0 with tooltip "0 en stock — demander un transfert"). Toggle "Monture du client" (flag shown on the order everywhere). Contact lenses / accessories: category + qty. Lens type (single select) + treatments (multi chips) + lens details (free text) — **no lens prices**. Payment: "Total" typed by secretary (must be ≥ frame/items price), discount line if applied, deposit with 30 / 50 / 100 % chips, payment method, balance due. Confirm → `create_order`.
+
+**Order detail**: keep demo layout (timeline, prescription, products, client card, payments, additional info, history). **Remove the "Costs and margin" panel.** Super admin extra actions in "…" menu: cancel (dialog with reason + refund), move back one step, free discount (before delivery only).
+
+**Clients**: list with chips All / New / Regular / Loyal (counts = non-cancelled orders across all stores; Loyal = `is_loyal`; New = 0–1 order; Regular = 2..N−1), client file (orders across stores: secretary sees count — via `client_order_stats(client_id)` security definer RPC returning counts only — + only her store's rows), "Vision over time" chart, "New order for this client". Super admin: set/clear pending discount.
+
+**Stock**: location tabs (secretary: only her store, no tabs), KPI strip (tracked categories, below threshold — **no money value**), search + product type chips + "Low stock only", table: category, type, quantity pill (red < min, amber = min), threshold. Super admin row actions: history, adjust (count), damage, transfer; header button "Transfers" (history + new transfer).
+
+**Workshop** (super admin): same as demo (summary strip, filter chips, cards with prescription + main action). Shows frame category or "Monture du client", lens type + treatments.
+
+**Purchasing** (super admin): tabs *Purchases* / *Suppliers*. New purchase: supplier, "Reçu à" (store/lab), date, supplier ref, lines (stock: category + unit price + qty → line total; lens: description + amount), total auto; payment now: 100 % / 30 % / 50 % / custom / nothing. Table columns: date, supplier, received at, total, paid, remaining (badge), actions (add payment, view). Suppliers tab: CRUD + balance owed per supplier.
+
+**Charges** (super admin, replaces demo "Expenses"): filters (period, location, category, status), table (date, category, location, reason, amount, order link, source badge: manual / supplier payment / recurring, status), "New charge" dialog (amount, date, category, location, required reason, optional order number lookup), pending recurring charges section with Approve / Edit amount, recurring charges manager (label, amount, category, location, day of month, active). Supplier-payment rows are read-only with a link to the purchase. Edit = logged; delete = soft delete.
+
+**Dashboard** (super admin): filters — period chips (Today, 7 days, This month, Last month, This year, Custom), store filter, comparison (vs M−1 / vs Y−1 / None). See §9 for KPIs. Remove gross/net margin cards of the demo, "Orders without costs" and stock value; replace with the KPIs below.
+
+**Settings** (super admin): sub-nav
+- *Lists* (all `settings_list_items` lists, FR/EN labels, drag to sort, archive, usage count)
+- *Products* (product types + categories: name, sale price, archive; thresholds per store)
+- *Custom fields* (built-in measurement fields + custom ones, visibility hidden/optional/required)
+- *Stores and lab* (create, edit, prefix — locked badge once used, deactivate)
+- *Users* (invite, role, store, deactivate, resend invite)
+- *Charge locations* (labels, archive)
+- *Loyalty* (number of delivered orders)
+- *Notifications* (stuck-order days per status)
+- *Roles and permissions* (read-only matrix in v1)
+
+---
+
+## 9. KPIs (all respect period + store filters; comparison uses the same formula on the comparison period)
+
+| KPI | Formula |
+|---|---|
+| CA (Chiffre d'affaires) | `sum(orders.total)` where `status ≠ 'cancelled'` and business date of `created_at` in period |
+| Montant encaissé | `sum(payments.amount)` by business date of `received_at` (refunds negative). Shown for every period; **primary card when period = Today** |
+| Charges | `sum(charges.amount)` where `status = 'approved'` and `is_deleted = false` and `charge_date` in period. Store filter: charges whose location belongs to that store; **'Général' and non-store locations only under "All stores"** (lab charges also when the lab is selected) |
+| NET | CA − Charges |
+| Orders | count non-cancelled orders |
+| Average basket | CA / Orders |
+| Balance to collect | sum of remaining balance of non-cancelled, non-delivered orders created in period |
+| Owed to suppliers | sum of `purchase_balances.remaining` (all time, as of today) |
+| Discounts given | `sum(discount_amount)` |
+| Cancellation rate | cancelled / all orders created in period |
+| Damaged frames | `−sum(qty_delta)` of `damage` movements (count, not money) |
+| Sales by frame category / treatment / lens type | counts + CA share (frame_revenue for categories) |
+| Stock | quantities per category per location + low-stock list |
+| Loyal clients / repeat rate | loyal count; % of clients served in period with ≥ 2 delivered orders |
+| Workshop time | avg days confirmed → in_store, and confirmed → delivered |
+| Pending recurring charges | count + amount awaiting approval (dashboard widget with link) |
+
+Charts (reuse demo components): CA over time vs comparison, CA & NET by store (bar + table), client segments, top categories/treatments, busiest hours heatmap, workshop lead times. Bottom widgets: glasses waiting for pick-up, pending charges, low stock.
+
+Implement KPIs as SQL functions (`kpi_summary(from, to, store_id)`, `kpi_timeseries(...)`, …) returning JSON; heavy ones may use materialized views refreshed by pg_cron. Never compute money totals in JS.
+
+---
+
+## 10. Notifications (Realtime)
+
+| Kind | Recipients |
+|---|---|
+| `client_became_loyal` | super admins + secretaries of the order's store |
+| `low_stock` | super admins + secretaries of that store |
+| `order_stuck` | super admins + secretaries of that store |
+| `duplicate_slip_blocked` | super admins |
+| `recurring_charges_pending` | super admins |
+
+Bell shows unread count; list page `/notifications`; clicking marks read and navigates to `link`.
+
+---
+
+## 11. Decisions log (kickoff, 2026-11-03)
+
+- **Discount vs frame price**: a discount may never bring `total` below `frame_revenue` → `OPTICOR:DISCOUNT_TOO_HIGH`. Discounts only reduce the lens part.
+- **Admin free discount** (before delivery only): amount ≤ current balance, so it never creates money owed back to the client.
+- **Cancel**: any status except `cancelled`, including `delivered` (stock returns, refund optional). **Step back**: super admin only, down to `confirmed`, never from `delivered`.
+- **Client's own frame**: no frame-type item on the order; `frame_revenue` = sum of other items.
+- **Prescription photo**: uploaded after `create_order` returns the id (`prescriptions/{order_id}/…`). If the upload fails the order stays valid and the order detail shows a "retry upload" action.
+- **Client segments**: based on non-cancelled orders across all stores (New 0–1, Regular 2..N−1, Loyal = `is_loyal`). Cross-store counts for secretaries come from `client_order_stats(client_id)` (security definer, counts only).
+- **Low-stock threshold**: missing `category_thresholds` row = no alert; default `low_stock_min` = 0.
+- **Secretary store**: must be a `kind = 'store'` location, never the lab.
+- **Global store selector** (super admin): cookie-persisted; filters Orders, Workshop, Stock tab; default for the Dashboard store filter.
+- **Sidebar badges**: Workshop = orders in `confirmed` + `in_workshop` (within the selected store scope); Charges = pending recurring charges count.
+- **Transfers**: dedicated page `/[locale]/stock/transfers` (super admin; history + new transfer), opened from the Stock "Transfers" button.
+- **Phase 1 dev fixtures**: a fake role switch and a hard-coded store list (2 stores + lab) exist only behind a dev env flag; both are removed in Phase 3.
+- **Git**: branch per phase (`phase-01-shell`, …), merged to `main` when green.
+
+---
+
+## 12. Later (design for it, don't build it)
+
+- Excel history import (~2,270 orders 2021–2023, prescriptions as text like `-1.75(-2 a 69)`, treatments like AR / BL / BLEU CAT / PGX / PROG / DF / LENTILLE): imported orders get `source = 'legacy'` column (add now, default `'app'`), status delivered, no stock movements, count toward loyalty when phone matches.
+- Custom roles UI, exports, invoices, per-order costs.
