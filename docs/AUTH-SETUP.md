@@ -98,3 +98,4 @@ Nobody can invite from the app until one super admin exists:
 ## 5. E2E test accounts (dev only)
 
 Add to `.env.local` (never commit): `E2E_SUPER_ADMIN_EMAIL`, `E2E_SUPER_ADMIN_PASSWORD`, `E2E_SECRETARY_EMAIL`, `E2E_SECRETARY_PASSWORD`. `npm run test:e2e` signs in with them; the tests that need them are skipped otherwise.
+Next 16 runs only one `next dev` per folder: if one is already running, use `E2E_BASE_URL=http://localhost:3000 npm run test:e2e`.
