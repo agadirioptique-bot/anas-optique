@@ -426,6 +426,44 @@
       "restored": "« {label} » restauré",
       "drag": "Déplacer « {label} »",
       "hint": "Les charges « Général » et des autres lieux ne comptent que dans la vue « Toutes les succursales » du tableau de bord."
+    },
+    "loyalty": {
+      "title": "Fidélité",
+      "description": "Un client devient fidèle (badge ⭐ et notification) quand il atteint ce nombre de commandes livrées, toutes succursales confondues.",
+      "threshold": "Seuil de fidélité",
+      "deliveredOrders": "commandes livrées",
+      "invalid": "Saisissez un nombre entre 1 et 100.",
+      "loyalNow": "{count, plural, =0 {Aucun client fidèle pour l’instant.} one {# client fidèle aujourd’hui.} other {# clients fidèles aujourd’hui.}}",
+      "preview": "{count, plural, =0 {Aucun client n’a encore {orders} commandes livrées.} one {# client a au moins {orders} commandes livrées.} other {# clients ont au moins {orders} commandes livrées.}}",
+      "lowerHint": "En baissant le seuil, les clients qui l’atteignent déjà deviennent fidèles dès l’enregistrement.",
+      "saved": "Seuil enregistré",
+      "savedNewLoyal": "{count, plural, one {Seuil enregistré · # client devient fidèle} other {Seuil enregistré · # clients deviennent fidèles}}"
+    },
+    "notifications": {
+      "title": "Commandes en retard",
+      "description": "Une notification est envoyée (à vous et à la succursale) quand une commande reste trop longtemps dans le même statut.",
+      "after": "au-delà de",
+      "days": "jours",
+      "invalid": "Chaque délai doit être entre 1 et 60 jours.",
+      "hint": "Vérifié chaque matin. Une seule notification par commande et par statut.",
+      "saved": "Délais enregistrés"
+    },
+    "roles": {
+      "title": "Rôles et permissions",
+      "description": "Lecture seule dans cette version. Les permissions sont aussi appliquées par la base de données : masquer un écran ne suffit jamais.",
+      "permission": "Permission",
+      "allowed": "Autorisé",
+      "denied": "Non autorisé",
+      "domains": {
+        "page": "Pages",
+        "scope": "Périmètre",
+        "order": "Commandes",
+        "client": "Clients",
+        "stock": "Stock",
+        "costs": "Coûts et finances",
+        "settings": "Paramètres",
+        "users": "Utilisateurs"
+      }
     }
   },
   "status": {
@@ -435,5 +473,53 @@
     "in_store": "En succursale",
     "delivered": "Livrée",
     "cancelled": "Annulée"
+  },
+  "perm": {
+    "page": {
+      "orders": "Voir les commandes",
+      "new_order": "Créer une commande",
+      "clients": "Voir les clients",
+      "stock": "Voir le stock",
+      "notifications": "Voir les notifications",
+      "dashboard": "Tableau de bord",
+      "workshop": "Atelier",
+      "purchases": "Achats et fournisseurs",
+      "charges": "Charges",
+      "settings": "Paramètres"
+    },
+    "scope": {
+      "all_stores": "Toutes les succursales et le labo (sinon : sa succursale uniquement)"
+    },
+    "order": {
+      "create": "Créer une commande",
+      "add_payment": "Encaisser un paiement",
+      "change_status": "Faire avancer le statut",
+      "deliver": "Livrer au client",
+      "cancel": "Annuler une commande (avec remboursement)",
+      "step_back": "Revenir au statut précédent",
+      "free_discount": "Accorder une remise libre"
+    },
+    "client": {
+      "read": "Consulter les clients",
+      "create": "Créer un client",
+      "update_contact": "Modifier nom et téléphone",
+      "apply_discount": "Appliquer une remise approuvée",
+      "set_discount": "Approuver une remise client"
+    },
+    "stock": {
+      "read": "Voir les quantités (sa succursale)",
+      "transfer": "Transférer du stock",
+      "damage": "Déclarer une casse",
+      "adjust": "Ajuster après inventaire"
+    },
+    "costs": {
+      "read": "Voir les coûts, achats, fournisseurs et charges"
+    },
+    "settings": {
+      "manage": "Modifier les paramètres"
+    },
+    "users": {
+      "manage": "Inviter et gérer les utilisateurs"
+    }
   }
 }

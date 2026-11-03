@@ -426,6 +426,44 @@
       "restored": "“{label}” restored",
       "drag": "Move “{label}”",
       "hint": "Charges of “General” and other locations only count in the dashboard’s “All stores” view."
+    },
+    "loyalty": {
+      "title": "Loyalty",
+      "description": "A client becomes loyal (⭐ badge and notification) when they reach this number of delivered orders, across all stores.",
+      "threshold": "Loyalty threshold",
+      "deliveredOrders": "delivered orders",
+      "invalid": "Enter a number between 1 and 100.",
+      "loyalNow": "{count, plural, =0 {No loyal clients yet.} one {# loyal client today.} other {# loyal clients today.}}",
+      "preview": "{count, plural, =0 {No client has {orders} delivered orders yet.} one {# client has at least {orders} delivered orders.} other {# clients have at least {orders} delivered orders.}}",
+      "lowerHint": "When you lower the threshold, clients who already reach it become loyal as soon as you save.",
+      "saved": "Threshold saved",
+      "savedNewLoyal": "{count, plural, one {Threshold saved · # client becomes loyal} other {Threshold saved · # clients become loyal}}"
+    },
+    "notifications": {
+      "title": "Late orders",
+      "description": "A notification is sent (to you and the store) when an order stays too long in the same status.",
+      "after": "after",
+      "days": "days",
+      "invalid": "Each delay must be between 1 and 60 days.",
+      "hint": "Checked every morning. One notification per order and status.",
+      "saved": "Delays saved"
+    },
+    "roles": {
+      "title": "Roles and permissions",
+      "description": "Read only in this version. Permissions are also enforced by the database: hiding a screen is never enough.",
+      "permission": "Permission",
+      "allowed": "Allowed",
+      "denied": "Not allowed",
+      "domains": {
+        "page": "Pages",
+        "scope": "Scope",
+        "order": "Orders",
+        "client": "Clients",
+        "stock": "Stock",
+        "costs": "Costs and finance",
+        "settings": "Settings",
+        "users": "Users"
+      }
     }
   },
   "status": {
@@ -435,5 +473,53 @@
     "in_store": "In store",
     "delivered": "Delivered",
     "cancelled": "Cancelled"
+  },
+  "perm": {
+    "page": {
+      "orders": "See orders",
+      "new_order": "Create an order",
+      "clients": "See clients",
+      "stock": "See stock",
+      "notifications": "See notifications",
+      "dashboard": "Dashboard",
+      "workshop": "Workshop",
+      "purchases": "Purchasing and suppliers",
+      "charges": "Charges",
+      "settings": "Settings"
+    },
+    "scope": {
+      "all_stores": "All stores and the lab (otherwise: own store only)"
+    },
+    "order": {
+      "create": "Create an order",
+      "add_payment": "Take a payment",
+      "change_status": "Move the status forward",
+      "deliver": "Deliver to the client",
+      "cancel": "Cancel an order (with refund)",
+      "step_back": "Go back one status",
+      "free_discount": "Give a free discount"
+    },
+    "client": {
+      "read": "Look up clients",
+      "create": "Create a client",
+      "update_contact": "Edit name and phone",
+      "apply_discount": "Apply an approved discount",
+      "set_discount": "Approve a client discount"
+    },
+    "stock": {
+      "read": "See quantities (own store)",
+      "transfer": "Transfer stock",
+      "damage": "Record damage",
+      "adjust": "Adjust after a count"
+    },
+    "costs": {
+      "read": "See costs, purchases, suppliers and charges"
+    },
+    "settings": {
+      "manage": "Change the settings"
+    },
+    "users": {
+      "manage": "Invite and manage users"
+    }
   }
 }
