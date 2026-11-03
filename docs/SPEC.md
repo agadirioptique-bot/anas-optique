@@ -66,7 +66,7 @@ Rules:
 - **Invitation by email only.** Super admin → Settings › Users → "Invite": full name, email, role, store (required for secretary).
   - Server Action (service role) calls `auth.admin.inviteUserByEmail(email, { data: { full_name, role, store_id }, redirectTo: SITE_URL + '/auth/confirm?next=/set-password' })` and upserts `profiles`.
   - Invite email template uses the SSR token-hash flow:
-    `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/{locale}/set-password`
+    `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/set-password` (the confirm route adds the user's locale)
   - `/auth/confirm` route verifies the OTP (`verifyOtp`), then redirects to set-password; user chooses a password; then lands on their home (secretary → Orders, super admin → Dashboard).
 - Sign-in: email + password. "Forgot password" → reset email (same token-hash pattern, `type=recovery`).
 - Custom SMTP is required for real emails (e.g. Resend) — Supabase's built-in mailer is for testing only.
@@ -75,8 +75,11 @@ Rules:
   - `public.auth_store_id() returns uuid` → `(auth.jwt() ->> 'store_id')::uuid`
   - `public.is_super_admin() returns boolean`
   - Also check `profiles.is_active` in the hook (inactive → no role claim → everything denied).
+  - **Live check** (decided in phase 3): `auth_role()` / `auth_store_id()` return the claim only while it still matches an active `profiles` row (security definer, one PK lookup per statement). Deactivating a user or changing role/store takes effect immediately, not at the next token refresh.
+- Settings › Users (phase 3): invite = Server Action (service role) → `inviteUserByEmail` + `profiles` insert (auth user deleted if the insert fails). Role / store / active changes go through `admin_update_user_access` (super admin only, never on oneself, never removes the last active super admin; revokes the user's sessions); deactivation also bans the user in Auth. The list comes from `admin_list_users()` (status Active / Invited / Disabled from `auth.users`).
+- `/auth/confirm` accepts `type` = `invite` | `recovery` and `next` from an allow-list (`/set-password`); it redirects to `/{profiles.locale}{next}`. Templates and dashboard steps: `docs/AUTH-SETUP.md`.
 - Session refresh in `src/proxy.ts` (Next.js 16 name for middleware) using `@supabase/ssr`; also handles locale routing (next-intl) and redirects unauthenticated users to `/{locale}/login`.
-- First super admin: bootstrap documented in SETUP-GUIDE (invite from Supabase dashboard, then one SQL update).
+- First super admin: bootstrap documented in `docs/AUTH-SETUP.md` (invite from Supabase dashboard, then one SQL insert of the profile).
 
 ---
 
@@ -418,7 +421,7 @@ Bell shows unread count; list page `/notifications`; clicking marks read and nav
 - **Global store selector** (super admin): cookie-persisted; filters Orders, Workshop, Stock tab; default for the Dashboard store filter.
 - **Sidebar badges**: Workshop = orders in `confirmed` + `in_workshop` (within the selected store scope); Charges = pending recurring charges count.
 - **Transfers**: dedicated page `/[locale]/stock/transfers` (super admin; history + new transfer), opened from the Stock "Transfers" button.
-- **Phase 1 dev fixtures**: a fake role switch and a hard-coded store list (2 stores + lab) exist only behind a dev env flag; both are removed in Phase 3.
+- **Phase 1 dev fixtures**: a fake role switch and a hard-coded store list (2 stores + lab) exist only behind a dev env flag; both are removed in Phase 3. *(Removed in phase 3; dev test stores now come from `supabase/seed.dev.sql`, run on the dev project only.)*
 - **Git**: branch per phase (`phase-01-shell`, …), merged to `main` when green.
 
 Phase 2 schema additions (2026-11-03):
