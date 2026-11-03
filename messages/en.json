@@ -1293,5 +1293,167 @@
       "deleted": "Supplier deleted",
       "more": "Actions for {name}"
     }
+  },
+  "charges": {
+    "tabs": {
+      "charges": "Charges",
+      "recurring": "Recurring"
+    },
+    "new": "New charge",
+    "newRecurring": "New recurring charge",
+    "periods": {
+      "month": "This month",
+      "lastMonth": "Last month",
+      "year": "This year",
+      "custom": "Custom"
+    },
+    "period": "Period",
+    "from": "From",
+    "to": "To",
+    "allLocations": "All locations",
+    "allCategories": "All categories",
+    "statusFilter": {
+      "all": "All",
+      "approved": "Approved",
+      "pending": "Pending"
+    },
+    "showDeleted": "Show deleted",
+    "kpi": {
+      "approved": "Approved charges",
+      "pending": "Waiting for approval",
+      "count": "{count, plural, =0 {No charge} one {# charge} other {# charges}}"
+    },
+    "columns": {
+      "date": "Date",
+      "category": "Category",
+      "location": "Location",
+      "reason": "Reason",
+      "amount": "Amount",
+      "order": "Order",
+      "source": "Source",
+      "status": "Status"
+    },
+    "sources": {
+      "manual": "Manual",
+      "supplier": "Supplier payment",
+      "recurring": "Recurring"
+    },
+    "statuses": {
+      "approved": "Approved",
+      "pending": "Pending"
+    },
+    "deleted": "Deleted",
+    "actions": {
+      "history": "History",
+      "edit": "Edit",
+      "delete": "Delete",
+      "restore": "Restore",
+      "openPurchase": "View purchase",
+      "openOrder": "Open order {number}",
+      "more": "Actions for {reason}"
+    },
+    "readOnly": "Supplier payment: change it from the purchase.",
+    "empty": "No charge in this period.",
+    "emptyBody": "Add a charge or change the filters.",
+    "deletedDone": "Charge deleted",
+    "restoredDone": "Charge restored",
+    "deleteTitle": "Delete this charge?",
+    "deleteBody": "It will no longer count in the totals. You can restore it with “Show deleted”.",
+    "pending": {
+      "title": "Waiting for approval",
+      "hint": "Created automatically by recurring charges. Only approved charges count in the result.",
+      "approve": "Approve",
+      "editAmount": "Other amount",
+      "skip": "Skip",
+      "approved": "{label} approved",
+      "skipped": "{label} skipped",
+      "skipTitle": "Skip “{label}”?",
+      "skipBody": "The charge is deleted for this month; you can restore it with “Show deleted”.",
+      "editTitle": "Approve with another amount",
+      "amount": "Amount",
+      "confirm": "Approve"
+    },
+    "form": {
+      "createTitle": "New charge",
+      "editTitle": "Edit charge",
+      "amount": "Amount",
+      "date": "Date",
+      "category": "Category",
+      "chooseCategory": "Choose a category",
+      "location": "Location",
+      "chooseLocation": "Choose a location",
+      "reason": "Reason",
+      "reasonPlaceholder": "E.g. November rent, electricity bill…",
+      "reasonRequired": "The reason is required.",
+      "order": "Linked order",
+      "orderPlaceholder": "Order number, e.g. 832",
+      "orderHint": "Optional: to find the charge from the order. Not used in the KPIs.",
+      "orderNone": "No order found.",
+      "orderClear": "Remove the order",
+      "created": "Charge added",
+      "saved": "Charge saved",
+      "errors": {
+        "amount": "Enter an amount.",
+        "category": "Choose a category.",
+        "location": "Choose a location.",
+        "date": "The date can't be in the future."
+      }
+    },
+    "recurring": {
+      "columns": {
+        "label": "Label",
+        "amount": "Amount",
+        "category": "Category",
+        "location": "Location",
+        "day": "Day",
+        "active": "Active"
+      },
+      "dayValue": "on day {day}",
+      "empty": "No recurring charge.",
+      "emptyBody": "Rent, salaries, subscriptions…: each month a pending charge is created on the chosen day.",
+      "hint": "Each month, on the chosen day, a “pending” charge is created; it counts in the result once approved.",
+      "form": {
+        "createTitle": "New recurring charge",
+        "editTitle": "Edit recurring charge",
+        "label": "Label",
+        "labelPlaceholder": "E.g. Maârif rent",
+        "amount": "Amount",
+        "day": "Day of the month (1 to 28)",
+        "category": "Category",
+        "location": "Location",
+        "active": "Active",
+        "saved": "Recurring charge saved",
+        "created": "Recurring charge added",
+        "labelRequired": "The label is required."
+      },
+      "activated": "Recurring charge enabled",
+      "deactivated": "Recurring charge disabled",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteTitle": "Delete “{label}”?",
+      "deleteBody": "It hasn't created any charge yet: it will be deleted for good.",
+      "deleted": "Recurring charge deleted",
+      "more": "Actions for {label}",
+      "toggle": "Enable or disable {label}"
+    },
+    "history": {
+      "title": "Charge history",
+      "empty": "No history.",
+      "loadFailed": "Could not load the history.",
+      "created": "Created",
+      "approved": "Approved",
+      "edited": "Edited",
+      "deleted": "Deleted",
+      "restored": "Restored",
+      "system": "Automatic",
+      "fields": {
+        "amount": "Amount",
+        "charge_date": "Date",
+        "category_id": "Category",
+        "location_id": "Location",
+        "reason": "Reason",
+        "order_id": "Order"
+      }
+    }
   }
 }

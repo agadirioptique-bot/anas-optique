@@ -1293,5 +1293,167 @@
       "deleted": "Fournisseur supprimé",
       "more": "Actions pour {name}"
     }
+  },
+  "charges": {
+    "tabs": {
+      "charges": "Charges",
+      "recurring": "Récurrentes"
+    },
+    "new": "Nouvelle charge",
+    "newRecurring": "Nouvelle charge récurrente",
+    "periods": {
+      "month": "Ce mois",
+      "lastMonth": "Mois dernier",
+      "year": "Cette année",
+      "custom": "Personnalisé"
+    },
+    "period": "Période",
+    "from": "Du",
+    "to": "Au",
+    "allLocations": "Tous les emplacements",
+    "allCategories": "Toutes les catégories",
+    "statusFilter": {
+      "all": "Toutes",
+      "approved": "Approuvées",
+      "pending": "En attente"
+    },
+    "showDeleted": "Afficher les supprimées",
+    "kpi": {
+      "approved": "Charges approuvées",
+      "pending": "En attente d'approbation",
+      "count": "{count, plural, =0 {Aucune charge} one {# charge} other {# charges}}"
+    },
+    "columns": {
+      "date": "Date",
+      "category": "Catégorie",
+      "location": "Emplacement",
+      "reason": "Motif",
+      "amount": "Montant",
+      "order": "Commande",
+      "source": "Origine",
+      "status": "Statut"
+    },
+    "sources": {
+      "manual": "Manuelle",
+      "supplier": "Paiement fournisseur",
+      "recurring": "Récurrente"
+    },
+    "statuses": {
+      "approved": "Approuvée",
+      "pending": "En attente"
+    },
+    "deleted": "Supprimée",
+    "actions": {
+      "history": "Historique",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "restore": "Restaurer",
+      "openPurchase": "Voir l'achat",
+      "openOrder": "Ouvrir la commande {number}",
+      "more": "Actions pour {reason}"
+    },
+    "readOnly": "Paiement fournisseur : à modifier depuis l'achat.",
+    "empty": "Aucune charge sur cette période.",
+    "emptyBody": "Ajoutez une charge ou changez les filtres.",
+    "deletedDone": "Charge supprimée",
+    "restoredDone": "Charge restaurée",
+    "deleteTitle": "Supprimer cette charge ?",
+    "deleteBody": "Elle ne comptera plus dans les totaux. Vous pourrez la restaurer avec « Afficher les supprimées ».",
+    "pending": {
+      "title": "En attente d'approbation",
+      "hint": "Créées automatiquement par les charges récurrentes. Seules les charges approuvées comptent dans le résultat.",
+      "approve": "Approuver",
+      "editAmount": "Autre montant",
+      "skip": "Ignorer",
+      "approved": "{label} approuvée",
+      "skipped": "{label} ignorée",
+      "skipTitle": "Ignorer « {label} » ?",
+      "skipBody": "La charge est supprimée pour ce mois ; vous pourrez la restaurer avec « Afficher les supprimées ».",
+      "editTitle": "Approuver avec un autre montant",
+      "amount": "Montant",
+      "confirm": "Approuver"
+    },
+    "form": {
+      "createTitle": "Nouvelle charge",
+      "editTitle": "Modifier la charge",
+      "amount": "Montant",
+      "date": "Date",
+      "category": "Catégorie",
+      "chooseCategory": "Choisir une catégorie",
+      "location": "Emplacement",
+      "chooseLocation": "Choisir un emplacement",
+      "reason": "Motif",
+      "reasonPlaceholder": "Ex. : loyer de novembre, facture d'électricité…",
+      "reasonRequired": "Le motif est obligatoire.",
+      "order": "Commande liée",
+      "orderPlaceholder": "N° de commande, ex. 832",
+      "orderHint": "Facultatif : pour retrouver la charge depuis la commande. Ne compte pas dans les indicateurs.",
+      "orderNone": "Aucune commande trouvée.",
+      "orderClear": "Retirer la commande",
+      "created": "Charge ajoutée",
+      "saved": "Charge enregistrée",
+      "errors": {
+        "amount": "Saisissez un montant.",
+        "category": "Choisissez une catégorie.",
+        "location": "Choisissez un emplacement.",
+        "date": "La date ne peut pas être dans le futur."
+      }
+    },
+    "recurring": {
+      "columns": {
+        "label": "Libellé",
+        "amount": "Montant",
+        "category": "Catégorie",
+        "location": "Emplacement",
+        "day": "Jour",
+        "active": "Active"
+      },
+      "dayValue": "le {day} du mois",
+      "empty": "Aucune charge récurrente.",
+      "emptyBody": "Loyer, salaires, abonnements… : chaque mois, une charge en attente est créée à la date choisie.",
+      "hint": "Chaque mois, au jour choisi, une charge « en attente » est créée ; elle compte dans le résultat une fois approuvée.",
+      "form": {
+        "createTitle": "Nouvelle charge récurrente",
+        "editTitle": "Modifier la charge récurrente",
+        "label": "Libellé",
+        "labelPlaceholder": "Ex. : Loyer Maârif",
+        "amount": "Montant",
+        "day": "Jour du mois (1 à 28)",
+        "category": "Catégorie",
+        "location": "Emplacement",
+        "active": "Active",
+        "saved": "Charge récurrente enregistrée",
+        "created": "Charge récurrente ajoutée",
+        "labelRequired": "Le libellé est obligatoire."
+      },
+      "activated": "Charge récurrente activée",
+      "deactivated": "Charge récurrente désactivée",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "deleteTitle": "Supprimer « {label} » ?",
+      "deleteBody": "Elle n'a encore créé aucune charge : elle sera supprimée définitivement.",
+      "deleted": "Charge récurrente supprimée",
+      "more": "Actions pour {label}",
+      "toggle": "Activer ou désactiver {label}"
+    },
+    "history": {
+      "title": "Historique de la charge",
+      "empty": "Aucun historique.",
+      "loadFailed": "Impossible de charger l'historique.",
+      "created": "Créée",
+      "approved": "Approuvée",
+      "edited": "Modifiée",
+      "deleted": "Supprimée",
+      "restored": "Restaurée",
+      "system": "Automatique",
+      "fields": {
+        "amount": "Montant",
+        "charge_date": "Date",
+        "category_id": "Catégorie",
+        "location_id": "Emplacement",
+        "reason": "Motif",
+        "order_id": "Commande"
+      }
+    }
   }
 }
