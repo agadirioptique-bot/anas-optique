@@ -328,6 +328,51 @@
       "thresholdsDescription": "An alert is sent when the quantity goes down to this threshold or below. Empty cell: no alert.",
       "thresholdFor": "Threshold {category} — {store}",
       "thresholdSaved": "Threshold saved"
+    },
+    "fields": {
+      "title": "Order fields",
+      "description": "The built-in measurement fields and your custom fields. For each one choose: hidden, optional or required.",
+      "add": "New field",
+      "createTitle": "New custom field",
+      "editTitle": "Edit field",
+      "labelFr": "Label (FR)",
+      "labelEn": "Label (EN)",
+      "labelPlaceholder": "e.g. Reading distance (cm)",
+      "labelRequired": "Enter a label.",
+      "type": "Type",
+      "typeLocked": "The type cannot change after creation.",
+      "types": {
+        "text": "Text",
+        "number": "Number",
+        "date": "Date",
+        "select": "List"
+      },
+      "optionsFr": "Choices (FR), one per line",
+      "optionsEn": "Choices (EN), one per line",
+      "optionsHint": "English choices follow the same order; empty = same label as in French.",
+      "optionsRequired": "Enter at least two choices.",
+      "visibility": "Display",
+      "visibilities": {
+        "hidden": "Hidden",
+        "optional": "Optional",
+        "required": "Required"
+      },
+      "visibilitySaved": "“{label}” updated",
+      "builtin": "Built-in field",
+      "used": "{count, plural, =0 {never filled} one {filled in # order} other {filled in # orders}}",
+      "cannotDelete": "Already filled in orders: hide it instead.",
+      "saved": "“{label}” saved",
+      "deleted": "Field deleted",
+      "deleteTitle": "Delete “{label}”?",
+      "deleteBody": "No order has filled it: it will be deleted permanently.",
+      "drag": "Move “{label}”",
+      "empty": "No fields.",
+      "preview": "Preview",
+      "previewHint": "What the secretary will see in the Measurements step.",
+      "previewEmpty": "All fields are hidden.",
+      "choose": "Choose…",
+      "requiredMark": "required",
+      "photoHint": "Photo added after the order is saved"
     }
   },
   "status": {

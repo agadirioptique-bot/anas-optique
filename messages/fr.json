@@ -328,6 +328,51 @@
       "thresholdsDescription": "Une alerte est envoyée quand la quantité descend à ce seuil ou en dessous. Case vide : pas d’alerte.",
       "thresholdFor": "Seuil {category} — {store}",
       "thresholdSaved": "Seuil enregistré"
+    },
+    "fields": {
+      "title": "Champs de la commande",
+      "description": "Les champs de mesure intégrés et vos champs personnalisés. Choisissez pour chacun : masqué, facultatif ou obligatoire.",
+      "add": "Nouveau champ",
+      "createTitle": "Nouveau champ personnalisé",
+      "editTitle": "Modifier le champ",
+      "labelFr": "Libellé (FR)",
+      "labelEn": "Libellé (EN)",
+      "labelPlaceholder": "Ex. Distance de lecture (cm)",
+      "labelRequired": "Saisissez un libellé.",
+      "type": "Type",
+      "typeLocked": "Le type ne change plus après la création.",
+      "types": {
+        "text": "Texte",
+        "number": "Nombre",
+        "date": "Date",
+        "select": "Liste"
+      },
+      "optionsFr": "Choix (FR), un par ligne",
+      "optionsEn": "Choix (EN), un par ligne",
+      "optionsHint": "Les choix anglais suivent le même ordre ; vide = même libellé qu’en français.",
+      "optionsRequired": "Saisissez au moins deux choix.",
+      "visibility": "Affichage",
+      "visibilities": {
+        "hidden": "Masqué",
+        "optional": "Facultatif",
+        "required": "Obligatoire"
+      },
+      "visibilitySaved": "« {label} » mis à jour",
+      "builtin": "Champ intégré",
+      "used": "{count, plural, =0 {jamais rempli} one {rempli dans # commande} other {rempli dans # commandes}}",
+      "cannotDelete": "Déjà rempli dans des commandes : masquez-le plutôt.",
+      "saved": "« {label} » enregistré",
+      "deleted": "Champ supprimé",
+      "deleteTitle": "Supprimer « {label} » ?",
+      "deleteBody": "Aucune commande ne l’a rempli : il sera supprimé définitivement.",
+      "drag": "Déplacer « {label} »",
+      "empty": "Aucun champ.",
+      "preview": "Aperçu",
+      "previewHint": "Ce que la secrétaire verra à l’étape Mesures.",
+      "previewEmpty": "Tous les champs sont masqués.",
+      "choose": "Choisir…",
+      "requiredMark": "obligatoire",
+      "photoHint": "Photo ajoutée après l’enregistrement de la commande"
     }
   },
   "status": {

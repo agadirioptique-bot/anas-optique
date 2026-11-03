@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import { requireUser, superAdminPage } from "@/features/auth/guards";
 import { getVisibleStores } from "@/features/auth/session";
 import { isSettingsTab, SettingsNav, type SettingsTab } from "@/features/settings/components/settings-nav";
+import { FieldsTab } from "@/features/settings/fields/components/fields-tab";
+import { getFieldsData } from "@/features/settings/fields/queries";
 import { ListsTab } from "@/features/settings/lists/components/lists-tab";
 import { getListItems } from "@/features/settings/lists/queries";
 import { ProductsTab } from "@/features/settings/products/components/products-tab";
@@ -29,6 +31,10 @@ async function ProductsSection() {
   return <ProductsTab data={await getProductsData()} />;
 }
 
+async function FieldsSection() {
+  return <FieldsTab data={await getFieldsData()} />;
+}
+
 function ComingSoon() {
   const t = useTranslations("placeholder");
   return (
@@ -42,6 +48,7 @@ function ComingSoon() {
 const SECTIONS: Partial<Record<SettingsTab, () => Promise<ReactNode>>> = {
   lists: ListsSection,
   products: ProductsSection,
+  fields: FieldsSection,
   users: UsersSection,
 };
 
