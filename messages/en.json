@@ -10,7 +10,9 @@
     "back": "Back",
     "allLocations": "All stores",
     "locations": "Stores",
-    "lab": "Lab"
+    "lab": "Lab",
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -84,19 +86,48 @@
     "forgotSubtitle": "Get a link to choose a new password.",
     "setPasswordTitle": "Choose a password",
     "setPasswordSubtitle": "Create the password of your OPTICOR account.",
-    "comingSoon": "The form will be available in the authentication phase.",
     "heroTitle": "Your optical stores, clear and under control.",
     "heroPoint1": "An order entered in under a minute, as simple as the paper slip.",
     "heroPoint2": "Glasses tracked from the workshop to pick-up, with a WhatsApp reminder.",
     "heroPoint3": "Revenue, charges and stock of every store, in real time.",
-    "languageToggle": "Language"
+    "languageToggle": "Language",
+    "email": "Email",
+    "emailPlaceholder": "first.last@example.com",
+    "emailRequired": "Enter your email.",
+    "emailInvalid": "This email is not valid.",
+    "password": "Password",
+    "passwordRequired": "Enter your password.",
+    "submit": "Sign in",
+    "forgotLink": "Forgot password?",
+    "backToLogin": "Back to sign in",
+    "forgotSubmit": "Send the link",
+    "forgotSent": "If an account exists for {email}, we just sent it an email with a link to choose a new password.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "passwordHint": "At least {min} characters.",
+    "passwordTooShort": "The password must be at least {min} characters.",
+    "passwordMismatch": "The two passwords do not match.",
+    "setPasswordSubmit": "Save and continue",
+    "setPasswordNoSession": "This link has expired or was already used. Ask for a new link.",
+    "setPasswordNoSessionCta": "Get a new link"
   },
-  "dev": {
-    "badge": "DEV",
-    "roleSwitch": "Test role",
-    "roleSwitchHint": "Development mode only: switch roles without authentication.",
-    "enterAs": "Enter as {role}",
-    "loginHint": "Development mode: simulated authentication."
+  "errors": {
+    "unexpected": "Something went wrong. Please try again.",
+    "invalidInput": "Some information is invalid.",
+    "invalidCredentials": "Incorrect email or password.",
+    "accountDisabled": "This account is disabled. Contact the optician.",
+    "rateLimited": "Too many attempts. Wait a few minutes and try again.",
+    "weakPassword": "This password is too weak. Choose a longer one.",
+    "samePassword": "Choose a password different from the old one.",
+    "sessionExpired": "Your session has expired. Sign in again or ask for a new link.",
+    "emailExists": "An account already exists with this email.",
+    "alreadyActive": "This account is already active: the invitation can no longer be resent.",
+    "linkInvalid": "This link is invalid or has expired. Ask for a new link.",
+    "forbidden": "You are not allowed to do this.",
+    "notFound": "Item not found.",
+    "selfChange": "You cannot change your own role or deactivate your own account.",
+    "lastSuperAdmin": "At least one active super admin must remain.",
+    "secretaryStoreInvalid": "A secretary must belong to an active store (not the lab)."
   },
   "placeholder": {
     "title": "Coming soon",
@@ -154,6 +185,54 @@
     "notifications": {
       "title": "Notifications",
       "description": "Alerts that need your attention."
+    }
+  },
+  "settings": {
+    "tabs": {
+      "label": "Settings sections",
+      "lists": "Lists",
+      "products": "Products",
+      "fields": "Custom fields",
+      "stores": "Stores and lab",
+      "users": "Users",
+      "chargeLocations": "Charge locations",
+      "loyalty": "Loyalty",
+      "notifications": "Notifications",
+      "roles": "Roles and permissions"
+    },
+    "users": {
+      "title": "Users",
+      "description": "One account per person. A secretary belongs to a single store.",
+      "invite": "Invite",
+      "inviteTitle": "Invite a user",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "e.g. Omar Benjelloun",
+      "nameRequired": "Enter the full name.",
+      "email": "Email",
+      "role": "Role",
+      "location": "Store",
+      "noLocation": "None (global access)",
+      "chooseStore": "Choose a store",
+      "storeRequired": "Choose the secretary’s store.",
+      "status": "Status",
+      "active": "Active",
+      "invited": "Invitation sent",
+      "disabled": "Deactivated",
+      "send": "Send the invitation",
+      "sent": "Invitation sent",
+      "sentBody": "An email was sent to {email}. The link lets them choose a password.",
+      "done": "Done",
+      "resend": "Resend invitation",
+      "resent": "Invitation resent to {email}",
+      "updated": "{name}: {what} updated",
+      "roleWord": "role",
+      "locationWord": "store",
+      "deactivateTitle": "Deactivate {name}?",
+      "deactivateBody": "Access is blocked immediately and the person is signed out. History is kept; you can reactivate the account.",
+      "deactivate": "Deactivate",
+      "deactivated": "{name} deactivated",
+      "activated": "{name} reactivated",
+      "you": "you"
     }
   }
 }

@@ -18,8 +18,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { setDevRole } from "@/features/dev/actions";
-import { useRouter } from "@/i18n/navigation";
+import { signOut } from "@/features/auth/actions";
 import type { AppLocale } from "@/i18n/routing";
 import { initials } from "@/lib/format";
 import { useShell } from "./shell-context";
@@ -31,14 +30,7 @@ export function UserMenu() {
   const locale = useLocale();
   const switchLocale = useSwitchLocale();
   const { theme, setTheme } = useTheme();
-  const router = useRouter();
   const store = stores.find((s) => s.id === user.storeId);
-
-  const signOut = async () => {
-    // Phase 3: supabase.auth.signOut(). Phase 1: clear the fake session.
-    await setDevRole("signed_out");
-    router.replace("/login");
-  };
 
   return (
     <DropdownMenu>

@@ -10,7 +10,9 @@
     "back": "Retour",
     "allLocations": "Toutes les succursales",
     "locations": "Succursales",
-    "lab": "Laboratoire"
+    "lab": "Laboratoire",
+    "cancel": "Annuler",
+    "close": "Fermer"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -84,19 +86,48 @@
     "forgotSubtitle": "Recevez un lien pour choisir un nouveau mot de passe.",
     "setPasswordTitle": "Choisir un mot de passe",
     "setPasswordSubtitle": "Créez le mot de passe de votre compte OPTICOR.",
-    "comingSoon": "Le formulaire sera disponible à l'étape d'authentification.",
     "heroTitle": "Vos magasins d'optique, clairs et sous contrôle.",
     "heroPoint1": "Une commande saisie en moins d'une minute, aussi simple que la fiche papier.",
     "heroPoint2": "Le suivi des lunettes de l'atelier jusqu'au retrait, avec rappel WhatsApp.",
     "heroPoint3": "Chiffre d'affaires, charges et stock de chaque succursale, en temps réel.",
-    "languageToggle": "Langue"
+    "languageToggle": "Langue",
+    "email": "E-mail",
+    "emailPlaceholder": "prenom.nom@exemple.ma",
+    "emailRequired": "Saisissez votre e-mail.",
+    "emailInvalid": "Cet e-mail n’est pas valide.",
+    "password": "Mot de passe",
+    "passwordRequired": "Saisissez votre mot de passe.",
+    "submit": "Se connecter",
+    "forgotLink": "Mot de passe oublié ?",
+    "backToLogin": "Retour à la connexion",
+    "forgotSubmit": "Envoyer le lien",
+    "forgotSent": "Si un compte existe pour {email}, un e-mail avec un lien pour choisir un nouveau mot de passe vient de lui être envoyé.",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "passwordHint": "Au moins {min} caractères.",
+    "passwordTooShort": "Le mot de passe doit contenir au moins {min} caractères.",
+    "passwordMismatch": "Les deux mots de passe ne correspondent pas.",
+    "setPasswordSubmit": "Enregistrer et continuer",
+    "setPasswordNoSession": "Ce lien a expiré ou a déjà été utilisé. Demandez un nouveau lien.",
+    "setPasswordNoSessionCta": "Recevoir un nouveau lien"
   },
-  "dev": {
-    "badge": "DEV",
-    "roleSwitch": "Rôle de test",
-    "roleSwitchHint": "Mode développement uniquement : changez de rôle sans authentification.",
-    "enterAs": "Entrer en tant que {role}",
-    "loginHint": "Mode développement : authentification simulée."
+  "errors": {
+    "unexpected": "Une erreur inattendue est survenue. Réessayez.",
+    "invalidInput": "Certaines informations sont invalides.",
+    "invalidCredentials": "E-mail ou mot de passe incorrect.",
+    "accountDisabled": "Ce compte est désactivé. Contactez l’opticien.",
+    "rateLimited": "Trop de tentatives. Patientez quelques minutes puis réessayez.",
+    "weakPassword": "Ce mot de passe est trop faible. Choisissez-en un plus long.",
+    "samePassword": "Choisissez un mot de passe différent de l’ancien.",
+    "sessionExpired": "Votre session a expiré. Reconnectez-vous ou demandez un nouveau lien.",
+    "emailExists": "Un compte existe déjà avec cet e-mail.",
+    "alreadyActive": "Ce compte est déjà activé : l’invitation ne peut plus être renvoyée.",
+    "linkInvalid": "Ce lien est invalide ou a expiré. Demandez un nouveau lien.",
+    "forbidden": "Vous n’avez pas la permission de faire cette action.",
+    "notFound": "Élément introuvable.",
+    "selfChange": "Vous ne pouvez pas modifier votre propre rôle ni désactiver votre compte.",
+    "lastSuperAdmin": "Il doit rester au moins un super admin actif.",
+    "secretaryStoreInvalid": "Une secrétaire doit être rattachée à une succursale active (pas au laboratoire)."
   },
   "placeholder": {
     "title": "Bientôt disponible",
@@ -154,6 +185,54 @@
     "notifications": {
       "title": "Notifications",
       "description": "Les alertes qui demandent votre attention."
+    }
+  },
+  "settings": {
+    "tabs": {
+      "label": "Sections des paramètres",
+      "lists": "Listes",
+      "products": "Produits",
+      "fields": "Champs personnalisés",
+      "stores": "Succursales et labo",
+      "users": "Utilisateurs",
+      "chargeLocations": "Lieux de charges",
+      "loyalty": "Fidélité",
+      "notifications": "Notifications",
+      "roles": "Rôles et permissions"
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "description": "Un compte par personne. Une secrétaire est rattachée à une seule succursale.",
+      "invite": "Inviter",
+      "inviteTitle": "Inviter un utilisateur",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Ex. Omar Benjelloun",
+      "nameRequired": "Saisissez le nom complet.",
+      "email": "E-mail",
+      "role": "Rôle",
+      "location": "Succursale",
+      "noLocation": "Aucune (accès global)",
+      "chooseStore": "Choisir une succursale",
+      "storeRequired": "Choisissez la succursale de la secrétaire.",
+      "status": "Statut",
+      "active": "Actif",
+      "invited": "Invitation envoyée",
+      "disabled": "Désactivé",
+      "send": "Envoyer l’invitation",
+      "sent": "Invitation envoyée",
+      "sentBody": "Un e-mail a été envoyé à {email}. Le lien permet de choisir un mot de passe.",
+      "done": "Terminé",
+      "resend": "Renvoyer l’invitation",
+      "resent": "Invitation renvoyée à {email}",
+      "updated": "{name} : {what} mis à jour",
+      "roleWord": "rôle",
+      "locationWord": "succursale",
+      "deactivateTitle": "Désactiver {name} ?",
+      "deactivateBody": "L’accès est bloqué immédiatement et la personne est déconnectée. L’historique est conservé ; vous pourrez réactiver le compte.",
+      "deactivate": "Désactiver",
+      "deactivated": "{name} désactivé",
+      "activated": "{name} réactivé",
+      "you": "vous"
     }
   }
 }

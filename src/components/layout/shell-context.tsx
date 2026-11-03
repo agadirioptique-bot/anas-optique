@@ -9,8 +9,6 @@ export interface ShellValue {
   stores: StoreSummary[];
   /** Super admin selector value: "all" or a store/lab id. */
   activeStore: string;
-  /** Phase 1 fake sign-in (shows the DEV role switch). */
-  devFakeAuth: boolean;
 }
 
 const ShellContext = createContext<ShellValue | null>(null);

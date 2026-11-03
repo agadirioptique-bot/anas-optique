@@ -1,4 +1,8 @@
+import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
+
+// Supabase keys + E2E_* test accounts (dev project). Next loads .env.local itself for the server.
+if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 const PORT = 3100;
 
@@ -20,7 +24,5 @@ export default defineConfig({
     url: `http://localhost:${PORT}/fr/login`,
     timeout: 180_000,
     reuseExistingServer: !process.env.CI,
-    // Phase 1 fake sign-in; phase 3 replaces this with seeded test users.
-    env: { OPTICOR_DEV_FAKE_AUTH: "1" },
   },
 });

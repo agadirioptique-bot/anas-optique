@@ -4,7 +4,6 @@ import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { BrandName, LogoMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
-import { DevRoleSwitch } from "@/features/dev/role-switch";
 import { Link } from "@/i18n/navigation";
 import { homePath } from "@/lib/permissions";
 import { LocationSelector } from "./location-selector";
@@ -15,7 +14,7 @@ import { UserMenu } from "./user-menu";
 
 export function Topbar() {
   const t = useTranslations();
-  const { user, devFakeAuth } = useShell();
+  const { user } = useShell();
   const openPalette = () => usePalette.getState().setOpen(true);
 
   return (
@@ -44,7 +43,6 @@ export function Topbar() {
           <Button variant="ghost" size="icon" className="rounded-full md:hidden" onClick={openPalette} aria-label={t("shell.searchShort")}>
             <Search className="size-5" />
           </Button>
-          {devFakeAuth && <DevRoleSwitch />}
           <NotificationBell />
           <UserMenu />
         </div>
