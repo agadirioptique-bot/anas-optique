@@ -261,7 +261,7 @@ function SuppliersTab({ suppliers, onEdit }: { suppliers: SupplierRow[]; onEdit:
     void run(() => setSupplierArchived({ id: s.id, archived }), t(archived ? "purchases.suppliers.archivedDone" : "purchases.suppliers.restoredDone"));
 
   const menu = (s: SupplierRow) => (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon-sm" aria-label={t("purchases.suppliers.more", { name: s.name })} onClick={(e) => e.stopPropagation()}>
           <MoreVertical />

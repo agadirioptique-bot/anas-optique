@@ -265,7 +265,7 @@ export function StockPage({
                 </span>
               </button>
               {isSuperAdmin && (
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" aria-label={t("stock.actions.more", { category: r.categoryName })}>
                       <MoreVertical />

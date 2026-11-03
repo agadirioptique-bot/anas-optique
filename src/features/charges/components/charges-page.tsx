@@ -400,7 +400,7 @@ function Ledger({ charges, reference, onEdit }: { charges: ChargeRow[]; referenc
   const [deleting, setDeleting] = useState<ChargeRow | null>(null);
 
   const menu = (c: ChargeRow) => (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon-sm" aria-label={t("actions.more", { reason: c.reason })} onClick={(e) => e.stopPropagation()}>
           <MoreVertical />
@@ -529,7 +529,7 @@ function RecurringTab({ recurring, reference, onEdit }: { recurring: RecurringRo
   const toggle = (r: RecurringRow, active: boolean) => void run(() => setRecurringActive({ id: r.id, active }), t(active ? "activated" : "deactivated"));
 
   const menu = (r: RecurringRow) => (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon-sm" aria-label={t("more", { label: r.label })} onClick={(e) => e.stopPropagation()}>
           <MoreVertical />

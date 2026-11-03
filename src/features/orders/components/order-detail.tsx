@@ -153,7 +153,7 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
               </Button>
             )}
             {row.status !== "cancelled" && (canCollect || isSuperAdmin) && (
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon" aria-label={t("detail.actions")} data-testid="order-menu">
                     <MoreHorizontal />

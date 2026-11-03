@@ -144,7 +144,14 @@ export function DataTable<T>({
             {visible.map((row) => (
               <tr
                 key={rowKey(row)}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onClick={
+                  onRowClick
+                    ? (e) => {
+                        // Clicks inside portals (row menus, dialogs) bubble here through React: ignore them.
+                        if (e.currentTarget.contains(e.target as Node)) onRowClick(row);
+                      }
+                    : undefined
+                }
                 className={cn("border-b transition-colors last:border-0", onRowClick && "cursor-pointer hover:bg-muted/50", rowClassName?.(row))}
               >
                 {columns.map((c) => (
