@@ -105,3 +105,5 @@ To look at them: Dashboard → **Integrations** → **Cron** → *Jobs* (`genera
 
 Add to `.env.local` (never commit): `E2E_SUPER_ADMIN_EMAIL`, `E2E_SUPER_ADMIN_PASSWORD`, `E2E_SECRETARY_EMAIL`, `E2E_SECRETARY_PASSWORD`. `npm run test:e2e` signs in with them; the tests that need them are skipped otherwise.
 Next 16 runs only one `next dev` per folder: if one is already running, use `E2E_BASE_URL=http://localhost:3000 npm run test:e2e`.
+
+The order-flow tests (`e2e/orders.spec.ts`) don't need these: run `npm run e2e:accounts` first — it creates or resets two DEV-only test users (`opticor-e2e-secretary@example.com`, `opticor-e2e-admin@example.com`) with a random password saved in the git-ignored `e2e/.auth/accounts.json`.

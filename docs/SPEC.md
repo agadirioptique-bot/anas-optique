@@ -454,6 +454,15 @@ Phase 5 — Settings (2026-11-03):
 - Drag-to-sort: `reorder_rows(table, ids)` (security invoker, allow-listed tables, super admin).
 - Usage views (security invoker): `settings_list_usage`, `custom_field_usage`, `store_usage`, `client_delivery_counts`.
 
+Phase 6 — Clients & Orders (2026-11-03):
+- `order_overview` view (security_invoker): one row per order for board, list, client file and search (display number, client, money, frame category, `status_since`).
+- `client_directory(q, segment, sort, limit, offset)` (definer, any role): clients with cross-store order counts and segments, **never money**. `client_order_stats` also returns `spent` — super admin only, null for secretaries (money summed in SQL).
+- `user_names(ids)` (definer, any role) for "by Salma" in timelines/history; `similar_clients(name)` (invoker, trigram ≥ 0.4) for the new-client warning; `set_prescription_photo(order_id, path)` (definer, store access, file must exist under `prescriptions/{order_id}/`).
+- New order: the booklet letter (`orders.booklet`) is an optional "Carnet" field next to the slip number; the slip is checked live and again by `create_order`. An order needs a frame, the client's own frame, or at least one other item. Pending client discount = % of the typed total, applied with a switch.
+- Board: delivered column = last 7 days, cancelled (toggle) = last 30 days; a card is late after `stuck_order_days[status]`. Delivery always goes through `deliver_order` (collect dialog when a balance is due).
+- WhatsApp "ready" message (FR): « Bonjour {prénom}, vos lunettes (commande {N°}) sont prêtes à la {succursale}. Reste à payer : {montant}. À bientôt ! »
+- E2E: `npm run e2e:accounts` provisions DEV-only Playwright users (TSA) with random passwords in git-ignored `e2e/.auth/accounts.json`; `E2E_BASE_URL=http://localhost:3000 npm run test:e2e`.
+
 ## 12. Later (design for it, don't build it)
 
 - Excel history import (~2,270 orders 2021–2023, prescriptions as text like `-1.75(-2 a 69)`, treatments like AR / BL / BLEU CAT / PGX / PROG / DF / LENTILLE): imported orders get `source = 'legacy'` column (add now, default `'app'`), status delivered, no stock movements, count toward loyalty when phone matches.
