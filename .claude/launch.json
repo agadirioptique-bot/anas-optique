@@ -3,8 +3,11 @@
   "configurations": [
     {
       "name": "opticor-dev",
-      "runtimeExecutable": "env",
-      "runtimeArgs": ["OPTICOR_DEV_FAKE_AUTH=1", "npm", "run", "dev"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3000
     }
   ]
