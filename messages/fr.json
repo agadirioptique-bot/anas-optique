@@ -843,7 +843,9 @@
       "orders": "Commandes",
       "spent": "Total dépensé",
       "basket": "Panier moyen",
-      "lastVisit": "Dernière visite"
+      "lastVisit": "Dernière visite",
+      "delivered": "Livrées",
+      "firstOrder": "Première commande"
     },
     "rxTitle": "Évolution de la vue",
     "rxHint": "Sphère (trait plein) et cylindre (pointillés) de chaque œil, commande après commande.",
@@ -861,7 +863,46 @@
     "notFound": "Ce client n'existe pas ou n'est pas visible avec votre rôle.",
     "backToClients": "Retour aux clients",
     "whatsappChat": "Écrire sur WhatsApp",
-    "call": "Appeler"
+    "call": "Appeler",
+    "descriptionShared": "Les clients sont partagés par toutes les succursales.",
+    "firstOrder": "Première commande le {date}",
+    "inStores": "dans {count} succursales",
+    "loyalSince": "Client fidèle depuis le {date}",
+    "nameRequired": "Saisissez le nom complet (2 caractères minimum).",
+    "phoneInvalid": "Numéro invalide (ex. 06 12 34 56 78).",
+    "notes": "Notes",
+    "notesPlaceholder": "Ex. préfère être appelé le matin",
+    "otherStoresOrders": "{count, plural, one {+ # commande dans une autre succursale} other {+ # commandes dans d’autres succursales}}",
+    "showMore": "Afficher plus ({shown} sur {total})",
+    "similarTitle": "Un client au nom proche existe déjà :",
+    "sortLabel": "Trier par",
+    "sorts": {
+      "recent": "Dernière commande",
+      "name": "Nom",
+      "orders": "Nombre de commandes"
+    },
+    "toLoyal": "{count, plural, =0 {fidèle à la prochaine livraison} one {encore # avant fidélité} other {encore # avant fidélité}}",
+    "rxDate": "Date",
+    "discount": {
+      "title": "Remise pour la prochaine commande",
+      "description": "La secrétaire pourra l’appliquer en un clic lors de la prochaine commande de ce client.",
+      "type": "Type de remise",
+      "percent": "Pourcentage",
+      "amount": "Montant",
+      "value": "Valeur",
+      "invalid": "Saisissez un montant positif (100 % au maximum).",
+      "note": "Motif (facultatif)",
+      "notePlaceholder": "Ex. geste commercial, client fidèle",
+      "saved": "Remise approuvée",
+      "pending": "Remise approuvée pour la prochaine commande : {value}",
+      "none": "Aucune remise en attente.",
+      "clear": "Retirer",
+      "change": "Modifier la remise",
+      "set": "Approuver une remise",
+      "clearTitle": "Retirer la remise approuvée ?",
+      "clearBody": "La prochaine commande de ce client sera au prix normal.",
+      "cleared": "Remise retirée"
+    }
   },
   "money": {
     "resteShort": "Reste {amount}",

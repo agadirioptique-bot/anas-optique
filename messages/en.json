@@ -843,7 +843,9 @@
       "orders": "Orders",
       "spent": "Total spent",
       "basket": "Average basket",
-      "lastVisit": "Last visit"
+      "lastVisit": "Last visit",
+      "delivered": "Delivered",
+      "firstOrder": "First order"
     },
     "rxTitle": "Vision over time",
     "rxHint": "Sphere (solid) and cylinder (dotted) for each eye, order after order.",
@@ -861,7 +863,46 @@
     "notFound": "This client does not exist or is not visible with your role.",
     "backToClients": "Back to clients",
     "whatsappChat": "Message on WhatsApp",
-    "call": "Call"
+    "call": "Call",
+    "descriptionShared": "Clients are shared by every store.",
+    "firstOrder": "First order on {date}",
+    "inStores": "in {count} stores",
+    "loyalSince": "Loyal client since {date}",
+    "nameRequired": "Enter the full name (at least 2 characters).",
+    "phoneInvalid": "Invalid number (e.g. 06 12 34 56 78).",
+    "notes": "Notes",
+    "notesPlaceholder": "e.g. prefers a call in the morning",
+    "otherStoresOrders": "{count, plural, one {+ # order in another store} other {+ # orders in other stores}}",
+    "showMore": "Show more ({shown} of {total})",
+    "similarTitle": "A client with a similar name already exists:",
+    "sortLabel": "Sort by",
+    "sorts": {
+      "recent": "Last order",
+      "name": "Name",
+      "orders": "Number of orders"
+    },
+    "toLoyal": "{count, plural, =0 {loyal at the next delivery} one {# more to become loyal} other {# more to become loyal}}",
+    "rxDate": "Date",
+    "discount": {
+      "title": "Discount for the next order",
+      "description": "The secretary can apply it in one click on this client’s next order.",
+      "type": "Discount type",
+      "percent": "Percentage",
+      "amount": "Amount",
+      "value": "Value",
+      "invalid": "Enter a positive amount (100 % at most).",
+      "note": "Reason (optional)",
+      "notePlaceholder": "e.g. goodwill gesture, loyal client",
+      "saved": "Discount approved",
+      "pending": "Approved discount for the next order: {value}",
+      "none": "No pending discount.",
+      "clear": "Remove",
+      "change": "Change the discount",
+      "set": "Approve a discount",
+      "clearTitle": "Remove the approved discount?",
+      "clearBody": "This client’s next order will be at the normal price.",
+      "cleared": "Discount removed"
+    }
   },
   "money": {
     "resteShort": "Due {amount}",
