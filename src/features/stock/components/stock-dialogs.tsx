@@ -15,7 +15,8 @@ import { cn } from "@/lib/utils";
 import { adjustStock, recordDamage } from "../actions";
 import type { Labeled } from "../queries";
 import type { DrawerTarget } from "./movements-drawer";
-import { signed, Stepper } from "./stock-bits";
+import { Stepper } from "@/components/shared/stepper";
+import { signed } from "./stock-bits";
 
 /** Dialog target: one category at one location, with its current level. */
 export type RowTarget = DrawerTarget;

@@ -79,7 +79,9 @@
     "open": "Ouvrir",
     "new": "Nouveau",
     "items": "{count, plural, =0 {aucun article} one {# article} other {# articles}}",
-    "colon": " :"
+    "colon": " :",
+    "decrease": "Retirer 1",
+    "increase": "Ajouter 1"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -1085,9 +1087,7 @@
       "reasonPlaceholder": "Choisir un motif",
       "note": "Note",
       "confirm": "Enregistrer le comptage",
-      "done": "{category} : stock ajusté à {qty}",
-      "decrease": "Retirer 1",
-      "increase": "Ajouter 1"
+      "done": "{category} : stock ajusté à {qty}"
     },
     "damage": {
       "title": "Déclarer une casse ou une perte",
@@ -1134,5 +1134,164 @@
     },
     "back": "Retour au stock",
     "total": "{count, plural, one {# article} other {# articles}}"
+  },
+  "purchases": {
+    "tabs": {
+      "purchases": "Achats",
+      "suppliers": "Fournisseurs"
+    },
+    "new": "Nouvel achat",
+    "owed": "Dû aux fournisseurs",
+    "owedHint": "{count, plural, =0 {Aucun achat à régler} one {# achat à régler} other {# achats à régler}}",
+    "bought": "Total des achats",
+    "searchPlaceholder": "Rechercher un fournisseur, une référence…",
+    "unpaidOnly": "Reste à payer",
+    "columns": {
+      "date": "Date",
+      "supplier": "Fournisseur",
+      "receivedAt": "Reçu à",
+      "ref": "Réf. fournisseur",
+      "total": "Total",
+      "paid": "Payé",
+      "remaining": "Reste"
+    },
+    "actions": {
+      "addPayment": "Ajouter un paiement",
+      "view": "Voir l'achat"
+    },
+    "empty": "Aucun achat pour l'instant.",
+    "emptyBody": "Enregistrez un achat : le stock est mis à jour dès la réception.",
+    "form": {
+      "description": "Enregistrer un achat = marchandise reçue : le stock est mis à jour tout de suite.",
+      "supplier": "Fournisseur",
+      "chooseSupplier": "Choisir un fournisseur",
+      "newSupplier": "Nouveau fournisseur",
+      "receivedAt": "Reçu à",
+      "chooseLocation": "Choisir un emplacement",
+      "date": "Date",
+      "ref": "Réf. fournisseur",
+      "refPlaceholder": "N° de BL ou de facture",
+      "stockLines": "Articles en stock",
+      "lensLines": "Verres (hors stock)",
+      "category": "Catégorie",
+      "chooseCategory": "Choisir une catégorie",
+      "unitPrice": "Prix unitaire",
+      "qty": "Quantité",
+      "lineTotal": "Total ligne",
+      "description2": "Description",
+      "descriptionPlaceholder": "Ex. : 2 verres progressifs, commande CNT-00832",
+      "amount": "Montant",
+      "addStock": "Ajouter un article",
+      "addLens": "Ajouter des verres",
+      "removeLine": "Retirer la ligne",
+      "total": "Total de l'achat",
+      "payNow": "Paiement maintenant",
+      "payChoices": {
+        "full": "100 %",
+        "half": "50 %",
+        "third": "30 %",
+        "custom": "Personnalisé",
+        "none": "Rien"
+      },
+      "payAmount": "Montant payé",
+      "method": "Mode de paiement",
+      "chooseMethod": "Choisir un mode",
+      "paidAt": "Date du paiement",
+      "note": "Note",
+      "confirm": "Enregistrer l'achat",
+      "done": "Achat enregistré",
+      "errors": {
+        "supplier": "Choisissez un fournisseur.",
+        "location": "Choisissez où la marchandise est reçue.",
+        "lines": "Ajoutez au moins une ligne complète.",
+        "payTooHigh": "Le paiement dépasse le total de l'achat.",
+        "method": "Choisissez un mode de paiement.",
+        "date": "La date ne peut pas être dans le futur."
+      }
+    },
+    "detail": {
+      "title": "Achat — {supplier}",
+      "receivedAt": "Reçu à {location}",
+      "ref": "Réf. {ref}",
+      "createdBy": "Enregistré le {date} par {user}",
+      "lines": "Lignes",
+      "kinds": {
+        "stock": "Stock",
+        "lens": "Verres"
+      },
+      "items": "{count, plural, one {# article en stock} other {# articles en stock}}",
+      "total": "Total",
+      "paid": "Payé",
+      "remaining": "Reste à payer",
+      "payments": "Paiements",
+      "noPayments": "Aucun paiement pour l'instant.",
+      "chargeCreated": "Charge créée",
+      "columns": {
+        "item": "Article",
+        "unitPrice": "Prix unitaire",
+        "qty": "Qté",
+        "lineTotal": "Total"
+      },
+      "paymentsColumns": {
+        "date": "Date",
+        "method": "Mode",
+        "amount": "Montant",
+        "by": "Par"
+      },
+      "notFound": "Cet achat n'existe pas ou a été supprimé.",
+      "back": "Retour aux achats"
+    },
+    "pay": {
+      "title": "Ajouter un paiement",
+      "description": "{supplier} · reste {amount}",
+      "choices": {
+        "settle": "Solder",
+        "half": "50 %",
+        "custom": "Personnalisé"
+      },
+      "amount": "Montant",
+      "method": "Mode de paiement",
+      "paidAt": "Date du paiement",
+      "note": "Note",
+      "tooHigh": "Le montant dépasse le reste à payer ({amount}).",
+      "confirm": "Enregistrer le paiement",
+      "done": "Paiement de {amount} enregistré",
+      "hint": "Une charge « Paiement fournisseur » est créée automatiquement, en lecture seule."
+    },
+    "suppliers": {
+      "new": "Nouveau fournisseur",
+      "showArchived": "Afficher les archivés",
+      "columns": {
+        "name": "Nom",
+        "phone": "Téléphone",
+        "purchases": "Achats",
+        "totalBought": "Total acheté",
+        "owed": "Dû",
+        "lastPurchase": "Dernier achat"
+      },
+      "empty": "Aucun fournisseur.",
+      "emptyBody": "Ajoutez vos fournisseurs pour enregistrer vos achats.",
+      "form": {
+        "createTitle": "Nouveau fournisseur",
+        "editTitle": "Modifier le fournisseur",
+        "name": "Nom",
+        "phone": "Téléphone",
+        "note": "Note",
+        "nameRequired": "Le nom est obligatoire.",
+        "saved": "Fournisseur enregistré",
+        "created": "Fournisseur ajouté"
+      },
+      "edit": "Modifier",
+      "archive": "Archiver",
+      "restore": "Restaurer",
+      "archived": "Archivé",
+      "archivedDone": "Fournisseur archivé",
+      "restoredDone": "Fournisseur restauré",
+      "delete": "Supprimer",
+      "deleteTitle": "Supprimer {name} ?",
+      "deleteBody": "Ce fournisseur n'a aucun achat : il sera supprimé définitivement.",
+      "deleted": "Fournisseur supprimé",
+      "more": "Actions pour {name}"
+    }
   }
 }

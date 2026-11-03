@@ -1996,6 +1996,14 @@ export type Database = {
           },
         ]
       }
+      purchasing_summary: {
+        Row: {
+          owed: number | null
+          total_bought: number | null
+          unpaid_count: number | null
+        }
+        Relationships: []
+      }
       settings_list_usage: {
         Row: {
           item_id: string | null

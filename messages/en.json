@@ -79,7 +79,9 @@
     "open": "Open",
     "new": "New",
     "items": "{count, plural, =0 {no items} one {# item} other {# items}}",
-    "colon": ":"
+    "colon": ":",
+    "decrease": "Remove 1",
+    "increase": "Add 1"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -1085,9 +1087,7 @@
       "reasonPlaceholder": "Choose a reason",
       "note": "Note",
       "confirm": "Save count",
-      "done": "{category}: stock set to {qty}",
-      "decrease": "Remove 1",
-      "increase": "Add 1"
+      "done": "{category}: stock set to {qty}"
     },
     "damage": {
       "title": "Report damage or loss",
@@ -1134,5 +1134,164 @@
     },
     "back": "Back to stock",
     "total": "{count, plural, one {# item} other {# items}}"
+  },
+  "purchases": {
+    "tabs": {
+      "purchases": "Purchases",
+      "suppliers": "Suppliers"
+    },
+    "new": "New purchase",
+    "owed": "Owed to suppliers",
+    "owedHint": "{count, plural, =0 {Nothing left to pay} one {# purchase to pay} other {# purchases to pay}}",
+    "bought": "Total purchased",
+    "searchPlaceholder": "Search a supplier, a reference…",
+    "unpaidOnly": "Left to pay",
+    "columns": {
+      "date": "Date",
+      "supplier": "Supplier",
+      "receivedAt": "Received at",
+      "ref": "Supplier ref.",
+      "total": "Total",
+      "paid": "Paid",
+      "remaining": "Left"
+    },
+    "actions": {
+      "addPayment": "Add a payment",
+      "view": "View purchase"
+    },
+    "empty": "No purchase yet.",
+    "emptyBody": "Record a purchase: stock is updated as soon as it is received.",
+    "form": {
+      "description": "Recording a purchase = goods received: stock is updated right away.",
+      "supplier": "Supplier",
+      "chooseSupplier": "Choose a supplier",
+      "newSupplier": "New supplier",
+      "receivedAt": "Received at",
+      "chooseLocation": "Choose a location",
+      "date": "Date",
+      "ref": "Supplier ref.",
+      "refPlaceholder": "Delivery note or invoice no.",
+      "stockLines": "Stock items",
+      "lensLines": "Lenses (not stocked)",
+      "category": "Category",
+      "chooseCategory": "Choose a category",
+      "unitPrice": "Unit price",
+      "qty": "Quantity",
+      "lineTotal": "Line total",
+      "description2": "Description",
+      "descriptionPlaceholder": "E.g. 2 progressive lenses, order CNT-00832",
+      "amount": "Amount",
+      "addStock": "Add an item",
+      "addLens": "Add lenses",
+      "removeLine": "Remove line",
+      "total": "Purchase total",
+      "payNow": "Payment now",
+      "payChoices": {
+        "full": "100%",
+        "half": "50%",
+        "third": "30%",
+        "custom": "Custom",
+        "none": "Nothing"
+      },
+      "payAmount": "Amount paid",
+      "method": "Payment method",
+      "chooseMethod": "Choose a method",
+      "paidAt": "Payment date",
+      "note": "Note",
+      "confirm": "Save purchase",
+      "done": "Purchase saved",
+      "errors": {
+        "supplier": "Choose a supplier.",
+        "location": "Choose where the goods are received.",
+        "lines": "Add at least one complete line.",
+        "payTooHigh": "The payment is above the purchase total.",
+        "method": "Choose a payment method.",
+        "date": "The date can't be in the future."
+      }
+    },
+    "detail": {
+      "title": "Purchase — {supplier}",
+      "receivedAt": "Received at {location}",
+      "ref": "Ref. {ref}",
+      "createdBy": "Recorded on {date} by {user}",
+      "lines": "Lines",
+      "kinds": {
+        "stock": "Stock",
+        "lens": "Lenses"
+      },
+      "items": "{count, plural, one {# stock item} other {# stock items}}",
+      "total": "Total",
+      "paid": "Paid",
+      "remaining": "Left to pay",
+      "payments": "Payments",
+      "noPayments": "No payment yet.",
+      "chargeCreated": "Charge created",
+      "columns": {
+        "item": "Item",
+        "unitPrice": "Unit price",
+        "qty": "Qty",
+        "lineTotal": "Total"
+      },
+      "paymentsColumns": {
+        "date": "Date",
+        "method": "Method",
+        "amount": "Amount",
+        "by": "By"
+      },
+      "notFound": "This purchase doesn't exist.",
+      "back": "Back to purchases"
+    },
+    "pay": {
+      "title": "Add a payment",
+      "description": "{supplier} · {amount} left",
+      "choices": {
+        "settle": "Pay in full",
+        "half": "50%",
+        "custom": "Custom"
+      },
+      "amount": "Amount",
+      "method": "Payment method",
+      "paidAt": "Payment date",
+      "note": "Note",
+      "tooHigh": "The amount is above what is left to pay ({amount}).",
+      "confirm": "Save payment",
+      "done": "Payment of {amount} saved",
+      "hint": "A read-only “Supplier payment” charge is created automatically."
+    },
+    "suppliers": {
+      "new": "New supplier",
+      "showArchived": "Show archived",
+      "columns": {
+        "name": "Name",
+        "phone": "Phone",
+        "purchases": "Purchases",
+        "totalBought": "Total purchased",
+        "owed": "Owed",
+        "lastPurchase": "Last purchase"
+      },
+      "empty": "No supplier.",
+      "emptyBody": "Add your suppliers to record purchases.",
+      "form": {
+        "createTitle": "New supplier",
+        "editTitle": "Edit supplier",
+        "name": "Name",
+        "phone": "Phone",
+        "note": "Note",
+        "nameRequired": "The name is required.",
+        "saved": "Supplier saved",
+        "created": "Supplier added"
+      },
+      "edit": "Edit",
+      "archive": "Archive",
+      "restore": "Restore",
+      "archived": "Archived",
+      "archivedDone": "Supplier archived",
+      "restoredDone": "Supplier restored",
+      "delete": "Delete",
+      "deleteTitle": "Delete {name}?",
+      "deleteBody": "This supplier has no purchase: it will be deleted for good.",
+      "deleted": "Supplier deleted",
+      "more": "Actions for {name}"
+    }
   }
 }

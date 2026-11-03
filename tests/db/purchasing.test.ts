@@ -169,6 +169,14 @@ describe.skipIf(!hasDbEnv)("purchasing", () => {
     expect(data).toEqual({ purchases_count: 2, total_bought: 650.5, paid: 350.5, owed: 300 });
   });
 
+  it("the page summary equals the sum of what is left on every purchase", async () => {
+    const { data: rows } = await f.admin.from("purchase_overview").select("remaining");
+    const cents = (rows ?? []).reduce((s, r) => s + Math.round((r.remaining ?? 0) * 100), 0);
+    const { data: summary } = await f.admin.from("purchasing_summary").select("owed, unpaid_count").single();
+    expect(Math.round((summary?.owed ?? 0) * 100)).toBe(cents);
+    expect(summary?.unpaid_count).toBe((rows ?? []).filter((r) => (r.remaining ?? 0) > 0).length);
+  });
+
   it("two active suppliers can't share a name; an archived one frees it", async () => {
     const first = await newSupplier("dup");
     const clash = await f.admin.from("suppliers").insert({ name: `  fournisseur DUP ${runId} ` }).select("id").single();
@@ -181,6 +189,8 @@ describe.skipIf(!hasDbEnv)("purchasing", () => {
   });
 
   it("secretary: no purchases, suppliers or balances, no writes", async () => {
+    const { data: summary } = await f.secretary.from("purchasing_summary").select("owed, unpaid_count, total_bought").single();
+    expect(summary).toEqual({ owed: 0, unpaid_count: 0, total_bought: 0 });
     for (const view of ["purchase_overview", "supplier_balances"] as const) {
       const { data, error } = await f.secretary.from(view).select("*").limit(5);
       expect(error).toBeNull();

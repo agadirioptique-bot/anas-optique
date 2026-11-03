@@ -13,7 +13,7 @@ import { useSettingsAction } from "@/features/settings/use-settings-action";
 import { cn } from "@/lib/utils";
 import { createTransfer } from "../actions";
 import type { StockRow } from "../queries";
-import { Stepper } from "./stock-bits";
+import { Stepper } from "@/components/shared/stepper";
 
 export interface TransferPreset {
   fromStoreId?: string;
