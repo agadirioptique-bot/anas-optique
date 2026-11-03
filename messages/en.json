@@ -1012,5 +1012,127 @@
     "tooHigh": "The discount is more than the balance ({amount}).",
     "confirm": "Give the discount",
     "done": "Discount of {amount} given"
+  },
+  "stock": {
+    "descriptionScoped": "Stock of {location}, computed from every movement.",
+    "locations": "Locations",
+    "kpi": {
+      "tracked": "Tracked categories",
+      "units": "Items in stock",
+      "low": "Below threshold",
+      "lowValue": "{count, plural, =0 {None} one {# category} other {# categories}}"
+    },
+    "searchPlaceholder": "Search a category…",
+    "allTypes": "All types",
+    "types": "Product types",
+    "lowOnly": "Low stock only",
+    "columns": {
+      "category": "Category",
+      "type": "Type",
+      "quantity": "Quantity",
+      "threshold": "Threshold"
+    },
+    "states": {
+      "none": "No threshold",
+      "ok": "Enough stock",
+      "atMin": "At threshold",
+      "below": "Below threshold"
+    },
+    "archived": "Archived",
+    "empty": "No category to show.",
+    "minShort": "min {min}",
+    "threshold": {
+      "edit": "Edit the threshold of {category}",
+      "saved": "Threshold saved: {min}",
+      "cleared": "Threshold removed: no more alerts",
+      "hint": "Leave empty for no alert."
+    },
+    "actions": {
+      "history": "History",
+      "adjust": "Adjust to count",
+      "damage": "Damage or loss",
+      "transfer": "Transfer",
+      "more": "Actions for {category}"
+    },
+    "kinds": {
+      "purchase": "Purchase",
+      "sale": "Sale",
+      "sale_cancel": "Sale cancelled",
+      "transfer_out": "Transfer out",
+      "transfer_in": "Transfer in",
+      "damage": "Damage or loss",
+      "adjustment": "Adjustment"
+    },
+    "drawer": {
+      "title": "Movement history",
+      "at": "at {location}",
+      "level": "{count, plural, =0 {0 in stock} one {# in stock} other {# in stock}}",
+      "empty": "No movement yet.",
+      "balance": "Stock after the movement",
+      "truncated": "Only the latest {count} movements are shown.",
+      "to": "to {location}",
+      "from": "from {location}",
+      "openOrder": "Open order {number}",
+      "loadFailed": "Could not load the history."
+    },
+    "adjust": {
+      "title": "Adjust to counted stock",
+      "current": "In stock",
+      "counted": "Counted quantity",
+      "difference": "Difference",
+      "noDifference": "No difference: nothing to record.",
+      "reason": "Reason",
+      "reasonPlaceholder": "Choose a reason",
+      "note": "Note",
+      "confirm": "Save count",
+      "done": "{category}: stock set to {qty}",
+      "decrease": "Remove 1",
+      "increase": "Add 1"
+    },
+    "damage": {
+      "title": "Report damage or loss",
+      "qty": "Quantity",
+      "reason": "Reason",
+      "reasonPlaceholder": "E.g. broken frame, lost item…",
+      "reasonRequired": "The reason is required.",
+      "tooMany": "{count, plural, =0 {No item in stock.} one {Only # item in stock.} other {Only # items in stock.}}",
+      "confirm": "Report",
+      "done": "{category}: {qty} removed from stock",
+      "hint": "No charge is created."
+    }
+  },
+  "transfers": {
+    "new": "New transfer",
+    "description": "Stock leaves the source and arrives at the destination immediately.",
+    "from": "From",
+    "to": "To",
+    "swap": "Swap source and destination",
+    "lines": "Items",
+    "category": "Category",
+    "chooseCategory": "Choose a category",
+    "qty": "Quantity",
+    "available": "{count, plural, =0 {none available} one {# available} other {# available}}",
+    "addLine": "Add a category",
+    "removeLine": "Remove this line",
+    "note": "Note",
+    "notePlaceholder": "Optional",
+    "shortage": "Not enough stock at the source.",
+    "sameLocation": "Choose two different locations.",
+    "noLines": "Add at least one category.",
+    "nothingAvailable": "No stock at this location.",
+    "confirm": "Transfer",
+    "done": "{count, plural, one {# item transferred} other {# items transferred}} from {from} to {to}",
+    "history": "Transfer history",
+    "empty": "No transfer yet.",
+    "emptyBody": "Transfers will show up here with the items moved.",
+    "columns": {
+      "date": "Date",
+      "route": "Route",
+      "items": "Items",
+      "note": "Note",
+      "by": "By"
+    },
+    "back": "Back to stock",
+    "total": "{count, plural, one {# item} other {# items}}"
   }
 }

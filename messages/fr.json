@@ -1012,5 +1012,127 @@
     "tooHigh": "La remise dépasse le reste à payer ({amount}).",
     "confirm": "Accorder la remise",
     "done": "Remise de {amount} accordée"
+  },
+  "stock": {
+    "descriptionScoped": "Stock de {location}, calculé à partir de chaque mouvement.",
+    "locations": "Emplacements",
+    "kpi": {
+      "tracked": "Catégories suivies",
+      "units": "Articles en stock",
+      "low": "Sous le seuil",
+      "lowValue": "{count, plural, =0 {Aucune} one {# catégorie} other {# catégories}}"
+    },
+    "searchPlaceholder": "Rechercher une catégorie…",
+    "allTypes": "Tous les types",
+    "types": "Types de produit",
+    "lowOnly": "Stock bas uniquement",
+    "columns": {
+      "category": "Catégorie",
+      "type": "Type",
+      "quantity": "Quantité",
+      "threshold": "Seuil"
+    },
+    "states": {
+      "none": "Pas de seuil",
+      "ok": "Stock suffisant",
+      "atMin": "Au seuil",
+      "below": "Sous le seuil"
+    },
+    "archived": "Archivée",
+    "empty": "Aucune catégorie à afficher.",
+    "minShort": "min {min}",
+    "threshold": {
+      "edit": "Modifier le seuil de {category}",
+      "saved": "Seuil enregistré : {min}",
+      "cleared": "Seuil supprimé : plus d'alerte",
+      "hint": "Laissez vide pour ne pas recevoir d'alerte."
+    },
+    "actions": {
+      "history": "Historique",
+      "adjust": "Ajuster au comptage",
+      "damage": "Casse ou perte",
+      "transfer": "Transférer",
+      "more": "Actions pour {category}"
+    },
+    "kinds": {
+      "purchase": "Achat",
+      "sale": "Vente",
+      "sale_cancel": "Vente annulée",
+      "transfer_out": "Transfert sortant",
+      "transfer_in": "Transfert entrant",
+      "damage": "Casse ou perte",
+      "adjustment": "Ajustement"
+    },
+    "drawer": {
+      "title": "Historique des mouvements",
+      "at": "à {location}",
+      "level": "{count, plural, =0 {0 en stock} one {# en stock} other {# en stock}}",
+      "empty": "Aucun mouvement pour l'instant.",
+      "balance": "Stock après le mouvement",
+      "truncated": "Seuls les {count} derniers mouvements sont affichés.",
+      "to": "vers {location}",
+      "from": "depuis {location}",
+      "openOrder": "Ouvrir la commande {number}",
+      "loadFailed": "Impossible de charger l'historique."
+    },
+    "adjust": {
+      "title": "Ajuster au stock compté",
+      "current": "En stock",
+      "counted": "Quantité comptée",
+      "difference": "Écart",
+      "noDifference": "Aucun écart : rien à enregistrer.",
+      "reason": "Motif",
+      "reasonPlaceholder": "Choisir un motif",
+      "note": "Note",
+      "confirm": "Enregistrer le comptage",
+      "done": "{category} : stock ajusté à {qty}",
+      "decrease": "Retirer 1",
+      "increase": "Ajouter 1"
+    },
+    "damage": {
+      "title": "Déclarer une casse ou une perte",
+      "qty": "Quantité",
+      "reason": "Motif",
+      "reasonPlaceholder": "Ex. : monture cassée, article perdu…",
+      "reasonRequired": "Le motif est obligatoire.",
+      "tooMany": "{count, plural, =0 {Aucun article en stock.} one {Seulement # article en stock.} other {Seulement # articles en stock.}}",
+      "confirm": "Déclarer",
+      "done": "{category} : {qty} retiré(s) du stock",
+      "hint": "Aucune charge n'est créée."
+    }
+  },
+  "transfers": {
+    "new": "Nouveau transfert",
+    "description": "Le stock quitte la source et arrive à destination immédiatement.",
+    "from": "Depuis",
+    "to": "Vers",
+    "swap": "Inverser source et destination",
+    "lines": "Articles",
+    "category": "Catégorie",
+    "chooseCategory": "Choisir une catégorie",
+    "qty": "Quantité",
+    "available": "{count, plural, =0 {aucun disponible} one {# disponible} other {# disponibles}}",
+    "addLine": "Ajouter une catégorie",
+    "removeLine": "Retirer cette ligne",
+    "note": "Note",
+    "notePlaceholder": "Facultatif",
+    "shortage": "Stock insuffisant à la source.",
+    "sameLocation": "Choisissez deux emplacements différents.",
+    "noLines": "Ajoutez au moins une catégorie.",
+    "nothingAvailable": "Aucun stock à cet emplacement.",
+    "confirm": "Transférer",
+    "done": "{count, plural, one {# article transféré} other {# articles transférés}} de {from} vers {to}",
+    "history": "Historique des transferts",
+    "empty": "Aucun transfert pour l'instant.",
+    "emptyBody": "Les transferts apparaîtront ici, avec les articles déplacés.",
+    "columns": {
+      "date": "Date",
+      "route": "Trajet",
+      "items": "Articles",
+      "note": "Note",
+      "by": "Par"
+    },
+    "back": "Retour au stock",
+    "total": "{count, plural, one {# article} other {# articles}}"
   }
 }
