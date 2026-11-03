@@ -1,10 +1,12 @@
 import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { claimsMatchProfile } from "./claims";
 import type { SessionUser, StoreSummary } from "./types";
 
 /**
- * The signed-in user, or null (no session, no profile, or deactivated).
+ * The signed-in user, or null (no session, no profile, deactivated, or a token issued before the
+ * user's role/store changed — the database denies that token, see `claimsMatchProfile`).
  * The JWT is verified by `getClaims()`; role/store come from the live profile row.
  */
 export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
@@ -18,7 +20,7 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
     .select("id, full_name, email, role, store_id, is_active")
     .eq("id", userId)
     .maybeSingle();
-  if (!profile || !profile.is_active) return null;
+  if (!profile || !profile.is_active || !claimsMatchProfile(data.claims, profile)) return null;
 
   return {
     id: profile.id,

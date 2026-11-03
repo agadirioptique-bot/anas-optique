@@ -6,7 +6,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureStore, ensureUser, hasDbEnv, signIn } from "../db/fixtures";
 
 /**
- * `npm run e2e:accounts` — DEV only. Resets the Playwright users (TSA secretary + super admin) with a
+ * `npm run e2e:accounts` — DEV only. Resets the Playwright users (TSA secretary + super admin, and a
+ * second TSA secretary that e2e/session.spec.ts moves between stores) with a
  * fresh random password and writes them to the git-ignored e2e/.auth/accounts.json. Also makes sure
  * TSA has a stocked frame category for the order flow. Nobody types or sees the passwords.
  */
@@ -18,6 +19,10 @@ it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   const admin = { email: "opticor-e2e-admin@example.com", fullName: "E2E Super Admin", role: "super_admin" as const };
   await ensureUser(service, secretary, storeA, password);
   await ensureUser(service, admin, null, password);
+  // Moved between stores by e2e/session.spec.ts: its own account, so parallel specs keep their session.
+  const mover = { email: "opticor-e2e-mover@example.com", fullName: "E2E Secrétaire mobile", role: "secretary" as const };
+  await ensureUser(service, mover, storeA, password);
+  await ensureStore(service, "TSB", "Test Succursale B");
 
   // A frame category with stock at TSA (topped up each run).
   const adminDb = await signIn(admin.email, password);
@@ -37,6 +42,6 @@ it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   const dir = join(process.cwd(), "e2e/.auth");
   mkdirSync(dir, { recursive: true });
   const file = join(dir, "accounts.json");
-  writeFileSync(file, JSON.stringify({ secretary: { email: secretary.email, password }, admin: { email: admin.email, password }, storePrefix: "TSA", frameName }, null, 2));
+  writeFileSync(file, JSON.stringify({ secretary: { email: secretary.email, password }, admin: { email: admin.email, password }, mover: { email: mover.email, password }, storePrefix: "TSA", frameName }, null, 2));
   chmodSync(file, 0o600);
 });
