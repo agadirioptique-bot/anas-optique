@@ -1181,6 +1181,13 @@ export type Database = {
             foreignKeyName: "purchase_lines_purchase_id_fkey"
             columns: ["purchase_id"]
             isOneToOne: false
+            referencedRelation: "purchase_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_lines_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
             referencedRelation: "purchases"
             referencedColumns: ["id"]
           },
@@ -1245,6 +1252,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "stores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_balances"
+            referencedColumns: ["supplier_id"]
           },
           {
             foreignKeyName: "purchases_supplier_id_fkey"
@@ -1562,6 +1576,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "purchase_balances"
             referencedColumns: ["purchase_id"]
+          },
+          {
+            foreignKeyName: "supplier_payments_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_overview"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "supplier_payments_purchase_id_fkey"
@@ -1899,6 +1920,77 @@ export type Database = {
             foreignKeyName: "purchases_supplier_id_fkey"
             columns: ["supplier_id"]
             isOneToOne: false
+            referencedRelation: "supplier_balances"
+            referencedColumns: ["supplier_id"]
+          },
+          {
+            foreignKeyName: "purchases_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_overview: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string | null
+          line_count: number | null
+          note: string | null
+          paid: number | null
+          purchase_date: string | null
+          receive_store_id: string | null
+          receive_store_kind: Database["public"]["Enums"]["store_kind"] | null
+          receive_store_name: string | null
+          remaining: number | null
+          stock_qty: number | null
+          supplier_id: string | null
+          supplier_name: string | null
+          supplier_ref: string | null
+          total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_receive_store_id_fkey"
+            columns: ["receive_store_id"]
+            isOneToOne: false
+            referencedRelation: "stock_overview"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "purchases_receive_store_id_fkey"
+            columns: ["receive_store_id"]
+            isOneToOne: false
+            referencedRelation: "store_usage"
+            referencedColumns: ["store_id"]
+          },
+          {
+            foreignKeyName: "purchases_receive_store_id_fkey"
+            columns: ["receive_store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_balances"
+            referencedColumns: ["supplier_id"]
+          },
+          {
+            foreignKeyName: "purchases_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
             referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
@@ -2074,6 +2166,17 @@ export type Database = {
           orders?: never
           secretaries?: never
           store_id?: string | null
+        }
+        Relationships: []
+      }
+      supplier_balances: {
+        Row: {
+          last_purchase_date: string | null
+          owed: number | null
+          paid: number | null
+          purchases_count: number | null
+          supplier_id: string | null
+          total_bought: number | null
         }
         Relationships: []
       }
