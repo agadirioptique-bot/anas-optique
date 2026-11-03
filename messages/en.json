@@ -301,6 +301,33 @@
       "fixedTitle": "Fixed values",
       "fixedBody": "Order statuses drive the tracking of each pair of glasses: they cannot be changed.",
       "statuses": "Order statuses"
+    },
+    "products": {
+      "typesTitle": "Product types",
+      "typesDescription": "The three stocked product types. Lenses are not a product: they are never in stock.",
+      "labelFr": "Label (FR)",
+      "labelEn": "Label (EN)",
+      "frameType": "Frame",
+      "categoriesTitle": "Categories and sale prices",
+      "categoriesDescription": "Stock is tracked per category. A new price applies to new orders; past orders keep their price.",
+      "showArchived": "Show archived",
+      "newCategory": "New category…",
+      "categoryName": "Category",
+      "salePrice": "Sale price",
+      "added": "“{name}” added",
+      "saved": "Saved",
+      "priceSaved": "Price of “{name}” updated",
+      "restored": "“{name}” restored",
+      "archived": "“{name}” archived",
+      "archiveTitle": "Archive “{name}”?",
+      "archiveBody": "It will no longer appear in new orders or purchases. Stock and history stay visible. You can restore it.",
+      "drag": "Move “{name}”",
+      "reordered": "Order saved",
+      "emptyCategories": "No categories.",
+      "thresholdsTitle": "Low-stock thresholds",
+      "thresholdsDescription": "An alert is sent when the quantity goes down to this threshold or below. Empty cell: no alert.",
+      "thresholdFor": "Threshold {category} — {store}",
+      "thresholdSaved": "Threshold saved"
     }
   },
   "status": {

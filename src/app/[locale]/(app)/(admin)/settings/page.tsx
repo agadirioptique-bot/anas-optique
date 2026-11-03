@@ -8,6 +8,8 @@ import { getVisibleStores } from "@/features/auth/session";
 import { isSettingsTab, SettingsNav, type SettingsTab } from "@/features/settings/components/settings-nav";
 import { ListsTab } from "@/features/settings/lists/components/lists-tab";
 import { getListItems } from "@/features/settings/lists/queries";
+import { ProductsTab } from "@/features/settings/products/components/products-tab";
+import { getProductsData } from "@/features/settings/products/queries";
 import { UsersTab } from "@/features/settings/users/components/users-tab";
 import { listUsers } from "@/features/settings/users/queries";
 
@@ -23,6 +25,10 @@ async function ListsSection() {
   return <ListsTab items={await getListItems()} />;
 }
 
+async function ProductsSection() {
+  return <ProductsTab data={await getProductsData()} />;
+}
+
 function ComingSoon() {
   const t = useTranslations("placeholder");
   return (
@@ -35,6 +41,7 @@ function ComingSoon() {
 /** One server component per sub-page: each loads only its own data. */
 const SECTIONS: Partial<Record<SettingsTab, () => Promise<ReactNode>>> = {
   lists: ListsSection,
+  products: ProductsSection,
   users: UsersSection,
 };
 

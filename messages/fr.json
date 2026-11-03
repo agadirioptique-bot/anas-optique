@@ -301,6 +301,33 @@
       "fixedTitle": "Valeurs fixes",
       "fixedBody": "Les statuts de commande pilotent le suivi des lunettes : ils ne sont pas modifiables.",
       "statuses": "Statuts des commandes"
+    },
+    "products": {
+      "typesTitle": "Types de produits",
+      "typesDescription": "Les trois types de produits stockés. Les verres ne sont pas un produit : ils ne sont jamais en stock.",
+      "labelFr": "Libellé (FR)",
+      "labelEn": "Libellé (EN)",
+      "frameType": "Monture",
+      "categoriesTitle": "Catégories et prix de vente",
+      "categoriesDescription": "Le stock est suivi par catégorie. Un nouveau prix s’applique aux nouvelles commandes ; les commandes passées gardent leur prix.",
+      "showArchived": "Afficher les archivées",
+      "newCategory": "Nouvelle catégorie…",
+      "categoryName": "Catégorie",
+      "salePrice": "Prix de vente",
+      "added": "« {name} » ajoutée",
+      "saved": "Enregistré",
+      "priceSaved": "Prix de « {name} » mis à jour",
+      "restored": "« {name} » restaurée",
+      "archived": "« {name} » archivée",
+      "archiveTitle": "Archiver « {name} » ?",
+      "archiveBody": "Elle n’apparaîtra plus dans les nouvelles commandes ni dans les achats. Le stock et l’historique restent visibles. Vous pourrez la restaurer.",
+      "drag": "Déplacer « {name} »",
+      "reordered": "Ordre enregistré",
+      "emptyCategories": "Aucune catégorie.",
+      "thresholdsTitle": "Seuils de stock bas",
+      "thresholdsDescription": "Une alerte est envoyée quand la quantité descend à ce seuil ou en dessous. Case vide : pas d’alerte.",
+      "thresholdFor": "Seuil {category} — {store}",
+      "thresholdSaved": "Seuil enregistré"
     }
   },
   "status": {
