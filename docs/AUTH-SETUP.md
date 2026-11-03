@@ -95,7 +95,13 @@ Nobody can invite from the app until one super admin exists:
 
 3. Click the link → choose a password → you land on the Dashboard. Invite everyone else from **Paramètres › Utilisateurs**.
 
-## 5. E2E test accounts (dev only)
+## 5. pg_cron (scheduled jobs)
+
+Nothing to click: the migration `…_storage_cron.sql` enables the `pg_cron` extension and schedules both jobs, so `npm run db:push` sets it up on any project (prod included).
+
+To look at them: Dashboard → **Integrations** → **Cron** → *Jobs* (`generate-recurring-charges` daily 05:00 UTC, `notify-stuck-orders` daily 07:00 UTC) and *History* for each run. If the Cron integration shows "not installed", click **Enable pg_cron** there, then run `npm run db:push` again.
+
+## 6. E2E test accounts (dev only)
 
 Add to `.env.local` (never commit): `E2E_SUPER_ADMIN_EMAIL`, `E2E_SUPER_ADMIN_PASSWORD`, `E2E_SECRETARY_EMAIL`, `E2E_SECRETARY_PASSWORD`. `npm run test:e2e` signs in with them; the tests that need them are skipped otherwise.
 Next 16 runs only one `next dev` per folder: if one is already running, use `E2E_BASE_URL=http://localhost:3000 npm run test:e2e`.

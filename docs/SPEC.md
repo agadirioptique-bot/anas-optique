@@ -290,15 +290,16 @@ All are `security definer`, `set search_path = ''`, check `auth_role()` / `auth_
 | `add_payment(order_id, amount, method_id)` | both | amount > 0 and ≤ balance. |
 | `deliver_order(order_id, final_payment jsonb null)` | both | Optional final payment + status delivered in one transaction. |
 | `cancel_order(order_id, reason_id, note, refund_amount, refund_method_id)` | super admin | Allowed from any status except `cancelled` (delivered included). Status cancelled, `sale_cancel` stock movements (frame/items back), optional refund as negative payment (≤ paid). Never delete. |
-| `set_client_discount(client_id, type, value, note)` / `clear_client_discount` | super admin | Pre-approve a discount for the client's next order. Consumed (cleared) by `create_order` when applied. |
+| `set_client_discount(client_id, type, value, note)` / `clear_client_discount` | super admin | Pre-approve a discount for the client's next order. Consumed (cleared) by `create_order` when applied (percent = % of the typed total). |
+| `apply_free_discount(order_id, amount)` | super admin | Before delivery; amount ≤ balance; never brings `total` below `frame_revenue`; not on top of a client discount. |
 | `create_purchase(payload)` | super admin | Purchase + lines + `purchase` stock movements at receive location + optional initial supplier payment (100% / 30% / 50% / custom). |
 | `add_supplier_payment(purchase_id, amount, paid_at, method_id)` | super admin | ≤ remaining; trigger creates the charge row. |
 | `create_transfer(from, to, lines)` | super admin | Checks stock at source; `transfer_out` / `transfer_in` movements. |
 | `record_damage(store_id, category_id, qty, reason)` | super admin | reason required; `damage` movement; no charge. |
 | `adjust_stock(store_id, category_id, counted_qty, reason_id, note)` | super admin | Movement of (counted − current) kind `adjustment`. |
 | `approve_charge(charge_id, amount null)` | super admin | pending → approved (optionally fix amount). |
-| `generate_recurring_charges()` | pg_cron (daily 06:00 Africa/Casablanca) | Idempotent per (recurring_charge_id, month). |
-| `notify_stuck_orders()` | pg_cron (daily) | Orders in a status longer than `stuck_order_days` → notify super admins + that store (once per order+status). |
+| `generate_recurring_charges(p_date)` | pg_cron (daily 05:00 UTC = 06:00 Casablanca) | Every active recurring charge whose `day_of_month` ≤ today gets one pending charge for the month: idempotent per (recurring_charge_id, month) and catches up missed days. Callable by `service_role` only. |
+| `notify_stuck_orders()` | pg_cron (daily 07:00 UTC), `service_role` only | Orders in a status longer than `stuck_order_days` → notify super admins + that store (once per order+status). |
 | `search_global(q text)` | both | Clients (name / phone) + orders (display number in any form: `832`, `00832`, `cnt-832`, `CNT-00832`) respecting RLS scope. |
 
 Triggers:
@@ -322,6 +323,9 @@ Triggers:
   - `stock_levels` / `stock_movements`: select own store only.
   - `notifications`: select/update own rows.
   - **No access at all**: `suppliers`, `purchases`, `purchase_lines`, `supplier_payments`, `charges`, `recurring_charges`, `charge_locations`, `audit_log`, `transfers`, `category_thresholds` (write).
+- **Ledger tables are RPC-only, also for the super admin** (decided in phase 4): `orders`, `order_items`, `order_treatments`, `order_status_history`, `payments`, `stock_movements`, `transfers`, `transfer_lines`, `purchases`, `purchase_lines`, `supplier_payments`, `audit_log` have select policies only. The super admin writes configuration tables directly (stores, products, lists, custom fields, settings, thresholds, suppliers, charge locations, charges, recurring charges); charges are never hard-deleted.
+- Clients: column grants — `authenticated` may insert/update only `full_name, phone_e164, has_whatsapp, notes`; discount fields via `set/clear_client_discount`, loyalty via trigger. Notifications: update of `read_at` only. `anon` has no table privileges.
+- Storage `private/prescriptions/{order_id}/…`: read + upload when the caller can see that order (orders RLS), delete super admin only.
 - Use `(select auth.uid())` / `(select public.auth_store_id())` pattern in policies for performance; index every `store_id`, `client_id`, `order_id` foreign key.
 - After each migration: run Supabase **security + performance advisors** (MCP `get_advisors`) and fix findings.
 
@@ -430,6 +434,14 @@ Phase 2 schema additions (2026-11-03):
 - Views `order_numbers` and `order_balances` added; all views are `security_invoker`.
 - `profiles.role` is enum `app_role`; `role_permissions.role` stays text (custom roles later). Permission keys are `domain.action` (e.g. `order.cancel`, `costs.read`), seeded in `supabase/seed.sql`.
 - Cross-table rules (store kind checks, one frame per order, prefix lock…) are triggers/RPCs in phase 4, not phase 2.
+
+Phase 4 (2026-11-03):
+- Internal helpers live in schema `private` (not exposed by the Data API): role/store checks, stock lock + `move_stock`, notification fan-out (`notify_users`, `super_admin_ids`, `store_user_ids`), trigger functions.
+- "Never negative stock": every stock removal takes `pg_advisory_xact_lock(store, category)` then checks the sum of movements (`OPTICOR:NO_STOCK`).
+- `deliver_order` only from `in_store`. `change_order_status` never sets `cancelled` (use `cancel_order`).
+- Supplier-payment charges: reason `Paiement fournisseur — <supplier>`, category code `supplier_purchase`, read-only (`OPTICOR:CHARGE_READ_ONLY`).
+- Notifications store `kind` and `title_key` (= kind) with `params`; the UI translates them (phase 12).
+- Tests: `npm run test:db` runs RLS + rule tests against DEV with test stores TSA/TSB and test users `opticor-test-secretary@example.com` / `opticor-test-admin@example.com` (random password per run). Their data stays on dev.
 
 ---
 

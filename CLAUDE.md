@@ -11,7 +11,7 @@ Multi-store ERP + BI for an optician (Morocco). Next.js App Router + Supabase + 
 - `_reference/opticor-demo/` (if present) — demo source: copy UI only, never its localStorage data layer.
 
 ## Commands
-- `npm run dev` · `npm run build` · `npm run lint` · `npm run typecheck` · `npm run test` · `npm run test:e2e`
+- `npm run dev` · `npm run build` · `npm run lint` · `npm run typecheck` · `npm run test` · `npm run test:db` (RLS/RPC tests against DEV) · `npm run test:e2e`
 - `npm run db:new -- <name>` new migration · `npm run db:push` apply migrations to the linked (dev) project · `npm run db:types` regenerate `src/types/database.ts`
 
 ## Structure
