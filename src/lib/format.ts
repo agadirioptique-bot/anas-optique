@@ -14,10 +14,35 @@ export function parseMoney(raw: string, locale: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-/** 1200.5 → "1 200,5 DH" (fr) / "1,200.5 DH" (en). Display only — sums are done in SQL. */
-export function formatMoney(value: number, locale: string): string {
-  const n = new Intl.NumberFormat(locale === "en" ? "en-GB" : "fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })
-    .format(value)
-    .replace(/ | /g, " ");
-  return `${n} DH`;
+const MINUS = "\u2212";
+const NBSP = "\u00a0";
+
+/** Intl uses a narrow no-break space in French; it almost vanishes in Inter, so use a regular one. */
+const wide = (s: string) => s.replace(/\u202f|\u00a0/g, NBSP);
+
+/** 1 250 DH (fr) · DH 1,250 (en). Negative amounts use a real minus sign. Display only — sums are done in SQL. */
+export function formatMoney(amount: number, locale: string): string {
+  const n = new Intl.NumberFormat(locale === "en" ? "en-GB" : "fr-FR", { maximumFractionDigits: 2 }).format(Math.abs(Math.round(amount * 100) / 100));
+  const sign = amount < 0 ? MINUS : "";
+  return locale === "en" ? `${sign}DH${NBSP}${wide(n)}` : `${sign}${wide(n)}${NBSP}DH`;
+}
+
+/** +1.25 / −0.75 / 0.00 · null → — (optician notation). */
+export function formatDiopter(value: number | null | undefined): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  if (value === 0) return "0.00";
+  return `${value > 0 ? "+" : MINUS}${Math.abs(value).toFixed(2)}`;
+}
+
+export function formatAxis(value: number | null | undefined): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  return `${Math.round(value)}°`;
+}
+
+/** What was typed in a prescription cell ("-0,75", "+1.5", "−2") → number, or null. */
+export function parseDecimal(raw: string): number | null {
+  const cleaned = raw.replace(/\s/g, "").replace(",", ".").replace(MINUS, "-");
+  if (cleaned === "" || cleaned === "-" || cleaned === "+") return null;
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : null;
 }
