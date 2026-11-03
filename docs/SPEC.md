@@ -478,6 +478,14 @@ Phase 8 — Purchasing (2026-11-03):
 - New purchase is a dialog on `/purchases` (supplier with inline "+ new supplier", "Reçu à" store or lab, date, supplier ref, stock lines by category — unit price × qty — and lens lines — description + amount —, live total). First payment chips: 100 % / 50 % / 30 % / custom / nothing (default nothing), amounts rounded to the cent, 100 % = exactly the total. Dates can't be in the future (UI `max` = browser's today; server allows one day of slack for time zones). Saving opens `/purchases/[id]`.
 - Purchase detail: lines, total / paid / remaining, payments (each one created a read-only charge), "Add payment" with "Pay in full" / 50 % / custom, ≤ remaining (checked again under lock by `add_supplier_payment`).
 
+Phase 9 — Charges (2026-11-03):
+- Write rules: `authenticated` may insert only `amount, charge_date, category_id, location_id, reason, order_id` and update those plus `is_deleted` (same idea for `recurring_charges`). Status and approval go through `approve_charge`; supplier / recurring sources come from their trigger / job. Trigger `charges_before_write` sets `updated_at`, `approved_by/at` on a manual insert, `deleted_by/at` on soft delete (cleared on restore), and checks that the category is an active `charge_categories` item — never `supplier_purchase` on a manual charge — and that the location is active (`OPTICOR:INVALID_INPUT`). Supplier and recurring inserts skip that check, so a category archived later can't stop the monthly job.
+- `charge_overview` (labels, order number, `source` manual / supplier / recurring, purchase link) and `charge_totals(from, to, location, category)` (approved / pending sums and counts, deleted excluded, summed in SQL). Page periods use today's business date from Postgres (`business_date`).
+- Pending recurring charges: Approve, approve with another amount, or Skip (= soft delete, restorable). Recurring charges: delete only when they never generated a charge (`inUse` → deactivate).
+- History per charge from `audit_log`: created, approved, edited (field: old → new), deleted, restored.
+- Sidebar badge: `ShellValue.badges` filled by the app layout (pending charges count, super admin); refreshed by `router.refresh()`. Workshop badge comes with phase 10.
+- UI rule: row menus that open dialogs use `DropdownMenu modal={false}` (otherwise Radix leaves `pointer-events: none` on `<body>` after the dialog closes), and `DataTable` ignores row clicks that bubble from portals.
+
 ## 12. Later (design for it, don't build it)
 
 - Excel history import (~2,270 orders 2021–2023, prescriptions as text like `-1.75(-2 a 69)`, treatments like AR / BL / BLEU CAT / PGX / PROG / DF / LENTILLE): imported orders get `source = 'legacy'` column (add now, default `'app'`), status delivered, no stock movements, count toward loyalty when phone matches.
