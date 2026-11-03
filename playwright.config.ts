@@ -5,6 +5,8 @@ import { defineConfig, devices } from "@playwright/test";
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 
 const PORT = 3100;
+// Next 16 allows one `next dev` per folder: point E2E_BASE_URL at an already running one (e.g. http://localhost:3000).
+const EXTERNAL_URL = process.env.E2E_BASE_URL;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -13,16 +15,18 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: "list",
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: EXTERNAL_URL ?? `http://localhost:${PORT}`,
     trace: "on-first-retry",
     // The app detects the browser language on "/"; French is the product default.
     locale: "fr-FR",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  webServer: {
-    command: `npx next dev -p ${PORT}`,
-    url: `http://localhost:${PORT}/fr/login`,
-    timeout: 180_000,
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: EXTERNAL_URL
+    ? undefined
+    : {
+        command: `npx next dev -p ${PORT}`,
+        url: `http://localhost:${PORT}/fr/login`,
+        timeout: 180_000,
+        reuseExistingServer: !process.env.CI,
+      },
 });

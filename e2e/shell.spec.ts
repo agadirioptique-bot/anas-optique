@@ -33,13 +33,13 @@ test("wrong credentials show an error", async ({ page }) => {
   await page.locator("#email").fill("nobody@example.com");
   await page.locator("#password").fill("not-the-password");
   await page.getByRole("button", { name: "Se connecter" }).click();
-  await expect(page.getByRole("alert")).toHaveText("E-mail ou mot de passe incorrect.");
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText("E-mail ou mot de passe incorrect.");
 });
 
 test("an invalid email link lands on the login page with a message", async ({ page }) => {
   await page.goto("/auth/confirm?token_hash=bogus&type=invite&next=/set-password");
   await expect(page).toHaveURL(/\/fr\/login\?error=linkInvalid$/);
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.getByRole("main").getByRole("alert")).toBeVisible();
 });
 
 test("super admin lands on the dashboard and sees every page", async ({ page }) => {
