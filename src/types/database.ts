@@ -1756,6 +1756,144 @@ export type Database = {
       }
     }
     Views: {
+      charge_overview: {
+        Row: {
+          amount: number | null
+          approved_at: string | null
+          approved_by: string | null
+          category_code: string | null
+          category_id: string | null
+          category_label_en: string | null
+          category_label_fr: string | null
+          charge_date: string | null
+          created_at: string | null
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string | null
+          is_deleted: boolean | null
+          location_id: string | null
+          location_label_en: string | null
+          location_label_fr: string | null
+          order_display_number: string | null
+          order_id: string | null
+          purchase_id: string | null
+          reason: string | null
+          recurring_charge_id: string | null
+          recurring_label: string | null
+          source: string | null
+          status: Database["public"]["Enums"]["charge_status"] | null
+          supplier_payment_id: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "charges_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "settings_list_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "settings_list_usage"
+            referencedColumns: ["item_id"]
+          },
+          {
+            foreignKeyName: "charges_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "charge_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_balances"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "charges_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_numbers"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "charges_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_recurring_charge_id_fkey"
+            columns: ["recurring_charge_id"]
+            isOneToOne: false
+            referencedRelation: "recurring_charges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_supplier_payment_id_fkey"
+            columns: ["supplier_payment_id"]
+            isOneToOne: true
+            referencedRelation: "supplier_payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_payments_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_balances"
+            referencedColumns: ["purchase_id"]
+          },
+          {
+            foreignKeyName: "supplier_payments_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_overview"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_payments_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_delivery_counts: {
         Row: {
           clients: number | null
@@ -2266,6 +2404,20 @@ export type Database = {
           p_to_status: Database["public"]["Enums"]["order_status"]
         }
         Returns: undefined
+      }
+      charge_totals: {
+        Args: {
+          p_category_id?: string
+          p_from: string
+          p_location_id?: string
+          p_to: string
+        }
+        Returns: {
+          approved_count: number
+          approved_total: number
+          pending_count: number
+          pending_total: number
+        }[]
       }
       clear_client_discount: {
         Args: { p_client_id: string }
