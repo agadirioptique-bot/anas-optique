@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPhone, normalizePhone } from "./phone";
+import { formatPhone, formatPhoneTyping, normalizePhone } from "./phone";
 
 describe("normalizePhone", () => {
   it("accepts the ways people type a Moroccan number", () => {
@@ -25,5 +25,13 @@ describe("formatPhone", () => {
     expect(formatPhone("+212612345678")).toBe("06 12 34 56 78");
     expect(formatPhone("+33612345678")).toBe("+33612345678");
     expect(formatPhone(null)).toBe("");
+  });
+});
+
+describe("formatPhoneTyping", () => {
+  it("groups digits by two while typing", () => {
+    expect(formatPhoneTyping("0612")).toBe("06 12");
+    expect(formatPhoneTyping("06 12 34 56 789")).toBe("06 12 34 56 78");
+    expect(formatPhoneTyping("+33 6 12")).toBe("+33 6 12");
   });
 });

@@ -29,3 +29,10 @@ export function formatPhone(e164: string | null | undefined): string {
   const local = "0" + e164.slice(4);
   return local.replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, "$1 $2 $3 $4 $5");
 }
+
+/** As-you-type grouping for Moroccan numbers: "0612345678" → "06 12 34 56 78". International input is left alone. */
+export function formatPhoneTyping(raw: string): string {
+  if (raw.trim().startsWith("+") || raw.trim().startsWith("00")) return raw;
+  const digits = raw.replace(/\D/g, "").slice(0, 10);
+  return digits.replace(/(\d{2})(?=\d)/g, "$1 ");
+}
