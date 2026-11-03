@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import type { NavKey } from "@/lib/permissions";
+import { useShell } from "./shell-context";
 
 export const NAV_ICONS: Record<NavKey, LucideIcon> = {
   dashboard: LayoutDashboard,
@@ -22,7 +23,7 @@ export const NAV_ICONS: Record<NavKey, LucideIcon> = {
   settings: Settings,
 };
 
-/** Counters next to nav items (workshop queue, pending charges). Wired to data in later phases. */
+/** Counters next to nav items: pending charges (phase 9); workshop queue comes with phase 10. */
 export function useNavBadges(): Partial<Record<NavKey, number>> {
-  return {};
+  return useShell().badges;
 }

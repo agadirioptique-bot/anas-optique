@@ -2,6 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 import type { SessionUser, StoreSummary } from "@/features/auth/types";
+import type { NavKey } from "@/lib/permissions";
 
 export interface ShellValue {
   user: SessionUser;
@@ -9,6 +10,8 @@ export interface ShellValue {
   stores: StoreSummary[];
   /** Super admin selector value: "all" or a store/lab id. */
   activeStore: string;
+  /** Counters next to nav items, computed by the app layout (re-rendered by router.refresh()). */
+  badges: Partial<Record<NavKey, number>>;
 }
 
 const ShellContext = createContext<ShellValue | null>(null);
