@@ -348,7 +348,7 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 
 **Clients**: list with chips All / New / Regular / Loyal (counts = non-cancelled orders across all stores; Loyal = `is_loyal`; New = 0–1 order; Regular = 2..N−1), client file (orders across stores: secretary sees count — via `client_order_stats(client_id)` security definer RPC returning counts only — + only her store's rows), "Vision over time" chart, "New order for this client". Super admin: set/clear pending discount.
 
-**Stock**: location tabs (secretary: only her store, no tabs), KPI strip (tracked categories, below threshold — **no money value**), search + product type chips + "Low stock only", table: category, type, quantity pill (red < min, amber = min), threshold. Super admin row actions: history, adjust (count), damage, transfer; header button "Transfers" (history + new transfer).
+**Stock**: location tabs (secretary: only her store, no tabs), KPI strip (tracked categories, items in stock, below threshold — **no money value**), search + product type chips + "Low stock only", table: category, type, quantity pill (red < min, amber = min), threshold (super admin edits it inline). Row click / history icon opens the movement history drawer for **both roles** (secretary: her store; kind, ±qty, level after, date, user, order N°). Super admin row actions: adjust (count), damage, transfer; header button "Transfers" (history + new transfer).
 
 **Workshop** (super admin): same as demo (summary strip, filter chips, cards with prescription + main action). Shows frame category or "Monture du client", lens type + treatments.
 
@@ -462,6 +462,14 @@ Phase 6 — Clients & Orders (2026-11-03):
 - Board: delivered column = last 7 days, cancelled (toggle) = last 30 days; a card is late after `stuck_order_days[status]`. Delivery always goes through `deliver_order` (collect dialog when a balance is due).
 - WhatsApp "ready" message (FR): « Bonjour {prénom}, vos lunettes (commande {N°}) sont prêtes à la {succursale}. Reste à payer : {montant}. À bientôt ! »
 - E2E: `npm run e2e:accounts` provisions DEV-only Playwright users (TSA) with random passwords in git-ignored `e2e/.auth/accounts.json`; `E2E_BASE_URL=http://localhost:3000 npm run test:e2e`.
+
+Phase 7 — Stock (2026-11-03):
+- Views (security_invoker, quantities only): `stock_overview` = every active category × visible location (0 included, so a first count can be entered with Adjust; archived categories still listed while their quantity ≠ 0); `stock_movement_history` = movements with `balance_after` (running sum per store + category), order display number, adjustment reason label, transfer counterpart (super admin only through `transfers` RLS).
+- Low stock (filter + KPI) = a threshold row exists and quantity ≤ min (same rule as the notification). Pill: no threshold → neutral, < min → red, = min → amber.
+- History drawer is available to secretaries too (decision 2026-11-03; read only, own store, no transfer / purchase links).
+- Defence in depth: trigger `stock_movements_not_negative` raises `OPTICOR:NO_STOCK` if any insert leaves a level below 0, whoever inserts it (RPCs still lock and check first).
+- Tabs: stores first, then the lab; default tab = top-bar store when one is selected. The transfer dialog (multi-line, source levels shown) opens from `/stock/transfers` and from a stock row (source + category prefilled).
+- Migration `20261103200423_stock_guard_definer.sql` was applied empty by mistake (CLI hang); the change is in `20261103201000_stock_guard_security_definer.sql`.
 
 ## 12. Later (design for it, don't build it)
 
