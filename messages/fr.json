@@ -122,7 +122,10 @@
     "actions": "Actions",
     "empty": "Aucun résultat",
     "hint": "Astuce : tapez un numéro de commande ou de téléphone",
-    "shortcut": "Ctrl K"
+    "shortcut": "Ctrl K",
+    "searching": "Recherche…",
+    "orders": "Commandes",
+    "clients": "Clients"
   },
   "notifications": {
     "title": "Notifications",

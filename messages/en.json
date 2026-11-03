@@ -122,7 +122,10 @@
     "actions": "Actions",
     "empty": "No results",
     "hint": "Tip: type an order or phone number",
-    "shortcut": "Ctrl K"
+    "shortcut": "Ctrl K",
+    "searching": "Searching…",
+    "orders": "Orders",
+    "clients": "Clients"
   },
   "notifications": {
     "title": "Notifications",
