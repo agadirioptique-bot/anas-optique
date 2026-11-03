@@ -662,7 +662,17 @@
       "thisYear": "This year"
     },
     "count": "{count, plural, =0 {No orders} one {# order} other {# orders}}",
-    "exportName": "orders"
+    "exportName": "orders",
+    "stepBack": "Go back",
+    "stepBackTitle": "Move {number} back to “{status}”?",
+    "stepBackBody": "The order goes back one step. The history keeps a record of it.",
+    "periods": {
+      "7": "Last 7 days",
+      "30": "Last 30 days",
+      "90": "Last 3 months",
+      "365": "Last 12 months",
+      "any": "Any date"
+    }
   },
   "wizard": {
     "title": "New order",
@@ -840,7 +850,8 @@
     "done": "{amount} collected",
     "delivered": "Order No. {number} delivered",
     "tooMuch": "The amount exceeds the balance ({amount}).",
-    "mustBeFull": "To deliver, collect the whole balance ({amount})."
+    "mustBeFull": "To deliver, collect the whole balance ({amount}).",
+    "invalidAmount": "Enter an amount above 0."
   },
   "cancel": {
     "title": "Cancel order No. {number}?",
@@ -851,7 +862,13 @@
     "revenue": "the order leaves revenue and statistics.",
     "confirm": "Cancel the order",
     "done": "Order No. {number} cancelled",
-    "doneBody": "{amount} refunded, stock updated."
+    "doneBody": "{amount} refunded, stock updated.",
+    "stockBack": "the products go back to the store’s stock;",
+    "reason": "Cancellation reason",
+    "note": "Details (optional)",
+    "refundAmount": "Refund (already paid: {paid})",
+    "refundMethod": "Refund method",
+    "refundTooHigh": "The refund cannot exceed what was paid ({amount})."
   },
   "clients": {
     "title": "Clients",
@@ -970,5 +987,14 @@
     "showChart": "Show chart",
     "tableCaption": "Chart data: {title}",
     "noData": "Not enough data for this period."
+  },
+  "discount": {
+    "title": "Free discount — {number}",
+    "description": "Lowers the balance before delivery. The order cannot go below the frame and products price.",
+    "amount": "Discount amount",
+    "hint": "At most the balance due: {amount}.",
+    "tooHigh": "The discount is more than the balance ({amount}).",
+    "confirm": "Give the discount",
+    "done": "Discount of {amount} given"
   }
 }

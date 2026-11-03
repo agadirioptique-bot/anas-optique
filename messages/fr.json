@@ -662,7 +662,17 @@
       "thisYear": "Cette année"
     },
     "count": "{count, plural, =0 {Aucune commande} one {# commande} other {# commandes}}",
-    "exportName": "commandes"
+    "exportName": "commandes",
+    "stepBack": "Revenir en arrière",
+    "stepBackTitle": "Remettre {number} à « {status} » ?",
+    "stepBackBody": "La commande revient d’une étape. L’historique garde la trace du retour.",
+    "periods": {
+      "7": "7 derniers jours",
+      "30": "30 derniers jours",
+      "90": "3 derniers mois",
+      "365": "12 derniers mois",
+      "any": "Toutes les dates"
+    }
   },
   "wizard": {
     "title": "Nouvelle commande",
@@ -840,7 +850,8 @@
     "done": "{amount} encaissés",
     "delivered": "Commande N° {number} livrée",
     "tooMuch": "Le montant dépasse le reste ({amount}).",
-    "mustBeFull": "Pour livrer, encaissez la totalité du reste ({amount})."
+    "mustBeFull": "Pour livrer, encaissez la totalité du reste ({amount}).",
+    "invalidAmount": "Saisissez un montant supérieur à 0."
   },
   "cancel": {
     "title": "Annuler la commande N° {number} ?",
@@ -851,7 +862,13 @@
     "revenue": "la commande sort du chiffre d'affaires et des statistiques.",
     "confirm": "Annuler la commande",
     "done": "Commande N° {number} annulée",
-    "doneBody": "{amount} remboursés, stock remis à jour."
+    "doneBody": "{amount} remboursés, stock remis à jour.",
+    "stockBack": "les produits retournent en stock dans la succursale ;",
+    "reason": "Motif d’annulation",
+    "note": "Précision (facultatif)",
+    "refundAmount": "Remboursement (déjà payé : {paid})",
+    "refundMethod": "Mode de remboursement",
+    "refundTooHigh": "Le remboursement ne peut pas dépasser ce qui a été payé ({amount})."
   },
   "clients": {
     "title": "Clients",
@@ -970,5 +987,14 @@
     "showChart": "Voir le graphique",
     "tableCaption": "Données du graphique : {title}",
     "noData": "Pas assez de données sur cette période."
+  },
+  "discount": {
+    "title": "Remise libre — {number}",
+    "description": "Réduit le reste à payer avant la livraison. La commande ne peut pas descendre sous le prix de la monture et des produits.",
+    "amount": "Montant de la remise",
+    "hint": "Au maximum le reste à payer : {amount}.",
+    "tooHigh": "La remise dépasse le reste à payer ({amount}).",
+    "confirm": "Accorder la remise",
+    "done": "Remise de {amount} accordée"
   }
 }
