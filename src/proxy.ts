@@ -3,21 +3,19 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
 import { supabaseAnonKey, supabaseUrl } from "./lib/supabase/env";
-import { homePath, isAppRole } from "./lib/permissions";
 
 const intlMiddleware = createMiddleware(routing);
 
 /** Pages reachable without a session (locale-less). Set password needs one, but the page checks it. */
 const PUBLIC_PATHS = ["/login", "/forgot-password", "/set-password"];
-/** Signed-in users are sent home from these. */
-const GUEST_ONLY_PATHS = ["/login", "/forgot-password"];
 
 type CookieToSet = { name: string; value: string; options: Parameters<NextResponse["cookies"]["set"]>[2] };
 
 /**
  * 1. Refresh the Supabase session (cookies written to the request for Server Components and to the response).
  * 2. next-intl locale routing.
- * 3. Optimistic redirects from the JWT claims. Real checks: server guards + RLS.
+ * 3. No session → login. Everything role-related is decided by the live profile (server guards, RLS):
+ *    the JWT claims may still describe a user who was just deactivated.
  */
 export default async function proxy(request: NextRequest) {
   const pending: CookieToSet[] = [];
@@ -60,8 +58,6 @@ export default async function proxy(request: NextRequest) {
   };
 
   if (!claims && !PUBLIC_PATHS.includes(path)) return redirectTo("/login");
-  const role = claims?.app_role;
-  if (claims && isAppRole(role) && GUEST_ONLY_PATHS.includes(path)) return redirectTo(homePath(role));
 
   return withSession(response);
 }
