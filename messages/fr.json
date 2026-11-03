@@ -1,0 +1,159 @@
+{
+  "meta": {
+    "title": "Gestion optique",
+    "description": "ERP et tableau de bord pour opticiens multi-succursales."
+  },
+  "brand": {
+    "tagline": "Gestion optique multi-succursales"
+  },
+  "common": {
+    "back": "Retour",
+    "allLocations": "Toutes les succursales",
+    "locations": "Succursales",
+    "lab": "Laboratoire"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "newOrder": "Nouvelle commande",
+    "newOrderShort": "Nouvelle",
+    "orders": "Commandes",
+    "workshop": "Atelier",
+    "clients": "Clients",
+    "stock": "Stock",
+    "transfers": "Transferts",
+    "purchases": "Achats",
+    "charges": "Charges",
+    "settings": "Paramètres",
+    "notifications": "Notifications",
+    "more": "Plus",
+    "menu": "Menu",
+    "skipToContent": "Aller au contenu",
+    "collapse": "Réduire le menu",
+    "expand": "Déplier le menu",
+    "mainNav": "Navigation principale",
+    "close": "Fermer"
+  },
+  "shell": {
+    "search": "Rechercher un client, une commande…",
+    "searchShort": "Rechercher",
+    "language": "Langue",
+    "theme": "Thème",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "themeSystem": "Système",
+    "signOut": "Se déconnecter",
+    "locationSelector": "Succursale affichée",
+    "noLocation": "Toutes les succursales",
+    "userMenu": "Menu utilisateur",
+    "storeChangeFailed": "Impossible de changer de succursale."
+  },
+  "palette": {
+    "placeholder": "Client (nom, téléphone), commande (N°) ou page…",
+    "pages": "Pages",
+    "actions": "Actions",
+    "empty": "Aucun résultat",
+    "hint": "Astuce : tapez un numéro de commande ou de téléphone",
+    "shortcut": "Ctrl K"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Tout est à jour",
+    "emptyBody": "Aucune notification pour le moment.",
+    "bellLabel": "{count, plural, =0 {Notifications} one {Notifications, # non lue} other {Notifications, # non lues}}",
+    "newCount": "{count, plural, =0 {aucune nouvelle} one {# nouvelle} other {# nouvelles}}",
+    "seeAll": "Voir toutes les notifications"
+  },
+  "unauthorized": {
+    "title": "Accès non autorisé",
+    "body": "Votre rôle ne donne pas accès à cette page. Si vous pensez que c'est une erreur, demandez à l'opticien de vérifier vos permissions.",
+    "cta": "Retour à l'accueil"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "body": "Cette page n'existe pas ou a été déplacée.",
+    "cta": "Retour à l'accueil"
+  },
+  "roles": {
+    "super_admin": "Super admin",
+    "secretary": "Secrétaire"
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "loginSubtitle": "Accédez à l'espace de gestion de vos magasins.",
+    "forgotTitle": "Mot de passe oublié",
+    "forgotSubtitle": "Recevez un lien pour choisir un nouveau mot de passe.",
+    "setPasswordTitle": "Choisir un mot de passe",
+    "setPasswordSubtitle": "Créez le mot de passe de votre compte OPTICOR.",
+    "comingSoon": "Le formulaire sera disponible à l'étape d'authentification.",
+    "heroTitle": "Vos magasins d'optique, clairs et sous contrôle.",
+    "heroPoint1": "Une commande saisie en moins d'une minute, aussi simple que la fiche papier.",
+    "heroPoint2": "Le suivi des lunettes de l'atelier jusqu'au retrait, avec rappel WhatsApp.",
+    "heroPoint3": "Chiffre d'affaires, charges et stock de chaque succursale, en temps réel.",
+    "languageToggle": "Langue"
+  },
+  "dev": {
+    "badge": "DEV",
+    "roleSwitch": "Rôle de test",
+    "roleSwitchHint": "Mode développement uniquement : changez de rôle sans authentification.",
+    "enterAs": "Entrer en tant que {role}",
+    "loginHint": "Mode développement : authentification simulée."
+  },
+  "placeholder": {
+    "title": "Bientôt disponible",
+    "body": "Cette page sera construite dans une prochaine étape."
+  },
+  "pages": {
+    "dashboard": {
+      "title": "Tableau de bord",
+      "description": "Chiffre d'affaires, charges et activité de vos succursales."
+    },
+    "orders": {
+      "title": "Commandes",
+      "description": "Suivez chaque paire de lunettes, de la commande au retrait."
+    },
+    "newOrder": {
+      "title": "Nouvelle commande",
+      "description": "Client, mesures, puis produits et paiement."
+    },
+    "orderDetail": {
+      "title": "Commande",
+      "description": "Suivi, prescription, produits et paiements."
+    },
+    "workshop": {
+      "title": "Atelier",
+      "description": "La file des lunettes à préparer, les plus anciennes en premier."
+    },
+    "clients": {
+      "title": "Clients",
+      "description": "Vos clients, leur fidélité et leur historique."
+    },
+    "clientDetail": {
+      "title": "Fiche client",
+      "description": "Coordonnées, vision dans le temps et commandes."
+    },
+    "stock": {
+      "title": "Stock",
+      "description": "Quantités par emplacement, calculées à partir de chaque mouvement."
+    },
+    "transfers": {
+      "title": "Transferts",
+      "description": "Déplacez du stock entre le labo et les succursales, en une seule action."
+    },
+    "purchases": {
+      "title": "Achats fournisseurs",
+      "description": "Achats et fournisseurs. La réception met le stock à jour automatiquement."
+    },
+    "charges": {
+      "title": "Charges",
+      "description": "Toutes les dépenses de vos succursales, approuvées ou en attente."
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Adaptez l'application à votre façon de travailler."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Les alertes qui demandent votre attention."
+    }
+  }
+}

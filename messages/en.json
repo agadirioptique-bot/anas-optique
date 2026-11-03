@@ -1,0 +1,159 @@
+{
+  "meta": {
+    "title": "Optical management",
+    "description": "ERP and dashboard for multi-store opticians."
+  },
+  "brand": {
+    "tagline": "Multi-store optical management"
+  },
+  "common": {
+    "back": "Back",
+    "allLocations": "All stores",
+    "locations": "Stores",
+    "lab": "Lab"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "newOrder": "New order",
+    "newOrderShort": "New",
+    "orders": "Orders",
+    "workshop": "Workshop",
+    "clients": "Clients",
+    "stock": "Stock",
+    "transfers": "Transfers",
+    "purchases": "Purchasing",
+    "charges": "Charges",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "more": "More",
+    "menu": "Menu",
+    "skipToContent": "Skip to content",
+    "collapse": "Collapse menu",
+    "expand": "Expand menu",
+    "mainNav": "Main navigation",
+    "close": "Close"
+  },
+  "shell": {
+    "search": "Search a client, an order…",
+    "searchShort": "Search",
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "signOut": "Sign out",
+    "locationSelector": "Displayed store",
+    "noLocation": "All stores",
+    "userMenu": "User menu",
+    "storeChangeFailed": "Could not change the store."
+  },
+  "palette": {
+    "placeholder": "Client (name, phone), order (No.) or page…",
+    "pages": "Pages",
+    "actions": "Actions",
+    "empty": "No results",
+    "hint": "Tip: type an order or phone number",
+    "shortcut": "Ctrl K"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "All caught up",
+    "emptyBody": "No notifications for now.",
+    "bellLabel": "{count, plural, =0 {Notifications} one {Notifications, # unread} other {Notifications, # unread}}",
+    "newCount": "{count, plural, =0 {none new} one {# new} other {# new}}",
+    "seeAll": "See all notifications"
+  },
+  "unauthorized": {
+    "title": "Access denied",
+    "body": "Your role does not give access to this page. If you think this is a mistake, ask the optician to check your permissions.",
+    "cta": "Back to home"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "This page does not exist or has been moved.",
+    "cta": "Back to home"
+  },
+  "roles": {
+    "super_admin": "Super admin",
+    "secretary": "Secretary"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginSubtitle": "Access the management space of your stores.",
+    "forgotTitle": "Forgot password",
+    "forgotSubtitle": "Get a link to choose a new password.",
+    "setPasswordTitle": "Choose a password",
+    "setPasswordSubtitle": "Create the password of your OPTICOR account.",
+    "comingSoon": "The form will be available in the authentication phase.",
+    "heroTitle": "Your optical stores, clear and under control.",
+    "heroPoint1": "An order entered in under a minute, as simple as the paper slip.",
+    "heroPoint2": "Glasses tracked from the workshop to pick-up, with a WhatsApp reminder.",
+    "heroPoint3": "Revenue, charges and stock of every store, in real time.",
+    "languageToggle": "Language"
+  },
+  "dev": {
+    "badge": "DEV",
+    "roleSwitch": "Test role",
+    "roleSwitchHint": "Development mode only: switch roles without authentication.",
+    "enterAs": "Enter as {role}",
+    "loginHint": "Development mode: simulated authentication."
+  },
+  "placeholder": {
+    "title": "Coming soon",
+    "body": "This page will be built in a later phase."
+  },
+  "pages": {
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Revenue, charges and activity across your stores."
+    },
+    "orders": {
+      "title": "Orders",
+      "description": "Follow every pair of glasses, from order to pick-up."
+    },
+    "newOrder": {
+      "title": "New order",
+      "description": "Client, measurements, then products and payment."
+    },
+    "orderDetail": {
+      "title": "Order",
+      "description": "Tracking, prescription, products and payments."
+    },
+    "workshop": {
+      "title": "Workshop",
+      "description": "The queue of glasses to prepare, oldest first."
+    },
+    "clients": {
+      "title": "Clients",
+      "description": "Your clients, their loyalty and their history."
+    },
+    "clientDetail": {
+      "title": "Client file",
+      "description": "Contact details, vision over time and orders."
+    },
+    "stock": {
+      "title": "Stock",
+      "description": "Quantities per location, computed from every movement."
+    },
+    "transfers": {
+      "title": "Transfers",
+      "description": "Move stock between the lab and the stores, in one action."
+    },
+    "purchases": {
+      "title": "Supplier purchasing",
+      "description": "Purchases and suppliers. Receiving updates the stock automatically."
+    },
+    "charges": {
+      "title": "Charges",
+      "description": "Every expense of your stores, approved or pending."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Adapt the application to the way you work."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Alerts that need your attention."
+    }
+  }
+}

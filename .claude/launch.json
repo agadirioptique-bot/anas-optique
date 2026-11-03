@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "opticor-dev",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["OPTICOR_DEV_FAKE_AUTH=1", "npm", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}

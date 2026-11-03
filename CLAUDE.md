@@ -1,5 +1,7 @@
 # OPTICOR
 
+@AGENTS.md
+
 Multi-store ERP + BI for an optician (Morocco). Next.js App Router + Supabase + Vercel. FR (default) / EN.
 
 ## Read before working
