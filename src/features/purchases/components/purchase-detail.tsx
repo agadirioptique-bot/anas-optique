@@ -69,7 +69,7 @@ export function PurchaseDetail({
       />
 
       <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
-        <div className="space-y-5">
+        <div className="order-2 space-y-5 lg:order-1">
           <Card className="gap-0 py-0">
             <CardHeader className="border-b py-4">
               <CardTitle className="text-base">{t("lines")}</CardTitle>
@@ -138,7 +138,8 @@ export function PurchaseDetail({
           </Card>
         </div>
 
-        <div className="space-y-5">
+        {/* Totals first on phones: "left to pay" is what the page is opened for. */}
+        <div className="order-1 space-y-5 lg:order-2">
           <Card>
             <CardContent className="space-y-3">
               <div className="flex items-baseline justify-between">
