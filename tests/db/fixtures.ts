@@ -46,6 +46,8 @@ export interface Fixtures {
     frameType: string;
     supplier: string;
   };
+  /** Values for the measurement fields currently set to "required" on dev, so orders pass validation. */
+  requiredFields: Record<string, unknown>;
   /** A frame category created for this run (starts with 0 stock everywhere); archived by cleanup(). */
   newFrameCategory(label: string): Promise<string>;
   /** Archives what the run created so it doesn't show up in the app on dev. */
@@ -103,6 +105,30 @@ export async function signIn(email: string, password: string): Promise<Db> {
   return client;
 }
 
+/** Placeholder values for the fields marked required in Settings › Custom fields. */
+async function requiredFieldValues(db: Db): Promise<Record<string, unknown>> {
+  const { data, error } = await db.from("custom_fields").select("key, field_type, is_builtin, options").eq("visibility", "required");
+  if (error) throw error;
+  const values: Record<string, unknown> = {};
+  const custom: Record<string, unknown> = {};
+  for (const field of data) {
+    if (field.key === "prescription_photo") continue;
+    if (field.key === "vision_type") {
+      values.vision_type_id = await listItem(db, "vision_types", "distance");
+      continue;
+    }
+    const options = (field.options as { value: string }[] | null) ?? [];
+    const value =
+      field.field_type === "number" ? 32
+      : field.field_type === "date" ? new Date().toISOString().slice(0, 10)
+      : field.field_type === "select" ? options[0]?.value
+      : "Test";
+    if (field.is_builtin) values[field.key] = value;
+    else custom[field.key] = value;
+  }
+  return Object.keys(custom).length ? { ...values, custom_values: custom } : values;
+}
+
 async function listItem(db: Db, listKey: string, code: string): Promise<string> {
   const { data, error } = await db.from("settings_list_items").select("id").eq("list_key", listKey).eq("code", code).single();
   if (error) throw error;
@@ -146,6 +172,7 @@ export async function setupFixtures(): Promise<Fixtures> {
   let slip = (Math.floor(Date.now() / 1000) % 1_000_000) * 100;
 
   const created: string[] = [];
+  const requiredFields = await requiredFieldValues(admin);
 
   const fixtures: Fixtures = {
     service,
@@ -156,6 +183,7 @@ export async function setupFixtures(): Promise<Fixtures> {
     storeA,
     storeB,
     ids,
+    requiredFields,
     async newFrameCategory(label) {
       const { data, error } = await admin
         .from("product_categories")
@@ -212,6 +240,7 @@ export function ownFrameOrder(f: Fixtures, storeId: string, extra: Record<string
     lens_type_id: f.ids.lensType,
     treatment_ids: [f.ids.treatment],
     subtotal: 400,
+    ...f.requiredFields,
     ...extra,
   };
 }
