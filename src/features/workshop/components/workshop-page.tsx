@@ -97,9 +97,9 @@ function Workshop({ orders, stuckDays, storeName }: { orders: WorkshopOrder[]; s
       {shown.length === 0 ? (
         <EmptyState illustration="box" title={orders.length ? t("workshop.emptyFilter") : t("workshop.empty")} body={orders.length ? undefined : t("workshop.emptyBody")} />
       ) : (
-        <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {shown.map((o) => (
-            <li key={o.id}>
+            <li key={o.id} className="min-w-0">
               <WorkshopCard order={o} stuckDays={stuckDays} now={now} showStore={!storeName} />
             </li>
           ))}
@@ -127,14 +127,16 @@ function WorkshopCard({ order: o, stuckDays, now, showStore }: { order: Workshop
   return (
     <Card className={cn("h-full gap-3 py-4", late && "border-destructive/60")} data-testid={`workshop-card-${o.displayNumber}`}>
       <CardContent className="flex h-full flex-col gap-3 px-4">
-        <div className="flex items-center gap-2">
-          <Link href={`/orders/${o.id}`} className="num text-lg font-bold text-primary hover:underline">
+        <div className="flex min-w-0 items-center gap-2">
+          <Link href={`/orders/${o.id}`} className="num text-lg font-bold whitespace-nowrap text-primary hover:underline">
             {o.displayNumber}
           </Link>
-          {showStore && <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">{o.storeName}</span>}
-          <StatusBadge status={o.status} className="ml-auto" />
+          <StatusBadge status={o.status} className="ml-auto shrink-0" />
         </div>
-        <p className="truncate font-medium">{o.clientName}</p>
+        <p className="truncate font-medium">
+          {o.clientName}
+          {showStore && <span className="font-normal text-muted-foreground"> · {o.storeName}</span>}
+        </p>
 
         <div className="space-y-0.5 rounded-xl bg-muted/60 px-3 py-2 text-sm">
           <p className="num">
