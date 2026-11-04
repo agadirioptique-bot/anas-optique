@@ -7,7 +7,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { SegmentBadge, WhatsAppIcon } from "@/components/shared/badges";
 import { ChoiceChips } from "@/components/shared/choice-chips";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -261,9 +261,28 @@ function ClientSearch() {
           />
           {loading && <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />}
         </div>
-        <CommandList className="max-h-80">
-          {!loading && (
-            <CommandEmpty className="px-4 py-6 text-sm">
+        {/* The listbox exists only with options in it (ARIA: a listbox owns options); "no client" is a status. */}
+        {hits.length > 0 ? (
+          <CommandList className="max-h-80">
+            <CommandGroup heading={query ? undefined : t("recentClients")}>
+              {hits.map((c) => (
+                <CommandItem key={c.id} value={c.id} onSelect={() => void pick(c.id)} className="gap-3 rounded-xl px-3 py-2.5">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">{initials(c.full_name)}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium">{c.full_name}</span>
+                    <span className="num flex items-center gap-1 text-xs text-muted-foreground">
+                      {c.has_whatsapp && <WhatsAppIcon className="size-3.5 text-whatsapp" />}
+                      {formatPhone(c.phone_e164)} · {c.last_order_at ? t("lastVisit", { date: f.date(c.last_order_at) }) : t("neverVisited")}
+                    </span>
+                  </span>
+                  {picking === c.id ? <Loader2 className="size-4 animate-spin" /> : <SegmentBadge segment={c.segment} className="hidden sm:inline-flex" />}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        ) : (
+          !loading && (
+            <div role="status" className="px-4 py-6 text-center text-sm">
               <p className="text-muted-foreground">{t("noClientFound")}</p>
               {query.trim() && (
                 <Button
@@ -281,24 +300,9 @@ function ClientSearch() {
                   {t("createInstead", { name: query.trim() })}
                 </Button>
               )}
-            </CommandEmpty>
-          )}
-          <CommandGroup heading={query ? undefined : t("recentClients")}>
-            {hits.map((c) => (
-              <CommandItem key={c.id} value={c.id} onSelect={() => void pick(c.id)} className="gap-3 rounded-xl px-3 py-2.5">
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">{initials(c.full_name)}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium">{c.full_name}</span>
-                  <span className="num flex items-center gap-1 text-xs text-muted-foreground">
-                    {c.has_whatsapp && <WhatsAppIcon className="size-3.5 text-whatsapp" />}
-                    {formatPhone(c.phone_e164)} · {c.last_order_at ? t("lastVisit", { date: f.date(c.last_order_at) }) : t("neverVisited")}
-                  </span>
-                </span>
-                {picking === c.id ? <Loader2 className="size-4 animate-spin" /> : <SegmentBadge segment={c.segment} className="hidden sm:inline-flex" />}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </CommandList>
+            </div>
+          )
+        )}
       </Command>
       {error && <p className="text-sm text-destructive">{error.message}</p>}
     </div>
