@@ -2462,6 +2462,18 @@ export type Database = {
       generate_recurring_charges: { Args: { p_date?: string }; Returns: number }
       is_super_admin: { Args: never; Returns: boolean }
       is_valid_diopter: { Args: { value: number }; Returns: boolean }
+      kpi_breakdown: {
+        Args: { p_from: string; p_store_id?: string; p_to: string }
+        Returns: Json
+      }
+      kpi_summary: {
+        Args: { p_from: string; p_store_id?: string; p_to: string }
+        Returns: Json
+      }
+      kpi_timeseries: {
+        Args: { p_from: string; p_store_id?: string; p_to: string }
+        Returns: Json
+      }
       notify_stuck_orders: { Args: never; Returns: number }
       record_damage: {
         Args: {
