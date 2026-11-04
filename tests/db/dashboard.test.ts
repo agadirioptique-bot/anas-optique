@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Database } from "@/types/database";
 import { ensureStore, expectDbError, hasDbEnv, setupFixtures, type Db, type Fixtures } from "./fixtures";
 
@@ -41,6 +41,8 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     f = await setupFixtures();
     const s = f.service;
     tsk = await ensureStore(s, "TSK", "Test KPI");
+    // Active only while the tests run (orders need an active store); hidden from the app otherwise.
+    await s.from("stores").update({ is_active: true }).eq("id", tsk);
     lab = (await s.from("stores").select("id").eq("kind", "lab").eq("is_active", true).single()).data!.id;
     const one = async <T,>(p: PromiseLike<{ data: T; error: unknown }>): Promise<NonNullable<T>> => {
       const { data, error } = await p;
@@ -172,6 +174,10 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
       charge(120, labLoc, "2001-01-10"),
       charge(50, tskLoc, "2000-12-15"),
     ], { defaultToNull: false }).select("id"));
+  });
+
+  afterAll(async () => {
+    if (tsk) await f?.service.from("stores").update({ is_active: false }).eq("id", tsk);
   });
 
   describe("store TSK, January 2001", () => {
