@@ -12,6 +12,8 @@ export interface ShellValue {
   activeStore: string;
   /** Counters next to nav items, computed by the app layout (re-rendered by router.refresh()). */
   badges: Partial<Record<NavKey, number>>;
+  /** Unread notifications when the page was rendered; the bell keeps it live (Realtime). */
+  unreadNotifications: number;
 }
 
 const ShellContext = createContext<ShellValue | null>(null);

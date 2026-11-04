@@ -2,6 +2,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { requireUser } from "@/features/auth/guards";
 import { getVisibleStores } from "@/features/auth/session";
 import { getPendingChargeCount } from "@/features/charges/queries";
+import { getUnreadCount } from "@/features/notifications/queries";
 import { getActiveStore } from "@/features/shell/store-scope";
 import { getWorkshopBadgeCount } from "@/features/workshop/queries";
 
@@ -19,5 +20,7 @@ export default async function AppLayout({ children }: LayoutProps<"/[locale]">) 
         }))
       : {};
 
-  return <AppShell value={{ user, stores, activeStore, badges }}>{children}</AppShell>;
+  const unreadNotifications = await getUnreadCount();
+
+  return <AppShell value={{ user, stores, activeStore, badges, unreadNotifications }}>{children}</AppShell>;
 }

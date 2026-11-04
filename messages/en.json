@@ -135,7 +135,45 @@
     "emptyBody": "No notifications for now.",
     "bellLabel": "{count, plural, =0 {Notifications} one {Notifications, # unread} other {Notifications, # unread}}",
     "newCount": "{count, plural, =0 {none new} one {# new} other {# new}}",
-    "seeAll": "See all notifications"
+    "seeAll": "See all notifications",
+    "markAllRead": "Mark all as read",
+    "markedAll": "All notifications are read",
+    "all": "All",
+    "unread": "Unread",
+    "filter": "Show",
+    "open": "Open",
+    "unreadDot": "Unread",
+    "emptyUnread": "No unread notification.",
+    "kinds": {
+      "client_became_loyal": {
+        "title": "New loyal client",
+        "body": "{client}: {orders, plural, one {# delivered order} other {# delivered orders}}."
+      },
+      "clients_became_loyal": {
+        "title": "Loyal clients",
+        "body": "{count, plural, one {# client becomes loyal} other {# clients become loyal}} (threshold: {threshold} delivered orders)."
+      },
+      "low_stock": {
+        "title": "Low stock",
+        "body": "{category} at {store}: {quantity} in stock (min {min})."
+      },
+      "order_stuck": {
+        "title": "Late order",
+        "body": "{number} has been “{status}” for {days, plural, =0 {less than a day} one {# day} other {# days}}."
+      },
+      "duplicate_slip_blocked": {
+        "title": "Duplicate slip blocked",
+        "body": "Slip {number} already exists: the new order was refused."
+      },
+      "recurring_charges_pending": {
+        "title": "Charges to approve",
+        "body": "{created, plural, one {# recurring charge created} other {# recurring charges created}} · {count} pending."
+      },
+      "unknown": {
+        "title": "Notification",
+        "body": "Open it to see the details."
+      }
+    }
   },
   "unauthorized": {
     "title": "Access denied",

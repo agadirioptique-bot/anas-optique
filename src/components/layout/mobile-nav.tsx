@@ -9,6 +9,7 @@ import { isNavActive, visibleNav } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { LocationSelector } from "./location-selector";
 import { NAV_ICONS, useNavBadges } from "./nav-config";
+import { useNotifications } from "@/features/notifications/components/notifications-provider";
 import { useShell } from "./shell-context";
 
 const SLOT = "flex h-16 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium";
@@ -19,6 +20,7 @@ export function MobileNav() {
   const { user } = useShell();
   const pathname = usePathname();
   const badges = useNavBadges();
+  const { unread } = useNotifications();
   const [moreOpen, setMoreOpen] = useState(false);
   const items = visibleNav(user.role);
   const overflow = items.length > 4;
@@ -83,8 +85,13 @@ export function MobileNav() {
               aria-current={pathname === "/notifications" ? "page" : undefined}
               className={cn(SLOT, "text-muted-foreground", pathname === "/notifications" && "text-primary")}
             >
-              <span className={cn("grid h-8 w-14 place-items-center rounded-full", pathname === "/notifications" && "bg-accent")}>
+              <span className={cn("relative grid h-8 w-14 place-items-center rounded-full", pathname === "/notifications" && "bg-accent")}>
                 <Bell className="size-5" aria-hidden="true" />
+                {unread > 0 && (
+                  <span className="num absolute -top-1 right-2 min-w-[18px] rounded-full bg-attention-strong px-1 text-center text-[10px] leading-[18px] font-bold text-attention-strong-foreground ring-2 ring-background">
+                    {unread > 99 ? "99+" : unread}
+                  </span>
+                )}
               </span>
               {t("notifications")}
             </Link>
