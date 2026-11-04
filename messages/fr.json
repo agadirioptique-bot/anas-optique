@@ -185,6 +185,13 @@
     "body": "Cette page n'existe pas ou a été déplacée.",
     "cta": "Retour à l'accueil"
   },
+  "errorPage": {
+    "title": "Un problème est survenu",
+    "body": "La page n'a pas pu s'afficher. Réessayez ; si cela continue, prévenez l'administrateur avec la référence ci-dessous.",
+    "retry": "Réessayer",
+    "home": "Retour à l'accueil",
+    "reference": "Référence : {digest}"
+  },
   "roles": {
     "super_admin": "Super admin",
     "secretary": "Secrétaire"

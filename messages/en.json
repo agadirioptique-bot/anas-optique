@@ -185,6 +185,13 @@
     "body": "This page does not exist or has been moved.",
     "cta": "Back to home"
   },
+  "errorPage": {
+    "title": "Something went wrong",
+    "body": "This page couldn't be displayed. Try again; if it keeps happening, tell your administrator and give the reference below.",
+    "retry": "Try again",
+    "home": "Back to home",
+    "reference": "Reference: {digest}"
+  },
   "roles": {
     "super_admin": "Super admin",
     "secretary": "Secretary"
