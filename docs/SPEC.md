@@ -492,6 +492,14 @@ Phase 10 — Workshop (2026-11-04):
 - The main button uses the order actions of the board (`change_order_status`, WhatsApp toast when the pair arrives in store); "Arrivée en succursale" takes the card out of the queue.
 - Workshop badge = `confirmed` + `in_workshop` in the top-bar store: it doesn't change when an order goes to the workshop, only when it is prepared.
 
+Phase 11 — Dashboard (2026-11-04):
+- SQL (security definer, super admin only, money in SQL): `kpi_summary(from, to, store)`, `kpi_timeseries(from, to, store)` (per hour for one day — charges sit in the first hour —, per day up to 92 days, per month beyond; zero-filled; buckets add up to the summary), `kpi_breakdown(from, to, store)` (by store + `general_charges`, frame categories, treatments, lens types, client segments, busiest hours, workshop lead times). Business days use `private.day_start` (Africa/Casablanca) so date filters stay index-friendly.
+- Periods: Today, 7 days (today−6 … today), This month = month to date, Last month = whole previous month, This year = year to date, Custom. "Today" comes from Postgres `business_date`. Comparison M−1 / Y−1 shifts both bounds (day clamped to the month end; a whole month stays whole); None hides the deltas. Delta = (cur − prev) / |prev|, "—" when prev = 0.
+- Store filter (URL `store`, default = top-bar store): orders, payments, stock movements by `store_id`; charges by `charge_locations.store_id`; **Général and other non-store locations only under All stores**; the lab keeps its own charges.
+- Interpretations of §9: owed to suppliers = all time, by the purchase's receive location when a store is selected; loyal clients / repeat rate = among clients served in the period (repeat = ≥ 2 delivered orders, all time, all stores); workshop time = average days created → first `in_store` and created → `delivered` for orders of the period; discounts and damaged frames count non-cancelled orders / frame types only; pending charges = all months.
+- Hero card = CA, or Montant encaissé when the period is Today. Second row: discounts, cancellation rate, owed to suppliers, damaged frames, loyal clients + repeat rate, workshop time. Demo margin cards, "orders without costs" and stock value are dropped.
+- Tests: `tests/db/dashboard.test.ts` checks every formula on a fixed dataset in store TSK dated Dec 2000 – Feb 2001 (exact even under All stores). The fixture is rebuilt before and removed after each run (TSK stays inactive), except its one purchase, whose supplier-payment charge is read-only.
+
 ## 12. Later (design for it, don't build it)
 
 - Excel history import (~2,270 orders 2021–2023, prescriptions as text like `-1.75(-2 a 69)`, treatments like AR / BL / BLEU CAT / PGX / PROG / DF / LENTILLE): imported orders get `source = 'legacy'` column (add now, default `'app'`), status delivered, no stock movements, count toward loyalty when phone matches.
