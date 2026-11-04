@@ -37,6 +37,26 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     return data as Record<string, number | null>;
   }
 
+  /**
+   * Removes the open part of the fixture (TSK orders, damage movements, fixture charges) so it never
+   * shows up in the live app (workshop, pick-up list, pending charges, badges). Run before and after.
+   * The purchase stays: its supplier-payment charge is read-only by design.
+   */
+  async function removeFixture() {
+    const s = f.service;
+    const old = ((await s.from("orders").select("id").eq("store_id", tsk)).data ?? []).map((o) => o.id);
+    if (old.length) {
+      for (const table of ["payments", "order_status_history", "order_items", "order_treatments"] as const) {
+        const { error } = await s.from(table).delete().in("order_id", old);
+        if (error) throw error;
+      }
+      const { error } = await s.from("orders").delete().in("id", old);
+      if (error) throw error;
+    }
+    await s.from("stock_movements").delete().eq("store_id", tsk).eq("kind", "damage");
+    await s.from("charges").delete().like("reason", "KPI fixture%");
+  }
+
   beforeAll(async () => {
     f = await setupFixtures();
     const s = f.service;
@@ -52,15 +72,7 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     const item = async (list: string, code: string) => (await one(s.from("settings_list_items").select("id").eq("list_key", list).eq("code", code).single())).id;
 
     // --- clean the previous run (TSK orders, damage movements, fixture charges) ---
-    const old = (await one(s.from("orders").select("id").eq("store_id", tsk))).map((o) => o.id);
-    if (old.length) {
-      for (const table of ["payments", "order_status_history", "order_items", "order_treatments"] as const) {
-        await one(s.from(table).delete().in("order_id", old).select("order_id"));
-      }
-      await one(s.from("orders").delete().in("id", old).select("id"));
-    }
-    await one(s.from("stock_movements").delete().eq("store_id", tsk).eq("kind", "damage").select("id"));
-    await one(s.from("charges").delete().like("reason", "KPI fixture%").select("id"));
+    await removeFixture();
 
     // --- reference data ---
     const frames = (await one(s.from("product_types").select("id").eq("key", "frames").single())).id;
@@ -177,7 +189,9 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
   });
 
   afterAll(async () => {
-    if (tsk) await f?.service.from("stores").update({ is_active: false }).eq("id", tsk);
+    if (!tsk || !f) return;
+    await removeFixture();
+    await f.service.from("stores").update({ is_active: false }).eq("id", tsk);
   });
 
   describe("store TSK, January 2001", () => {
