@@ -486,6 +486,12 @@ Phase 9 — Charges (2026-11-03):
 - Sidebar badge: `ShellValue.badges` filled by the app layout (pending charges count, super admin); refreshed by `router.refresh()`. Workshop badge comes with phase 10.
 - UI rule: row menus that open dialogs use `DropdownMenu modal={false}` (otherwise Radix leaves `pointer-events: none` on `<body>` after the dialog closes), and `DataTable` ignores row clicks that bubble from portals.
 
+Phase 10 — Workshop (2026-11-04):
+- Queue = orders in `confirmed`, `in_workshop`, `prepared`, oldest first, filtered by the top-bar store (every store → store name shown on each card). No migration: `order_overview` + lens type / treatments / lens details / EP / fitting height embedded from `orders`.
+- Late = more whole days in the current status than `stuck_order_days[status]` (same rule as the board); no setting → never late. The card bar turns amber on the last allowed day, red when late; late cards get a red border and an "En retard" tag; chips per step plus "En retard".
+- The main button uses the order actions of the board (`change_order_status`, WhatsApp toast when the pair arrives in store); "Arrivée en succursale" takes the card out of the queue.
+- Workshop badge = `confirmed` + `in_workshop` in the top-bar store: it doesn't change when an order goes to the workshop, only when it is prepared.
+
 ## 12. Later (design for it, don't build it)
 
 - Excel history import (~2,270 orders 2021–2023, prescriptions as text like `-1.75(-2 a 69)`, treatments like AR / BL / BLEU CAT / PGX / PROG / DF / LENTILLE): imported orders get `source = 'legacy'` column (add now, default `'app'`), status delivered, no stock movements, count toward loyalty when phone matches.
