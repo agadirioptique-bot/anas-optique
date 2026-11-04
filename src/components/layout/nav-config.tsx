@@ -23,7 +23,7 @@ export const NAV_ICONS: Record<NavKey, LucideIcon> = {
   settings: Settings,
 };
 
-/** Counters next to nav items: pending charges (phase 9); workshop queue comes with phase 10. */
+/** Counters next to nav items: workshop queue and pending charges, from the app layout. */
 export function useNavBadges(): Partial<Record<NavKey, number>> {
   return useShell().badges;
 }
