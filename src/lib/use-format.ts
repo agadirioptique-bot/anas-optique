@@ -1,6 +1,6 @@
 import { useFormatter, useLocale, useNow } from "next-intl";
 import { useSyncExternalStore } from "react";
-import { formatMoney } from "./format";
+import { formatDelta, formatMoney, formatMoneyCompact, formatPercent } from "./format";
 
 const noSubscribe = () => () => {};
 
@@ -26,6 +26,10 @@ export function useFormat() {
   const inBrowser = useInBrowser();
   return {
     money: (amount: number) => formatMoney(amount, locale),
+    moneyCompact: (amount: number) => formatMoneyCompact(amount, locale),
+    number: (n: number, digits = 0) => new Intl.NumberFormat(locale === "en" ? "en-GB" : "fr-FR", { maximumFractionDigits: digits }).format(n),
+    percent: (ratio: number, digits = 0) => formatPercent(ratio, locale, digits),
+    delta: (ratio: number) => formatDelta(ratio, locale),
     date: (value: string | Date) => (inBrowser ? format.dateTime(new Date(value), { day: "numeric", month: "short", year: "numeric" }) : ""),
     dateTime: (value: string | Date) =>
       inBrowser ? format.dateTime(new Date(value), { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "",

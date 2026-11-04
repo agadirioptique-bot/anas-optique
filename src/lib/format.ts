@@ -27,6 +27,24 @@ export function formatMoney(amount: number, locale: string): string {
   return locale === "en" ? `${sign}DH${NBSP}${wide(n)}` : `${sign}${wide(n)}${NBSP}DH`;
 }
 
+/** 12 k DH / DH 1.2M: chart axes only. */
+export function formatMoneyCompact(amount: number, locale: string): string {
+  const n = new Intl.NumberFormat(locale === "en" ? "en-GB" : "fr-FR", { notation: "compact", maximumFractionDigits: 1 }).format(Math.abs(amount));
+  const sign = amount < 0 ? MINUS : "";
+  return locale === "en" ? `${sign}DH${NBSP}${wide(n)}` : `${sign}${wide(n)}${NBSP}DH`;
+}
+
+/** 0.256 → 25,6 % (fr) / 25.6% (en). */
+export function formatPercent(ratio: number, locale: string, digits = 0): string {
+  return wide(new Intl.NumberFormat(locale === "en" ? "en-GB" : "fr-FR", { style: "percent", maximumFractionDigits: digits }).format(ratio));
+}
+
+/** Signed change: +12 % / −3,5 %. */
+export function formatDelta(ratio: number, locale: string): string {
+  const abs = formatPercent(Math.abs(ratio), locale, Math.abs(ratio) < 0.1 ? 1 : 0);
+  return `${ratio < 0 ? MINUS : "+"}${abs}`;
+}
+
 /** +1.25 / −0.75 / 0.00 · null → — (optician notation). */
 export function formatDiopter(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return "—";
