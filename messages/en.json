@@ -1455,5 +1455,31 @@
         "order_id": "Order"
       }
     }
+  },
+  "workshop": {
+    "descriptionScoped": "The queue of {store}, oldest first.",
+    "summary": {
+      "queue": "In progress",
+      "queueValue": "{count, plural, =0 {No pair} one {# pair} other {# pairs}}",
+      "age": "Average age",
+      "late": "Late",
+      "lateValue": "{count, plural, =0 {None} one {# order} other {# orders}}",
+      "byStep": "By step"
+    },
+    "chips": {
+      "label": "Step",
+      "all": "All",
+      "late": "Late"
+    },
+    "lens": "Lenses",
+    "frame": "Frame",
+    "noLensType": "Lens type not set",
+    "ep": "PD {re} / {le}",
+    "height": "H {value}",
+    "age": "{count, plural, =0 {created today} one {created # day ago} other {created # days ago}}",
+    "late": "Late",
+    "empty": "Nothing in progress.",
+    "emptyBody": "New confirmed orders will show up here.",
+    "emptyFilter": "No order for this filter."
   }
 }

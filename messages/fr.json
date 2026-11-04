@@ -1455,5 +1455,31 @@
         "order_id": "Commande"
       }
     }
+  },
+  "workshop": {
+    "descriptionScoped": "La file de {store}, les plus anciennes en premier.",
+    "summary": {
+      "queue": "En cours",
+      "queueValue": "{count, plural, =0 {Aucune paire} one {# paire} other {# paires}}",
+      "age": "Âge moyen",
+      "late": "En retard",
+      "lateValue": "{count, plural, =0 {Aucune} one {# commande} other {# commandes}}",
+      "byStep": "Par étape"
+    },
+    "chips": {
+      "label": "Étape",
+      "all": "Toutes",
+      "late": "En retard"
+    },
+    "lens": "Verres",
+    "frame": "Monture",
+    "noLensType": "Type de verre non précisé",
+    "ep": "EP {re} / {le}",
+    "height": "H {value}",
+    "age": "{count, plural, =0 {créée aujourd'hui} one {créée il y a # jour} other {créée il y a # jours}}",
+    "late": "En retard",
+    "empty": "Aucune paire en cours.",
+    "emptyBody": "Les nouvelles commandes confirmées apparaîtront ici.",
+    "emptyFilter": "Aucune commande pour ce filtre."
   }
 }
