@@ -410,6 +410,8 @@ Implement KPIs as SQL functions (`kpi_summary(from, to, store_id)`, `kpi_timeser
 
 Bell shows unread count; list page `/notifications`; clicking marks read and navigates to `link`.
 
+Also `clients_became_loyal` (super admins): summary sent when a new loyalty threshold makes existing clients loyal (phase 5).
+
 ---
 
 ## 11. Decisions log (kickoff, 2026-11-03)
@@ -499,6 +501,12 @@ Phase 11 — Dashboard (2026-11-04):
 - Interpretations of §9: owed to suppliers = all time, by the purchase's receive location when a store is selected; loyal clients / repeat rate = among clients served in the period (repeat = ≥ 2 delivered orders, all time, all stores); workshop time = average days created → first `in_store` and created → `delivered` for orders of the period; discounts and damaged frames count non-cancelled orders / frame types only; pending charges = all months.
 - Hero card = CA, or Montant encaissé when the period is Today. Second row: discounts, cancellation rate, owed to suppliers, damaged frames, loyal clients + repeat rate, workshop time. Demo margin cards, "orders without costs" and stock value are dropped.
 - Tests: `tests/db/dashboard.test.ts` checks every formula on a fixed dataset in store TSK dated Dec 2000 – Feb 2001 (exact even under All stores). The fixture is rebuilt before and removed after each run (TSK stays inactive), except its one purchase, whose supplier-payment charge is read-only.
+
+Phase 12 — Notifications (2026-11-04):
+- "Once" per kind and recipient: `client_became_loyal` once per client (dedupe); `low_stock` once per crossing down to ≤ min (a refill and a new crossing notify again); `order_stuck` once per order + status (dedupe, the daily job can run any number of times); `duplicate_slip_blocked` once per blocked attempt, super admins only; `recurring_charges_pending` once per day (dedupe); `clients_became_loyal` once per threshold change that makes clients loyal. Checked in `tests/db/notifications.test.ts` (+ `rules.test.ts` for loyalty).
+- Realtime: `notifications` is in the `supabase_realtime` publication; the app subscribes to `postgres_changes` on its own rows (`user_id=eq.<me>`), RLS still applies. One subscription per signed-in user in `NotificationsProvider`, shared by the top-bar bell and the phone bottom-bar item; a new row bumps the count and shows a toast with "Ouvrir". The server count (app layout) re-syncs it on every `router.refresh()`.
+- Mark read: `mark_notifications_read(ids | null)` (security invoker: own unread rows, `read_at` only). Clicking a notification marks it read and opens its deep link; "Tout marquer comme lu" in the bell and on `/notifications` (chips Toutes / Non lues, unread first).
+- Texts are built in the app from `kind` + `params` (FR/EN): `low_stock` links to `/stock?location=<store>`, `clients_became_loyal` to `/clients?segment=loyal`, orders to `/orders/<id>`, clients to `/clients/<id>`, recurring to `/charges`; an unknown kind falls back to the stored `link`.
 
 ## 12. Later (design for it, don't build it)
 
