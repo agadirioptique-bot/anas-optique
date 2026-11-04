@@ -3,6 +3,7 @@
 import { getSuperAdmin } from "@/features/auth/guards";
 import { getSessionUser } from "@/features/auth/session";
 import { dbErrorCode, fail, ok, type ActionResult } from "@/lib/errors";
+import { searchInput, uuidInput } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 import { clientSchema, discountSchema, updateClientSchema } from "./schemas";
 
@@ -35,8 +36,9 @@ export async function updateClientRecord(input: unknown): Promise<ActionResult> 
 
 /** "A client with a similar name already exists" while typing a new client. */
 export async function findSimilarClients(name: unknown): Promise<{ id: string; full_name: string; phone_e164: string }[]> {
-  if (typeof name !== "string" || name.trim().length < 3 || !(await getSessionUser())) return [];
-  const { data } = await (await createClient()).rpc("similar_clients", { p_name: name.trim().slice(0, 120) });
+  const parsed = searchInput(120, 3).safeParse(name);
+  if (!parsed.success || !(await getSessionUser())) return [];
+  const { data } = await (await createClient()).rpc("similar_clients", { p_name: parsed.data });
   return data ?? [];
 }
 
@@ -57,7 +59,8 @@ export async function setClientDiscount(input: unknown): Promise<ActionResult> {
 
 export async function clearClientDiscount(clientId: unknown): Promise<ActionResult> {
   if (!(await getSuperAdmin())) return fail("forbidden");
-  if (typeof clientId !== "string") return fail("invalidInput");
-  const { error } = await (await createClient()).rpc("clear_client_discount", { p_client_id: clientId });
+  const parsed = uuidInput.safeParse(clientId);
+  if (!parsed.success) return fail("invalidInput");
+  const { error } = await (await createClient()).rpc("clear_client_discount", { p_client_id: parsed.data });
   return error ? fail(dbErrorCode(error)) : ok(undefined);
 }

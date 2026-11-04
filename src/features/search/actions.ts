@@ -2,6 +2,7 @@
 
 import { getSessionUser } from "@/features/auth/session";
 import type { OrderStatus } from "@/lib/orders";
+import { searchInput } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 
 export interface SearchResults {
@@ -13,8 +14,9 @@ const EMPTY: SearchResults = { clients: [], orders: [] };
 
 /** Ctrl K: clients (name / phone) and orders (number in any form), scoped by RLS (search_global). */
 export async function searchGlobal(q: unknown): Promise<SearchResults> {
-  if (typeof q !== "string" || q.trim().length < 2 || !(await getSessionUser())) return EMPTY;
-  const { data, error } = await (await createClient()).rpc("search_global", { q: q.trim().slice(0, 60) });
+  const parsed = searchInput(60, 2).safeParse(q);
+  if (!parsed.success || !(await getSessionUser())) return EMPTY;
+  const { data, error } = await (await createClient()).rpc("search_global", { q: parsed.data });
   if (error || !data) return EMPTY;
   return data as unknown as SearchResults;
 }

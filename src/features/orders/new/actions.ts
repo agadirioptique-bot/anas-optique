@@ -2,6 +2,7 @@
 
 import { getSessionUser } from "@/features/auth/session";
 import { dbErrorCode, fail, ok, type ActionResult, type ErrorCode } from "@/lib/errors";
+import { searchInput, uuidInput } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 import { loadClientForOrder, type ClientForOrder } from "./data";
 import { createOrderPayloadSchema, photoSchema, slipCheckSchema } from "./schemas";
@@ -19,8 +20,9 @@ export interface ClientHit {
 
 /** Step 1 search (name / phone); empty query = most recent clients. */
 export async function searchClientsForOrder(q: unknown): Promise<ClientHit[]> {
-  if (!(await getSessionUser())) return [];
-  const query = typeof q === "string" ? q.trim().slice(0, 60) : "";
+  const parsed = searchInput(60).safeParse(q ?? "");
+  if (!parsed.success || !(await getSessionUser())) return [];
+  const query = parsed.data;
   const { data } = await (await createClient()).rpc("client_directory", {
     p_q: query,
     p_segment: "all",
@@ -32,8 +34,9 @@ export async function searchClientsForOrder(q: unknown): Promise<ClientHit[]> {
 }
 
 export async function getClientForOrder(id: unknown): Promise<ClientForOrder | null> {
-  if (typeof id !== "string" || !(await getSessionUser())) return null;
-  return loadClientForOrder(id);
+  const parsed = uuidInput.safeParse(id);
+  if (!parsed.success || !(await getSessionUser())) return null;
+  return loadClientForOrder(parsed.data);
 }
 
 export type SlipCheck = { taken: false } | { taken: true; orderId: string; display: string; client: string; date: string };
