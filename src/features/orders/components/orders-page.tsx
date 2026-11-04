@@ -149,11 +149,11 @@ export function OrdersPage({
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
         <Tabs value={filters.view} onValueChange={(v) => setFilters({ view: v as OrderListFilters["view"] })}>
           <TabsList className="w-full sm:w-auto">
-            <TabsTrigger value="board" className="px-4">
+            <TabsTrigger noPanel value="board" className="px-4">
               <KanbanSquare />
               {t("orders.board")}
             </TabsTrigger>
-            <TabsTrigger value="list" className="px-4">
+            <TabsTrigger noPanel value="list" className="px-4">
               <List />
               {t("orders.list")}
             </TabsTrigger>

@@ -88,6 +88,9 @@ function CommandInput({
   )
 }
 
+// cmdk forces tabindex="-1" on the list; a scrollable list must be reachable by keyboard (WCAG 2.1.1).
+const focusableList = (el: HTMLDivElement | null) => el?.setAttribute("tabindex", "0")
+
 function CommandList({
   className,
   ...props
@@ -95,6 +98,7 @@ function CommandList({
   return (
     <CommandPrimitive.List
       data-slot="command-list"
+      ref={focusableList}
       className={cn(
         "no-scrollbar max-h-72 scroll-py-1 overflow-x-hidden overflow-y-auto outline-none",
         className

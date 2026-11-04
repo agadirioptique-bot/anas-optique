@@ -13,8 +13,9 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { GripVertical } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useOptimistic, useState, useTransition, type ReactNode } from "react";
+import { useMemo, useOptimistic, useState, useTransition, type KeyboardEventHandler, type PointerEventHandler, type ReactNode } from "react";
 import { toast } from "sonner";
 import { STATUS_DOT } from "@/components/shared/badges";
 import { Link } from "@/i18n/navigation";
@@ -27,12 +28,27 @@ import { nextStatus, previousStatus, useOrderActions } from "./order-actions";
 const COLUMN_LIMIT = 40;
 
 function DraggableCard({ row, lateAfter, showStore, canMove, onAdvance }: { row: OrderRow; lateAfter?: number; showStore: boolean; canMove: boolean; onAdvance: () => void }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: row.id, data: { status: row.status }, disabled: !canMove });
+  const t = useTranslations("orders");
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging } = useDraggable({ id: row.id, data: { status: row.status }, disabled: !canMove });
   return (
     <OrderCard
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
+      // Pointer drag from anywhere on the card; keyboard drag from the handle.
+      onPointerDown={listeners?.onPointerDown as PointerEventHandler<HTMLDivElement> | undefined}
+      handle={
+        canMove && (
+          <button
+            ref={setActivatorNodeRef}
+            type="button"
+            {...attributes}
+            onKeyDown={listeners?.onKeyDown as KeyboardEventHandler<HTMLButtonElement> | undefined}
+            aria-label={t("moveCard", { number: row.displayNumber })}
+            className="relative z-10 -my-1 -mr-1 grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          >
+            <GripVertical className="size-4" aria-hidden="true" />
+          </button>
+        )
+      }
       row={row}
       lateAfter={lateAfter}
       showStore={showStore}

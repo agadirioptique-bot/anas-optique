@@ -200,7 +200,7 @@ export function StockPage({
           <div className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
             <TabsList aria-label={t("stock.locations")}>
               {locations.map((l) => (
-                <TabsTrigger key={l.id} value={l.id} className="px-4">
+                <TabsTrigger noPanel key={l.id} value={l.id} className="px-4">
                   {l.name}
                 </TabsTrigger>
               ))}

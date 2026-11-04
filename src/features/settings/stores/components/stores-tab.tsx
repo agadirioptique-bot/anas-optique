@@ -146,7 +146,7 @@ export function StoresTab({ stores }: { stores: StoreRow[] }) {
           {stores.map((s) => {
             const Icon = s.kind === "lab" ? FlaskConical : Store;
             return (
-              <li key={s.id} className={cn("rounded-2xl border p-4", !s.isActive && "bg-muted/40 opacity-70")}>
+              <li key={s.id} className={cn("rounded-2xl border p-4", !s.isActive && "bg-muted/60")}>
                 <div className="flex items-start gap-3">
                   <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground">
                     <Icon className="size-5" aria-hidden="true" />

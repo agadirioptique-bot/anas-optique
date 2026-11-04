@@ -2,7 +2,7 @@
 
 import { ArrowRight, Clock, Glasses } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { forwardRef, type HTMLAttributes } from "react";
+import { forwardRef, type HTMLAttributes, type ReactNode } from "react";
 import { ResteBadge, StatusBadge, WhatsAppIcon } from "@/components/shared/badges";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -19,11 +19,13 @@ export interface OrderCardProps extends HTMLAttributes<HTMLDivElement> {
   showStatus?: boolean;
   onAdvance?: () => void;
   dragging?: boolean;
+  /** Board only: the drag handle (keyboard drag lives there, so the card holds no nested controls). */
+  handle?: ReactNode;
 }
 
 /** Board card (demo): number, client, total, balance badge, days in status, WhatsApp, next step on phones. */
 export const OrderCard = forwardRef<HTMLDivElement, OrderCardProps>(function OrderCard(
-  { row, lateAfter, showStore, showStatus, onAdvance, dragging, className, ...rest },
+  { row, lateAfter, showStore, showStatus, onAdvance, dragging, handle, className, ...rest },
   ref,
 ) {
   const t = useTranslations();
@@ -52,6 +54,7 @@ export const OrderCard = forwardRef<HTMLDivElement, OrderCardProps>(function Ord
         <span className="ml-auto flex items-center gap-1.5">
           {row.ownFrame && <Glasses className="size-4 text-muted-foreground" aria-label={t("detail.clientFrame")} />}
           {row.clientHasWhatsapp && <WhatsAppIcon className="size-4 text-whatsapp" />}
+          {handle}
         </span>
       </div>
       <p className="mt-1.5 truncate font-medium">{row.clientName || "—"}</p>

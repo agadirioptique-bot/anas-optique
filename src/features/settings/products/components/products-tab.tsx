@@ -39,7 +39,7 @@ function TypesCard({ types }: { types: ProductTypeRow[] }) {
       <CardContent>
         <ul className="divide-y rounded-2xl border">
           {types.map((type) => (
-            <li key={type.id} className={cn("grid gap-2 p-3 md:grid-cols-[1fr_1fr_8rem_6rem] md:items-center", type.isArchived && "opacity-60")}>
+            <li key={type.id} className={cn("grid gap-2 p-3 md:grid-cols-[1fr_1fr_8rem_6rem] md:items-center", type.isArchived && "rounded-lg bg-muted/60")}>
               <LabelInput
                 value={type.labelFr}
                 label={`${t("labelFr")} · ${type.labelFr}`}
@@ -89,7 +89,7 @@ function CategoryLine({ category, onArchive }: { category: CategoryRow; onArchiv
     void run(() => updateCategory({ id: category.id, name: category.name, salePrice: Math.round(price * 100) / 100 }), t("priceSaved", { name: category.name }));
   };
   return (
-    <div className={cn("grid gap-2 py-2 sm:grid-cols-[1fr_10rem_8rem] sm:items-center", category.isArchived && "opacity-60")}>
+    <div className={cn("grid gap-2 py-2 sm:grid-cols-[1fr_10rem_8rem] sm:items-center", category.isArchived && "rounded-lg bg-muted/60")}>
       <LabelInput
         value={category.name}
         label={`${t("categoryName")} · ${category.name}`}

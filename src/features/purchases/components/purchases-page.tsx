@@ -87,10 +87,10 @@ export function PurchasesPage({
 
       <Tabs value={current} onValueChange={changeTab} className="mb-5">
         <TabsList>
-          <TabsTrigger value="purchases" className="px-4">
+          <TabsTrigger noPanel value="purchases" className="px-4">
             {t("purchases.tabs.purchases")}
           </TabsTrigger>
-          <TabsTrigger value="suppliers" className="px-4">
+          <TabsTrigger noPanel value="suppliers" className="px-4">
             {t("purchases.tabs.suppliers")}
           </TabsTrigger>
         </TabsList>

@@ -3,7 +3,7 @@
 import { Building2, FlaskConical, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useOptimistic, useTransition } from "react";
+import { useId, useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { setActiveStore } from "@/features/shell/actions";
@@ -17,6 +17,8 @@ export function LocationSelector({ className }: { className?: string }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [value, setOptimistic] = useOptimistic(activeStore);
+  const labelId = useId();
+  const triggerId = useId();
 
   if (user.role !== "super_admin") {
     const own = stores.find((s) => s.id === user.storeId);
@@ -39,7 +41,11 @@ export function LocationSelector({ className }: { className?: string }) {
 
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className={cn("w-full min-w-0 sm:w-60", className)} aria-label={t("shell.locationSelector")} title={t("shell.locationSelector")}>
+      {/* Name = "Succursale affichée" + the visible value (WCAG 2.5.3: the visible text is part of the name). */}
+      <span id={labelId} className="sr-only">
+        {t("shell.locationSelector")}
+      </span>
+      <SelectTrigger id={triggerId} className={cn("w-full min-w-0 sm:w-60", className)} aria-labelledby={`${labelId} ${triggerId}`} title={t("shell.locationSelector")}>
         <Building2 className="text-muted-foreground" aria-hidden="true" />
         <SelectValue />
       </SelectTrigger>

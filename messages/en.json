@@ -683,6 +683,7 @@
     "moreInColumn": "+ {count} more in the list",
     "moveOneStep": "An order moves forward one step at a time.",
     "dragHint": "Drag a card to the next column, or use the “Next step” button.",
+    "moveCard": "Move order {number}",
     "movedTo": "Order No. {number}: {status}",
     "whatsappNotify": "Notify on WhatsApp",
     "whatsappNotifyHint": "Opens WhatsApp with a pre-filled message",

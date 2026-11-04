@@ -304,7 +304,7 @@ export function HeatmapChart({ breakdown }: { breakdown: KpiBreakdown }) {
       {breakdown.heatmap.length === 0 ? (
         <Empty />
       ) : (
-        <div className="overflow-x-auto" data-testid="chart-heatmap">
+        <div className="overflow-x-auto rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring/50" tabIndex={0} data-testid="chart-heatmap">
           <table className="w-full border-separate border-spacing-0.5 text-xs">
             <thead>
               <tr>

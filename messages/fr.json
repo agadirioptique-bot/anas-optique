@@ -683,6 +683,7 @@
     "moreInColumn": "+ {count} autres dans la liste",
     "moveOneStep": "Une commande avance d'une étape à la fois.",
     "dragHint": "Glissez une carte vers la colonne suivante, ou utilisez le bouton « Étape suivante ».",
+    "moveCard": "Déplacer la commande {number}",
     "movedTo": "Commande N° {number} : {status}",
     "whatsappNotify": "Prévenir sur WhatsApp",
     "whatsappNotifyHint": "Ouvre WhatsApp avec un message pré-rempli",

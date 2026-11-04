@@ -266,13 +266,13 @@ export function ClientDetail({ file, isSuperAdmin, ownStoreId }: { file: ClientF
         <div className="flex flex-wrap items-center gap-2 pt-2">
           <SegmentBadge segment={segment} />
           <Button asChild variant="outline" size="sm" className="rounded-full">
-            <a href={`tel:${client.phone_e164}`} aria-label={t("clients.call")}>
+            <a href={`tel:${client.phone_e164}`} aria-label={`${t("clients.call")} ${formatPhone(client.phone_e164)}`}>
               <Phone />
               <span className="num">{formatPhone(client.phone_e164)}</span>
             </a>
           </Button>
           {client.has_whatsapp && (
-            <Button asChild variant="outline" size="sm" className="rounded-full text-whatsapp">
+            <Button asChild variant="outline" size="sm" className="rounded-full text-whatsapp-text">
               <a href={whatsappLink(client.phone_e164, `Bonjour ${client.full_name},`)} target="_blank" rel="noopener noreferrer">
                 <WhatsAppIcon />
                 {t("clients.whatsappChat")}

@@ -112,11 +112,11 @@ export function ChargesPage({
 
       <Tabs value={filters.tab} onValueChange={(v) => navigate({ tab: v as ChargeFilters["tab"] })} className="mb-5">
         <TabsList>
-          <TabsTrigger value="charges" className="px-4">
+          <TabsTrigger noPanel value="charges" className="px-4">
             {t("charges.tabs.charges")}
-            {pending.length > 0 && <span className="num ml-1.5 rounded-full bg-attention px-1.5 text-[11px] font-semibold text-white">{pending.length}</span>}
+            {pending.length > 0 && <span className="num ml-1.5 rounded-full bg-attention-strong px-1.5 text-[11px] font-semibold text-attention-strong-foreground">{pending.length}</span>}
           </TabsTrigger>
-          <TabsTrigger value="recurring" className="px-4">
+          <TabsTrigger noPanel value="recurring" className="px-4">
             {t("charges.tabs.recurring")}
           </TabsTrigger>
         </TabsList>
@@ -486,16 +486,19 @@ function Ledger({ charges, reference, onEdit }: { charges: ChargeRow[]; referenc
           empty={<EmptyState illustration="chart" title={t("empty")} body={t("emptyBody")} />}
           mobileCard={(c) => (
             <div className={cn("flex items-center gap-3 py-3 pr-2 pl-4", c.isDeleted && "opacity-60")}>
-              <button type="button" onClick={() => setHistory(c)} className="min-w-0 flex-1 text-left">
-                <span className="block truncate font-medium">{c.reason}</span>
-                <span className="num block truncate text-xs text-muted-foreground">
-                  {f.date(c.chargeDate)} · {localized(c.category, locale)} · {localized(c.location, locale)}
-                </span>
+              {/* The purchase badge is a link: keep it outside the row button (no nested controls). */}
+              <div className="min-w-0 flex-1">
+                <button type="button" onClick={() => setHistory(c)} className="block w-full min-w-0 text-left">
+                  <span className="block truncate font-medium">{c.reason}</span>
+                  <span className="num block truncate text-xs text-muted-foreground">
+                    {f.date(c.chargeDate)} · {localized(c.category, locale)} · {localized(c.location, locale)}
+                  </span>
+                </button>
                 <span className="mt-1 flex flex-wrap gap-1.5">
                   <SourceBadge row={c} />
                   <StatusBadge row={c} />
                 </span>
-              </button>
+              </div>
               <Money value={c.amount} className={cn("text-sm font-semibold", c.isDeleted && "line-through")} />
               {menu(c)}
             </div>

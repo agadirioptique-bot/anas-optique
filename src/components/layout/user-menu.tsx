@@ -35,7 +35,7 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full" aria-label={t("shell.userMenu")}>
+        <Button variant="ghost" size="icon" className="rounded-full" aria-label={`${initials(user.fullName)} · ${t("shell.userMenu")}`}>
           <Avatar className="size-9">
             <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">{initials(user.fullName)}</AvatarFallback>
           </Avatar>

@@ -199,7 +199,7 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
       </PageHeader>
 
       {row.status === "cancelled" && (
-        <p className="mb-6 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <p className="mb-6 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive-text">
           {t("detail.cancelledOn", { date: order.cancelledAt ? f.dateTime(order.cancelledAt) : "—" })}
           {order.cancelReason && ` · ${localized(order.cancelReason, locale)}`}
           {order.cancelNote && ` · ${order.cancelNote}`}

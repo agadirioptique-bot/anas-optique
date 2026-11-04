@@ -52,6 +52,8 @@
   --color-success-foreground: var(--success-foreground);
   --color-success-text: var(--success-text);
   --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-text: var(--whatsapp-text);
+  --color-destructive-text: var(--destructive-text);
 
   --color-status-confirmed: var(--status-confirmed);
   --color-status-workshop: var(--status-workshop);
@@ -108,6 +110,9 @@
   --success-foreground: #ffffff;
   --success-text: #1e7a6f;
   --whatsapp: #1fa855;
+  /* Text on light surfaces (WCAG AA 4.5:1); the brighter tones stay for icons and fills. */
+  --whatsapp-text: #157a3d;
+  --destructive-text: #a5281c;
 
   /* Status hues validated as an adjacent sequence (CVD ΔE ≥ 12.7, normal ≥ 15). */
   --status-confirmed: #4c9ef5;
@@ -165,6 +170,8 @@
   --success-foreground: #04201c;
   --success-text: #5fd4c4;
   --whatsapp: #3ccf74;
+  --whatsapp-text: #3ccf74;
+  --destructive-text: #f1948a;
 
   --status-confirmed: #4c95e8;
   --status-workshop: #7446d8;

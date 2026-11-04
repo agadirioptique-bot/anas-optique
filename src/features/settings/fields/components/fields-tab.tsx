@@ -148,7 +148,7 @@ export function FieldsTab({ data }: { data: FieldsData }) {
               handleLabel={(f) => t("drag", { label: name(f) })}
               onReorder={(ids) => reorder(ids, () => run(() => reorderRows({ table: "custom_fields", ids }), tc("saved")))}
               renderItem={(f) => (
-                <div className={cn("flex flex-wrap items-center gap-3 py-2.5", f.visibility === "hidden" && "opacity-60")}>
+                <div className={cn("flex flex-wrap items-center gap-3 py-2.5", f.visibility === "hidden" && "rounded-lg bg-muted/60")}>
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-1.5 truncate font-medium">
                       {f.isBuiltin && <Lock className="size-3.5 shrink-0 text-muted-foreground" aria-label={t("builtin")} />}
