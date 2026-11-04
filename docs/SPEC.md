@@ -77,9 +77,9 @@ Rules:
   - Also check `profiles.is_active` in the hook (inactive → no role claim → everything denied).
   - **Live check** (decided in phase 3): `auth_role()` / `auth_store_id()` return the claim only while it still matches an active `profiles` row (security definer, one PK lookup per statement). Deactivating a user or changing role/store takes effect immediately, not at the next token refresh. The app applies the same rule (`claimsMatchProfile` in `getSessionUser`): a token whose `app_role` / `store_id` no longer match the profile is treated as signed out and the user lands on the login page with "session expired" — never on empty pages (decided 2026-11-03).
 - Settings › Users (phase 3): invite = Server Action (service role) → `inviteUserByEmail` + `profiles` insert (auth user deleted if the insert fails). Role / store / active changes go through `admin_update_user_access` (super admin only, never on oneself, never removes the last active super admin; revokes the user's sessions); deactivation also bans the user in Auth. The list comes from `admin_list_users()` (status Active / Invited / Disabled from `auth.users`).
-- `/auth/confirm` accepts `type` = `invite` | `recovery` and `next` from an allow-list (`/set-password`); it redirects to `/{profiles.locale}{next}`. Templates and dashboard steps: `docs/AUTH-SETUP.md`.
+- `/auth/confirm` accepts `type` = `invite` | `recovery` and `next` from an allow-list (`/set-password`); it redirects to `/{profiles.locale}{next}`. Templates and dashboard steps: `docs/DEPLOY.md` §3.
 - Session refresh in `src/proxy.ts` (Next.js 16 name for middleware) using `@supabase/ssr`; also handles locale routing (next-intl) and redirects unauthenticated users to `/{locale}/login`.
-- First super admin: bootstrap documented in `docs/AUTH-SETUP.md` (invite from Supabase dashboard, then one SQL insert of the profile).
+- First super admin: bootstrap documented in `docs/DEPLOY.md` §5 (invite from Supabase dashboard, then one SQL insert of the profile).
 
 ---
 
@@ -507,6 +507,16 @@ Phase 12 — Notifications (2026-11-04):
 - Realtime: `notifications` is in the `supabase_realtime` publication; the app subscribes to `postgres_changes` on its own rows (`user_id=eq.<me>`), RLS still applies. One subscription per signed-in user in `NotificationsProvider`, shared by the top-bar bell and the phone bottom-bar item; a new row bumps the count and shows a toast with "Ouvrir". The server count (app layout) re-syncs it on every `router.refresh()`.
 - Mark read: `mark_notifications_read(ids | null)` (security invoker: own unread rows, `read_at` only). Clicking a notification marks it read and opens its deep link; "Tout marquer comme lu" in the bell and on `/notifications` (chips Toutes / Non lues, unread first).
 - Texts are built in the app from `kind` + `params` (FR/EN): `low_stock` links to `/stock?location=<store>`, `clients_became_loyal` to `/clients?segment=loyal`, orders to `/orders/<id>`, clients to `/clients/<id>`, recurring to `/charges`; an unknown kind falls back to the stored `link`.
+
+Phase 13 — Hardening & production (2026-11-04):
+- Security review written up in `docs/SECURITY-REVIEW.md`; production steps in `docs/DEPLOY.md` (replaces `AUTH-SETUP.md`). Production is only ever touched by the owner, following DEPLOY.md.
+- `anon` has no privilege in `public` (tables, views, sequences, functions, and by default for new objects): the app never queries signed out. Views are read-only for `authenticated`. Trigger functions aren't callable.
+- Supabase advisor 0029 ("signed-in users can execute SECURITY DEFINER function", 26 RPCs) is **accepted**: the RPCs are the write API (secretaries have no direct write on orders/payments/stock) and each checks role/store first. `tests/db/security.test.ts` reads the exposed RPCs and relations from the API's OpenAPI and fails if a new one isn't classified (super admin only / store-scoped / any role / invoker / server-only).
+- Security headers on every response (`X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS), no `X-Powered-By`. **No CSP yet** (needs nonces for Next's inline scripts and the Supabase origins); revisit after launch.
+- Every Server Action input goes through zod, including search boxes and ids (`src/lib/schemas.ts`).
+- Route states: skeleton `loading.tsx` (board and dashboard variants), `error.tsx` with "Réessayer" + digest reference (no error text from the server), `global-error.tsx`, translated 404 for unknown paths.
+- Accessibility target WCAG 2.1 AA, checked by axe on every page and role (`e2e/a11y.spec.ts`, serious/critical = failure) plus a no-sideways-scroll check at 375 px. Dialogs return focus to what opened them (`useReturnFocus`). Board cards drag by pointer anywhere, by keyboard from the ⋮⋮ handle. Archived rows are tinted, not faded with opacity.
+- E2E data on dev: `npm run e2e:accounts` cancels the open orders older than an hour in the test stores (TSA/TSB), so boards don't fill up across runs.
 
 ## 12. Later (design for it, don't build it)
 
