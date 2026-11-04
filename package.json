@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:db": "vitest run --config vitest.db.config.mts tests/db",
     "test:e2e": "playwright test",
+    "lighthouse": "node scripts/lighthouse.mjs",
     "e2e:accounts": "vitest run --config vitest.db.config.mts tests/e2e-accounts",
     "db:new": "supabase migration new",
     "db:push": "supabase db push --linked",

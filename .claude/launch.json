@@ -9,6 +9,17 @@
         "dev"
       ],
       "port": 3000
+    },
+    {
+      "name": "opticor-prod-build",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "start",
+        "-p",
+        "3200"
+      ],
+      "port": 3200
     }
   ]
 }

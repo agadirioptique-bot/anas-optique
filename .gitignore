@@ -29,3 +29,6 @@ _reference/*
 
 # Playwright test accounts (random passwords, written by npm run e2e:accounts)
 e2e/.auth/
+
+# Lighthouse reports (npm run lighthouse)
+/reports/
