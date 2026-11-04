@@ -2474,6 +2474,7 @@ export type Database = {
         Args: { p_from: string; p_store_id?: string; p_to: string }
         Returns: Json
       }
+      mark_notifications_read: { Args: { p_ids?: string[] }; Returns: number }
       notify_stuck_orders: { Args: never; Returns: number }
       record_damage: {
         Args: {
