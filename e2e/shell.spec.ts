@@ -1,15 +1,29 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * Real sign-in against the dev Supabase project. Test accounts come from .env.local
- * (E2E_SUPER_ADMIN_EMAIL / _PASSWORD, E2E_SECRETARY_EMAIL / _PASSWORD); tests that need one are skipped without it.
+ * Real sign-in against the dev Supabase project. Accounts come from `npm run e2e:accounts`
+ * (e2e/.auth/accounts.json, like the other specs); `.env.local` E2E_* variables still override them.
+ * Tests that need an account are skipped without one.
  */
+const file = join(process.cwd(), "e2e/.auth/accounts.json");
+type Account = { email?: string; password?: string };
+const provisioned = existsSync(file) ? (JSON.parse(readFileSync(file, "utf8")) as { admin: Account; secretary: Account }) : null;
 const ACCOUNTS = {
-  super_admin: { email: process.env.E2E_SUPER_ADMIN_EMAIL, password: process.env.E2E_SUPER_ADMIN_PASSWORD },
-  secretary: { email: process.env.E2E_SECRETARY_EMAIL, password: process.env.E2E_SECRETARY_PASSWORD },
+  super_admin: {
+    email: process.env.E2E_SUPER_ADMIN_EMAIL ?? provisioned?.admin.email,
+    password: process.env.E2E_SUPER_ADMIN_PASSWORD ?? provisioned?.admin.password,
+  },
+  secretary: {
+    email: process.env.E2E_SECRETARY_EMAIL ?? provisioned?.secretary.email,
+    password: process.env.E2E_SECRETARY_PASSWORD ?? provisioned?.secretary.password,
+  },
 };
 type Role = keyof typeof ACCOUNTS;
 const hasAccount = (role: Role) => !!ACCOUNTS[role].email && !!ACCOUNTS[role].password;
+// A dev server (next dev) can take several seconds per page on a busy machine.
+test.describe.configure({ timeout: 120_000 });
 
 async function signInAs(page: Page, role: Role, locale: "fr" | "en" = "fr") {
   const { email, password } = ACCOUNTS[role];
@@ -17,7 +31,7 @@ async function signInAs(page: Page, role: Role, locale: "fr" | "en" = "fr") {
   await page.locator("#email").fill(email!);
   await page.locator("#password").fill(password!);
   await page.locator("form").getByRole("button").click();
-  await expect(page).toHaveURL(role === "super_admin" ? /\/dashboard$/ : /\/orders$/);
+  await expect(page).toHaveURL(role === "super_admin" ? /\/dashboard$/ : /\/orders$/, { timeout: 60_000 });
 }
 
 test("signed-out visitors are sent to the login page", async ({ page }) => {
@@ -43,7 +57,7 @@ test("an invalid email link lands on the login page with a message", async ({ pa
 });
 
 test("super admin lands on the dashboard and sees every page", async ({ page }) => {
-  test.skip(!hasAccount("super_admin"), "E2E_SUPER_ADMIN_* not set");
+  test.skip(!hasAccount("super_admin"), "run `npm run e2e:accounts` first");
   await signInAs(page, "super_admin");
   await expect(page.getByRole("heading", { level: 1, name: "Tableau de bord" })).toBeVisible();
   const nav = page.getByTestId("sidebar").getByRole("navigation");
@@ -53,7 +67,7 @@ test("super admin lands on the dashboard and sees every page", async ({ page }) 
 });
 
 test("secretary only sees Orders, Clients and Stock and is denied admin pages", async ({ page }) => {
-  test.skip(!hasAccount("secretary"), "E2E_SECRETARY_* not set");
+  test.skip(!hasAccount("secretary"), "run `npm run e2e:accounts` first");
   await signInAs(page, "secretary");
   const nav = page.getByTestId("sidebar").getByRole("navigation");
   await expect(nav.getByRole("link")).toHaveText(["Commandes", "Clients", "Stock"]);
@@ -67,7 +81,7 @@ test("secretary only sees Orders, Clients and Stock and is denied admin pages", 
 });
 
 test("English locale renders English strings", async ({ page }) => {
-  test.skip(!hasAccount("super_admin"), "E2E_SUPER_ADMIN_* not set");
+  test.skip(!hasAccount("super_admin"), "run `npm run e2e:accounts` first");
   await signInAs(page, "super_admin", "en");
   await page.goto("/en/orders");
   await expect(page.getByRole("heading", { level: 1, name: "Orders" })).toBeVisible();
@@ -78,7 +92,7 @@ test.describe("phone width", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test("shows the bottom bar and hides the sidebar", async ({ page }) => {
-    test.skip(!hasAccount("secretary"), "E2E_SECRETARY_* not set");
+    test.skip(!hasAccount("secretary"), "run `npm run e2e:accounts` first");
     await signInAs(page, "secretary");
     await expect(page.getByTestId("mobile-nav")).toBeVisible();
     await expect(page.getByTestId("sidebar")).toBeHidden();

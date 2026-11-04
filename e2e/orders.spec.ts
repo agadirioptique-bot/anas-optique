@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { expect, test, type Page } from "@playwright/test";
+import { expect as baseExpect, test, type Page } from "@playwright/test";
 
 /**
  * Main flow against the DEV project (SPEC §8): a secretary creates an order, moves it through the
@@ -19,7 +19,9 @@ const accounts = existsSync(file)
   : null;
 
 test.skip(!accounts, "run `npm run e2e:accounts` first");
-test.describe.configure({ mode: "serial" });
+// A dev server (next dev) can take several seconds per page on a busy machine (same as the other specs).
+test.describe.configure({ mode: "serial", timeout: 180_000 });
+const expect = baseExpect.configure({ timeout: 30_000 });
 
 const shot = (page: Page, name: string) => page.screenshot({ path: `test-results/screens/${name}.png`, fullPage: true });
 
@@ -85,6 +87,8 @@ test("secretary: create → workshop → prepared → in store → collect → d
   const number = await createOrder(page, { ownFrame: false, screenshots: true });
 
   await page.goto("/fr/orders");
+  // Find it by number: the board shows at most 40 cards per column, and dev keeps older test orders.
+  await page.getByTestId("orders-search").fill(number);
   await expect(page.getByTestId(`order-card-${number}`)).toBeVisible();
   await expect(page.getByTestId("column-confirmed").getByTestId(`order-card-${number}`)).toBeVisible();
   await shot(page, "board");

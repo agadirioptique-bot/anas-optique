@@ -10,7 +10,8 @@ import { ensureStore, ensureUser, hasDbEnv, signIn } from "../db/fixtures";
  * second TSA secretary that e2e/session.spec.ts moves between stores) with a
  * fresh random password and writes them to the git-ignored e2e/.auth/accounts.json. Also makes sure
  * TSA has a stocked frame category for the order flow, and creates a pending recurring charge for
- * the charges flow. Nobody types or sees the passwords.
+ * the charges flow, and cancels the open orders earlier runs left in the test stores (TSA/TSB only)
+ * so the board doesn't fill up. Nobody types or sees the passwords.
  */
 it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   const service = createAdminClient();
@@ -23,7 +24,7 @@ it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   // Moved between stores by e2e/session.spec.ts: its own account, so parallel specs keep their session.
   const mover = { email: "opticor-e2e-mover@example.com", fullName: "E2E Secrétaire mobile", role: "secretary" as const };
   await ensureUser(service, mover, storeA, password);
-  await ensureStore(service, "TSB", "Test Succursale B");
+  const storeB = await ensureStore(service, "TSB", "Test Succursale B");
 
   // A frame category with stock at TSA (topped up each run).
   const adminDb = await signIn(admin.email, password);
@@ -53,6 +54,19 @@ it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   expect(recurring.error).toBeNull();
   const { data: today } = await service.rpc("business_date", { ts: new Date().toISOString() });
   expect((await service.rpc("generate_recurring_charges", { p_date: today! })).error).toBeNull();
+
+  // Earlier runs' open orders in the test stores (older than an hour, so a run in progress is spared).
+  const { data: reason } = await adminDb.from("settings_list_items").select("id").eq("list_key", "cancel_reasons").eq("is_archived", false).order("sort").limit(1).single();
+  const { data: stale } = await adminDb
+    .from("orders")
+    .select("id")
+    .in("store_id", [storeA, storeB])
+    .in("status", ["confirmed", "in_workshop", "prepared", "in_store"])
+    .lt("created_at", new Date(Date.now() - 3_600_000).toISOString());
+  for (const o of stale ?? []) {
+    const { error } = await adminDb.rpc("cancel_order", { p_order_id: o.id, p_reason_id: reason!.id, p_note: "Nettoyage E2E", p_refund_amount: 0 });
+    expect(error).toBeNull();
+  }
 
   const dir = join(process.cwd(), "e2e/.auth");
   mkdirSync(dir, { recursive: true });

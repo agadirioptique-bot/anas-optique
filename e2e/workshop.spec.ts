@@ -80,6 +80,17 @@ async function createOrder(page: Page) {
 
 const badge = (page: Page) => page.getByRole("complementary").getByRole("link", { name: /Atelier/ });
 
+/**
+ * The badge counts confirmed + in-workshop orders of the shown scope. Other specs create orders at the
+ * same time, so compare it with the cards of the same render (not with an earlier number).
+ */
+async function expectBadgeMatchesQueue(page: Page) {
+  await page.reload();
+  await expect(page.getByRole("heading", { level: 1, name: "Atelier" })).toBeVisible();
+  const waiting = await page.getByRole("main").getByRole("button", { name: /Envoyer à l'atelier|Marquer comme préparée/ }).count();
+  await expect(badge(page)).toHaveText(waiting ? new RegExp(`(^|\\D)${waiting}(\\D|$)`) : /^\D*$/);
+}
+
 test("super admin moves an order through the workshop with the main button", async ({ page }) => {
   await signIn(page, "secretary");
   const { number, lensLabel, treatmentLabel } = await createOrder(page);
@@ -95,18 +106,17 @@ test("super admin moves an order through the workshop with the main button", asy
   await expect(card.getByText(lensLabel, { exact: true })).toBeVisible();
   await expect(card.getByText(treatmentLabel, { exact: true })).toBeVisible();
   await expect(card.getByText(/−2\.25 \(−0\.75 × 180°\)/)).toBeVisible();
-  const before = Number((await badge(page).textContent())?.match(/\d+/)?.[0] ?? 0);
   await card.scrollIntoViewIfNeeded();
   await shot(page, "workshop");
 
   await card.getByRole("button", { name: /Envoyer à l'atelier/ }).click();
   await expect(card.getByText("À l’atelier").or(card.getByText("À l'atelier")).first()).toBeVisible();
-  // The badge counts confirmed + in workshop: it only goes down when the pair is prepared.
-  await expect(badge(page)).toContainText(String(before));
+  // The badge counts confirmed + in workshop: the pair still counts until it is prepared.
+  await expectBadgeMatchesQueue(page);
 
   await card.getByRole("button", { name: /Marquer comme préparée/ }).click();
   await expect(card.getByRole("button", { name: /Arrivée en succursale/ })).toBeVisible();
-  await expect(badge(page)).toContainText(String(before - 1));
+  await expectBadgeMatchesQueue(page);
   await card.getByRole("button", { name: /Arrivée en succursale/ }).click();
   await expect(page.getByTestId(`workshop-card-${number}`)).toHaveCount(0);
 
