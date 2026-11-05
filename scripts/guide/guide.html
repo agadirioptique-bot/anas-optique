@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>OPTICOR — Guide d'emploi</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+  :root {
+    --ink: #13232b; --muted: #5b6b77; --line: #dde5e9; --primary: #0f4c5c; --primary-soft: #e8f1f3;
+    --amber: #a3410a; --amber-soft: #fdf0e6; --green: #1e7a6f; --green-soft: #e7f4f1; --red: #a5281c; --red-soft: #fbeceb;
+  }
+  * { box-sizing: border-box; }
+  html { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.5; }
+  body { margin: 0; }
+  h1, h2, h3, h4 { color: var(--ink); line-height: 1.25; margin: 0; }
+  h1 { font-size: 22pt; letter-spacing: -0.01em; }
+  h2 { font-size: 15.5pt; margin: 0 0 3mm; padding-top: 1mm; }
+  h3 { font-size: 12pt; margin: 6mm 0 2mm; }
+  h4 { font-size: 10.5pt; margin: 4mm 0 1.5mm; }
+  p { margin: 0 0 2.4mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 5.5mm; }
+  li { margin: 0 0 1.2mm; }
+  strong { font-weight: 650; }
+  code, .k { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 9pt; background: #f1f5f7; border-radius: 3px; padding: 0 1.2mm; }
+  .ui { font-weight: 600; color: var(--primary); }
+  .muted { color: var(--muted); }
+  section.chapter { break-before: page; }
+  .part { break-before: page; display: flex; flex-direction: column; justify-content: center; min-height: 240mm; }
+  .part .num { font-size: 11pt; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .part h1 { font-size: 30pt; margin: 3mm 0 5mm; color: var(--primary); }
+  .part p { font-size: 11.5pt; max-width: 140mm; color: var(--muted); }
+  .eyebrow { font-size: 8.5pt; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.5mm; }
+  .role { display: inline-block; font-size: 8pt; font-weight: 650; border-radius: 999px; padding: .4mm 2.4mm; margin-left: 2mm; vertical-align: middle; }
+  .role.sec { background: var(--green-soft); color: var(--green); }
+  .role.adm { background: var(--primary-soft); color: var(--primary); }
+  figure { margin: 3mm 0 5mm; break-inside: avoid; }
+  /* Tall screenshots are scaled down so a heading and its picture stay on one page. */
+  figure img { display: block; max-width: 100%; max-height: 150mm; width: auto; height: auto; margin: 0 auto; border: 1px solid var(--line); border-radius: 2.5mm; }
+  h2, h3, h4, .eyebrow { break-after: avoid; page-break-after: avoid; }
+  figure.half img { max-width: 62%; }
+  figure.phone img { max-width: 70%; max-height: 120mm; }
+  figcaption { font-size: 8.6pt; color: var(--muted); margin-top: 1.6mm; text-align: center; }
+  .note, .tip, .warn { border-radius: 2mm; padding: 2.6mm 3.4mm; margin: 3mm 0 4mm; break-inside: avoid; font-size: 9.6pt; }
+  .note { background: var(--primary-soft); }
+  .tip { background: var(--green-soft); }
+  .warn { background: var(--amber-soft); }
+  .note b:first-child, .tip b:first-child, .warn b:first-child { display: block; margin-bottom: .8mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.3pt; break-inside: avoid; }
+  th, td { text-align: left; vertical-align: top; padding: 1.6mm 2mm; border-bottom: 1px solid var(--line); }
+  th { font-size: 8.4pt; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; background: #f6f8f9; }
+  td.c, th.c { text-align: center; }
+  .yes { color: var(--green); font-weight: 700; }
+  .no { color: var(--red); font-weight: 700; }
+  .steps { counter-reset: s; list-style: none; padding-left: 0; }
+  .steps > li { counter-increment: s; position: relative; padding-left: 8mm; margin-bottom: 2mm; }
+  .steps > li::before { content: counter(s); position: absolute; left: 0; top: .2mm; width: 5.4mm; height: 5.4mm; border-radius: 50%; background: var(--primary); color: #fff; font-size: 8pt; font-weight: 700; display: grid; place-items: center; }
+  /* Cover */
+  .cover { min-height: 255mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 3mm; font-weight: 700; letter-spacing: .25em; font-size: 11pt; color: var(--primary); }
+  .logo { width: 11mm; height: 11mm; border-radius: 3mm; background: var(--primary); display: grid; place-items: center; }
+  .cover h1 { font-size: 40pt; color: var(--primary); margin-bottom: 4mm; }
+  .cover .sub { font-size: 14pt; color: var(--muted); max-width: 150mm; }
+  .cover .who { display: flex; gap: 4mm; margin-top: 10mm; }
+  .cover .who div { flex: 1; border: 1px solid var(--line); border-radius: 3mm; padding: 4mm 5mm; }
+  .cover .who h4 { margin-top: 0; }
+  .cover .foot { color: var(--muted); font-size: 9pt; display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 3mm; }
+  /* Table of contents */
+  .toc ol { list-style: none; padding: 0; }
+  .toc li { display: flex; gap: 2mm; border-bottom: 1px dotted var(--line); padding: 1.4mm 0; margin: 0; }
+  .toc li.part-row { font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--line); margin-top: 3mm; }
+  .toc li span:first-child { width: 10mm; color: var(--muted); }
+  /* Flow diagram */
+  .flow { display: flex; align-items: stretch; gap: 1.6mm; margin: 4mm 0 2mm; break-inside: avoid; }
+  .flow .st { flex: 1; border-radius: 2.5mm; padding: 2.6mm 2.2mm; border: 1px solid var(--line); background: #fff; font-size: 8.6pt; }
+  .flow .st b { display: block; font-size: 9.6pt; margin-bottom: 1mm; }
+  .flow .st .dot { display: inline-block; width: 2.4mm; height: 2.4mm; border-radius: 50%; margin-right: 1.2mm; vertical-align: middle; }
+  .flow .arrow { align-self: center; color: var(--muted); font-size: 12pt; }
+  .flow-foot { display: flex; gap: 3mm; font-size: 8.6pt; margin-bottom: 4mm; }
+  .flow-foot div { flex: 1; border-radius: 2mm; padding: 2mm 3mm; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .card { border: 1px solid var(--line); border-radius: 2.5mm; padding: 3mm 3.5mm; break-inside: avoid; }
+  .card h4 { margin-top: 0; }
+  .kbd { display: inline-block; border: 1px solid #c9d4da; border-bottom-width: 2px; border-radius: 1.2mm; padding: 0 1.4mm; font-size: 8.6pt; font-family: inherit; background: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ COVER -->
+<section class="cover">
+  <div class="brand">
+    <span class="logo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="6.5" cy="13" r="3.5"/><circle cx="17.5" cy="13" r="3.5"/><path d="M10 13h4M3 12 4.5 7M21 12l-1.5-5"/></svg></span>
+    OPTICOR
+  </div>
+  <div>
+    <div class="eyebrow">Manuel d'utilisation</div>
+    <h1>Guide d'emploi</h1>
+    <p class="sub">Comment utiliser OPTICOR au quotidien : la prise de commande, le suivi des lunettes jusqu'au retrait, les clients et le stock — puis, pour l'opticien, le pilotage de toutes les succursales.</p>
+    <div class="who">
+      <div><h4>Secrétaire <span class="role sec">Partie A</span></h4><p class="muted">Commandes de sa succursale, encaissements, clients, consultation du stock, notifications.</p></div>
+      <div><h4>Super admin <span class="role adm">Partie B</span></h4><p class="muted">Tableau de bord, atelier, stock et transferts, achats et fournisseurs, charges, paramètres et utilisateurs.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>OPTICOR · ERP et pilotage multi-succursales pour opticien</span><span>Version 1 · novembre 2026</span></div>
+</section>
+
+<!-- ============================================================ TOC -->
+<section class="chapter toc">
+  <div class="eyebrow">Sommaire</div>
+  <h2>Ce que contient ce guide</h2>
+  <ol>
+    <li><span>1</span><span>Présentation d'OPTICOR et des deux rôles</span></li>
+    <li><span>2</span><span>Premiers pas : connexion, écran principal, recherche, téléphone</span></li>
+    <li><span>3</span><span>Le parcours d'une paire de lunettes (de la commande au retrait)</span></li>
+    <li class="part-row"><span>A</span><span>Partie A — La secrétaire</span></li>
+    <li><span>A1</span><span>Les commandes : tableau et liste</span></li>
+    <li><span>A2</span><span>Créer une nouvelle commande (3 étapes)</span></li>
+    <li><span>A3</span><span>La fiche commande : suivre, encaisser, livrer</span></li>
+    <li><span>A4</span><span>Les clients</span></li>
+    <li><span>A5</span><span>Le stock de sa succursale</span></li>
+    <li><span>A6</span><span>Les notifications</span></li>
+    <li class="part-row"><span>B</span><span>Partie B — Le super admin</span></li>
+    <li><span>B1</span><span>Le tableau de bord et les indicateurs</span></li>
+    <li><span>B2</span><span>Le sélecteur de succursale</span></li>
+    <li><span>B3</span><span>L'atelier</span></li>
+    <li><span>B4</span><span>Commandes et clients : ce que seul l'admin peut faire</span></li>
+    <li><span>B5</span><span>Le stock : transferts, comptage, casse, seuils</span></li>
+    <li><span>B6</span><span>Achats et fournisseurs</span></li>
+    <li><span>B7</span><span>Les charges</span></li>
+    <li><span>B8</span><span>Les paramètres</span></li>
+    <li><span>B9</span><span>Les notifications de l'admin</span></li>
+    <li class="part-row"><span>C</span><span>Annexes : glossaire, questions fréquentes, bonnes pratiques</span></li>
+  </ol>
+  <div class="note"><b>Les exemples de ce guide</b>Les captures d'écran viennent d'une base de démonstration : deux succursales (Maârif et Anfa), l'opticien <em>Karim Alaoui</em> (super admin) et les secrétaires <em>Salma Bennani</em> (Maârif) et <em>Nadia El Idrissi</em> (Anfa). Les noms des clients sont fictifs.</div>
+</section>
+
+<!-- ============================================================ 1 -->
+<section class="chapter">
+  <div class="eyebrow">Chapitre 1</div>
+  <h2>Présentation d'OPTICOR</h2>
+  <p>OPTICOR remplace le carnet de bons, le cahier de caisse et les tableaux Excel. Chaque paire de lunettes commandée devient une <strong>commande</strong> qui suit les étapes de fabrication jusqu'au retrait par le client ; chaque dirham encaissé, chaque monture sortie du stock et chaque dépense sont enregistrés au même endroit. L'opticien voit en temps réel ce qui se passe dans toutes ses succursales.</p>
+  <p>Il y a deux types de comptes :</p>
+  <div class="grid2">
+    <div class="card"><h4>La secrétaire <span class="role sec">secrétaire</span></h4><p>Elle travaille dans <strong>une seule succursale</strong>. Elle reçoit les clients, prend les commandes (ordonnance, monture, verres, acompte), fait avancer les commandes, encaisse le reste et remet les lunettes. Elle voit le stock de sa succursale (les quantités, jamais les coûts).</p></div>
+    <div class="card"><h4>Le super admin <span class="role adm">super admin</span></h4><p>C'est l'opticien (ou son associé). Il voit <strong>toutes les succursales et le laboratoire</strong>, l'atelier, les chiffres (chiffre d'affaires, encaissements, charges, résultat), gère le stock entre succursales, les achats aux fournisseurs, les charges et tous les paramètres. Lui seul peut annuler une commande ou accorder une remise.</p></div>
+  </div>
+  <h3>Qui peut faire quoi</h3>
+  <table>
+    <tr><th>Action</th><th class="c">Secrétaire</th><th class="c">Super admin</th></tr>
+    <tr><td>Voir et créer les commandes</td><td class="c"><span class="yes">✓</span> sa succursale</td><td class="c"><span class="yes">✓</span> toutes</td></tr>
+    <tr><td>Faire avancer une commande, encaisser, livrer</td><td class="c"><span class="yes">✓</span> sa succursale</td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Revenir d'une étape en arrière</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Annuler une commande, rembourser</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Voir et créer des clients (communs à toutes les succursales)</td><td class="c"><span class="yes">✓</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Appliquer une remise déjà approuvée pour un client</td><td class="c"><span class="yes">✓</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Accorder une remise (client ou commande)</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Voir le stock</td><td class="c"><span class="yes">✓</span> sa succursale, quantités</td><td class="c"><span class="yes">✓</span> partout</td></tr>
+    <tr><td>Transférer, ajuster, déclarer de la casse</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Voir les prix d'achat, fournisseurs, achats, charges</td><td class="c"><span class="no">✗</span> jamais</td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Tableau de bord, atelier, paramètres, utilisateurs</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+  </table>
+  <div class="note"><b>La sécurité ne dépend pas de l'écran</b>Ces règles sont appliquées par la base de données elle-même, pas seulement par les menus : même en tapant une adresse à la main, une secrétaire n'obtient jamais un coût, un achat ou une charge, ni les commandes d'une autre succursale. Si elle ouvre une page réservée, elle voit le message <span class="ui">Accès non autorisé</span>.</div>
+</section>
+
+<!-- ============================================================ 2 -->
+<section class="chapter">
+  <div class="eyebrow">Chapitre 2</div>
+  <h2>Premiers pas</h2>
+  <h3>Recevoir son accès</h3>
+  <p>Personne ne crée son compte soi-même : c'est le super admin qui invite chaque personne depuis <span class="ui">Paramètres › Utilisateurs</span>. La personne reçoit un e-mail « Votre accès à OPTICOR » avec un bouton <span class="ui">Choisir mon mot de passe</span>. Le lien ne fonctionne qu'une fois ; s'il a expiré, l'admin renvoie l'invitation.</p>
+  <h3>Se connecter</h3>
+  <figure class="half"><img src="shots/00-login.jpg"><figcaption>La page de connexion : e-mail et mot de passe.</figcaption></figure>
+  <ul>
+    <li>La secrétaire arrive directement sur <span class="ui">Commandes</span> ; le super admin sur le <span class="ui">Tableau de bord</span>.</li>
+    <li><span class="ui">Mot de passe oublié ?</span> envoie un e-mail pour en choisir un nouveau.</li>
+    <li>Si l'admin change la succursale ou le rôle d'une personne, celle-ci est déconnectée (« Votre session a expiré ») : il suffit de se reconnecter pour retrouver les bons droits.</li>
+    <li>Un compte désactivé ne peut plus se connecter (« Ce compte est désactivé »).</li>
+  </ul>
+  <h3>L'écran principal</h3>
+  <figure><img src="shots/a05-orders-board.jpg"><figcaption>L'écran d'un super admin : menu à gauche, barre du haut, contenu de la page au centre.</figcaption></figure>
+  <div class="grid2">
+    <div class="card"><h4>Le menu à gauche</h4><p>Le bouton <span class="ui">+ Nouvelle commande</span> est toujours en haut. Dessous, les pages auxquelles on a droit : la secrétaire voit <em>Commandes, Clients, Stock</em> ; l'admin voit en plus <em>Tableau de bord, Atelier, Achats, Charges, Paramètres</em>. Des pastilles orange indiquent ce qui attend : commandes à traiter à l'atelier, charges à approuver. <span class="ui">Réduire le menu</span> le replie en icônes.</p></div>
+    <div class="card"><h4>La barre du haut</h4><p><strong>Succursale</strong> : la secrétaire voit sa succursale (fixe) ; l'admin choisit « Toutes les succursales » ou une seule (voir B2). <strong>Recherche</strong> : trouve un client ou une commande. <strong>Cloche</strong> : les notifications en direct. <strong>Initiales</strong> : le menu personnel (langue français/anglais, thème clair/sombre, se déconnecter).</p></div>
+  </div>
+  <h3>La recherche rapide <span class="kbd">Ctrl</span> + <span class="kbd">K</span></h3>
+  <figure class="half"><img src="shots/s03-search.jpg"><figcaption>Tapez un nom, un téléphone ou un numéro de commande.</figcaption></figure>
+  <p>Depuis n'importe quelle page, <span class="kbd">Ctrl</span>+<span class="kbd">K</span> (ou un clic sur la barre de recherche) ouvre la recherche. Elle trouve les <strong>clients</strong> par nom ou téléphone et les <strong>commandes</strong> par numéro, écrit de n'importe quelle façon : <code>1215</code>, <code>01215</code>, <code>mrf-1215</code> ou <code>MRF-01215</code>. Flèches du clavier pour choisir, <span class="kbd">Entrée</span> pour ouvrir. La secrétaire ne trouve que les commandes de sa succursale.</p>
+  <h3>Sur téléphone</h3>
+  <div class="grid2">
+    <figure class="phone"><img src="shots/m01-phone-board.jpg"><figcaption>Le tableau des commandes sur téléphone.</figcaption></figure>
+    <div>
+      <p>OPTICOR fonctionne aussi sur téléphone ou tablette, sans application à installer : ouvrez l'adresse dans le navigateur.</p>
+      <ul>
+        <li>Le menu de gauche devient une <strong>barre en bas</strong> avec un gros bouton <span class="ui">+</span> pour une nouvelle commande ; <span class="ui">Plus</span> donne accès au reste.</li>
+        <li>Sur les cartes de commande, un bouton d'étape suivante (ex. <span class="ui">Envoyer à l'atelier</span>) remplace le glisser-déposer.</li>
+        <li>Les fenêtres (encaissement, nouveau client…) s'ouvrent en plein écran, avec le bouton principal en bas.</li>
+        <li>Pour la photo de l'ordonnance, le téléphone propose directement l'appareil photo.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 3 -->
+<section class="chapter">
+  <div class="eyebrow">Chapitre 3</div>
+  <h2>Le parcours d'une paire de lunettes</h2>
+  <p>Tout OPTICOR tourne autour de ce parcours. Une commande passe par cinq étapes, toujours dans cet ordre ; à chaque étape, le système sait où sont les lunettes, combien le client a payé et ce qu'il reste à encaisser.</p>
+  <div class="flow">
+    <div class="st"><b><span class="dot" style="background:#3b82f6"></span>Confirmée</b>Le bon est saisi, l'acompte encaissé, la monture sortie du stock.</div>
+    <div class="arrow">→</div>
+    <div class="st"><b><span class="dot" style="background:#8b5cf6"></span>À l'atelier</b>La commande est partie au montage (verres commandés, monture envoyée).</div>
+    <div class="arrow">→</div>
+    <div class="st"><b><span class="dot" style="background:#f59e0b"></span>Préparée</b>Les lunettes sont montées et contrôlées, prêtes à partir en succursale.</div>
+    <div class="arrow">→</div>
+    <div class="st"><b><span class="dot" style="background:#14b8a6"></span>En succursale</b>Les lunettes attendent le client. On le prévient (WhatsApp).</div>
+    <div class="arrow">→</div>
+    <div class="st"><b><span class="dot" style="background:#22c55e"></span>Livrée</b>Le client a payé le reste et a récupéré ses lunettes.</div>
+  </div>
+  <div class="flow-foot">
+    <div style="background:var(--red-soft)"><b>Annulée</b> — seul le super admin peut annuler, à n'importe quelle étape (même après livraison, pour un retour). La monture revient en stock ; un remboursement peut être enregistré.</div>
+    <div style="background:var(--amber-soft)"><b>En retard</b> — si une commande reste trop longtemps à la même étape (délais réglés dans Paramètres › Notifications), sa carte passe en rouge et une notification est envoyée.</div>
+  </div>
+  <h3>Ce qui se passe à chaque étape</h3>
+  <table>
+    <tr><th style="width:18%">Étape</th><th style="width:22%">Qui</th><th>Ce que fait le système</th></tr>
+    <tr><td><b>Confirmée</b></td><td>Secrétaire (ou admin) — <em>Nouvelle commande</em></td><td>Vérifie que le N° du bon n'est pas déjà utilisé dans la succursale, que la monture est en stock et que le total couvre au moins son prix. Enregistre l'ordonnance, l'acompte (même 0 DH) et sort la monture du stock. Le numéro de commande est créé : préfixe de la succursale + N° du bon, ex. <code>MRF-01215</code>.</td></tr>
+    <tr><td><b>À l'atelier</b></td><td>Secrétaire ou admin — bouton <span class="ui">Envoyer à l'atelier</span></td><td>La commande apparaît dans la file de l'<em>Atelier</em> (admin). Le compteur « Atelier » du menu compte les commandes confirmées et à l'atelier.</td></tr>
+    <tr><td><b>Préparée</b></td><td>Généralement l'atelier (admin) — <span class="ui">Marquer comme préparée</span></td><td>Les lunettes sont prêtes ; elles sortent du compteur de l'atelier.</td></tr>
+    <tr><td><b>En succursale</b></td><td>Secrétaire à la réception — <span class="ui">Arrivée en succursale</span></td><td>Le bouton <span class="ui">Prévenir sur WhatsApp</span> apparaît (message prêt à envoyer au client). La commande s'affiche dans le widget « À retirer » du tableau de bord.</td></tr>
+    <tr><td><b>Livrée</b></td><td>Secrétaire — <span class="ui">Encaisser le reste</span>, puis <span class="ui">Encaisser et livrer</span></td><td>Possible seulement quand le reste à payer est à 0 : on encaisse le solde dans la même fenêtre. La livraison compte pour la fidélité du client (voir A4).</td></tr>
+  </table>
+  <h3>L'argent et le stock, en une phrase</h3>
+  <ul>
+    <li><strong>Total</strong> = ce que le client paie (monture + verres + traitements) ; <strong>payé</strong> = la somme des paiements ; <strong>reste</strong> = total − payé − remise. Le reste est affiché partout en orange tant qu'il n'est pas à 0.</li>
+    <li>La monture sort du stock <strong>dès la confirmation</strong> (elle est réservée pour ce client), et y revient si la commande est annulée. Le stock n'est jamais modifié « à la main » : chaque mouvement (achat, vente, transfert, comptage, casse, annulation) est enregistré et consultable.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ PART A -->
+<section class="part">
+  <div class="num">Partie A</div>
+  <h1>La secrétaire</h1>
+  <p>Le travail de tous les jours à la réception : recevoir le client, saisir sa commande, faire avancer les lunettes, encaisser et livrer. Tout ce qui suit concerne aussi le super admin, qui peut faire les mêmes gestes dans toutes les succursales.</p>
+</section>
+
+<!-- A1 -->
+<section class="chapter">
+  <div class="eyebrow">A1 · Commandes <span class="role sec">secrétaire</span> <span class="role adm">admin</span></div>
+  <h2>Les commandes : tableau et liste</h2>
+  <figure><img src="shots/s01-orders-board.jpg"><figcaption>Le tableau des commandes de la Succursale Maârif, vu par Salma.</figcaption></figure>
+  <p>La page <span class="ui">Commandes</span> est la page d'accueil de la secrétaire. Elle a deux vues, à choisir en haut : <span class="ui">Tableau</span> et <span class="ui">Liste</span>.</p>
+  <h3>Le tableau (vue par étapes)</h3>
+  <p>Une colonne par étape : <em>Confirmée, À l'atelier, Préparée, En succursale, Livrée</em> (les livrées des 7 derniers jours). Le chiffre en haut de chaque colonne est le nombre de commandes. Chaque <strong>carte</strong> montre :</p>
+  <ul>
+    <li>le <strong>numéro</strong> de commande (cliquez dessus pour ouvrir la fiche) ;</li>
+    <li>le <strong>nom du client</strong>, l'icône <strong>WhatsApp</strong> s'il a WhatsApp, l'icône <strong>lunettes</strong> si c'est la monture du client ;</li>
+    <li>le <strong>total</strong> et le badge <span style="color:var(--amber);font-weight:600">Reste … DH</span> (ou « Soldée ») ;</li>
+    <li>depuis combien de jours elle est dans cette étape — en <span style="color:var(--red);font-weight:600">rouge</span> si elle est en retard.</li>
+  </ul>
+  <p><strong>Faire avancer une commande :</strong> glissez la carte dans la colonne suivante (avec la souris, ou au clavier avec la poignée <span class="k">⋮⋮</span> : <span class="kbd">Espace</span>, flèches, <span class="kbd">Espace</span>). Sur téléphone, utilisez le bouton d'étape suivante de la carte (ex. <span class="ui">Envoyer à l'atelier</span>). On ne peut avancer que d'une étape à la fois ; une commande ne passe en <em>Livrée</em> que par l'encaissement (A3).</p>
+  <h3>La liste</h3>
+  <figure><img src="shots/s02-orders-list.jpg"><figcaption>La vue Liste : toutes les commandes, avec filtres.</figcaption></figure>
+  <p>Toutes les commandes dans un tableau : numéro, client, date, statut, total, reste. Filtres : <strong>statut</strong>, <strong>période</strong> (7, 30, 90 jours, un an), <span class="ui">Reste à payer &gt; 0</span> pour voir qui doit encore de l'argent, <span class="ui">Afficher les annulées</span>. Le champ de recherche filtre par client, téléphone ou numéro. Un clic sur une ligne ouvre la fiche.</p>
+  <div class="tip"><b>Astuce</b>En fin de journée, la vue Liste avec « Reste à payer &gt; 0 » donne la liste des clients à relancer.</div>
+</section>
+
+<!-- A2 -->
+<section class="chapter">
+  <div class="eyebrow">A2 · Nouvelle commande <span class="role sec">secrétaire</span> <span class="role adm">admin</span></div>
+  <h2>Créer une nouvelle commande</h2>
+  <p>Bouton <span class="ui">+ Nouvelle commande</span> (menu de gauche, ou <span class="ui">+</span> sur téléphone). La saisie se fait en <strong>3 étapes</strong> ; à droite, un <strong>récapitulatif</strong> se remplit au fur et à mesure (client, ordonnance, produits, montants). <span class="ui">Suivant</span> passe à l'étape suivante si tout est correct, sinon les champs à corriger sont signalés en rouge ; <span class="ui">Précédent</span> revient en arrière sans rien perdre.</p>
+
+  <h3>Étape 1 — Le bon et le client</h3>
+  <figure><img src="shots/s04-wizard-client.jpg"><figcaption>Étape 1 : le N° du bon, puis le client (recherche d'un client existant).</figcaption></figure>
+  <ol class="steps">
+    <li><strong>N° du bon</strong> : le numéro imprimé sur le carnet de bons papier. Le préfixe de la succursale est déjà affiché (<code>MRF-</code>). OPTICOR vérifie aussitôt : « Numéro disponible » en vert, ou « Ce N° du bon existe déjà dans cette succursale » avec la commande concernée. Un même numéro ne peut jamais servir deux fois dans la même succursale (l'admin est prévenu si quelqu'un essaie).</li>
+    <li><strong>Client existant</strong> : tapez le nom ou le téléphone ; les clients récents s'affichent sans rien taper. Un clic choisit le client. Un bandeau jaune signale un <strong>client fidèle</strong> ; un bandeau « Remise approuvée » apparaît si l'opticien lui a accordé une remise (voir étape 3).</li>
+    <li><strong>Nouveau client</strong> : choisissez <span class="ui">Nouveau client</span> et saisissez le nom et le téléphone (obligatoires), et cochez s'il a WhatsApp. Un même téléphone ne peut appartenir qu'à un client : si le numéro existe déjà, OPTICOR le dit et propose le client existant. Il signale aussi les noms qui ressemblent à des clients existants, pour éviter les doublons.</li>
+  </ol>
+  <figure><img src="shots/s05-wizard-new-client.jpg"><figcaption>Nouveau client : nom, téléphone (format marocain), WhatsApp.</figcaption></figure>
+  <div class="note"><b>Les clients sont communs à toutes les succursales</b>Un client venu à Anfa est retrouvé à Maârif : son historique et sa fidélité se cumulent.</div>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Étape 2 — Les mesures (l'ordonnance)</h3>
+  <figure><img src="shots/s06-wizard-measures.jpg" style="max-height:118mm"><figcaption>Étape 2 : l'ordonnance œil droit (OD) et œil gauche (OG), puis les informations complémentaires.</figcaption></figure>
+  <table>
+    <tr><th style="width:22%">Champ</th><th>Ce qu'il faut saisir</th></tr>
+    <tr><td><b>SPH</b> (sphère)</td><td>La correction principale, en dioptries, par pas de 0,25 (ex. −1,75 ; +2,00). Les boutons − / + ajoutent ou retirent 0,25.</td></tr>
+    <tr><td><b>CYL</b> (cylindre)</td><td>La correction de l'astigmatisme (souvent négative), par pas de 0,25. Vide s'il n'y en a pas.</td></tr>
+    <tr><td><b>AXE</b></td><td>L'orientation de l'astigmatisme, de 0 à 180°. Obligatoire dès qu'il y a un cylindre.</td></tr>
+    <tr><td><b>ADD</b> (addition)</td><td>Pour les verres de près / progressifs : la correction ajoutée pour la lecture.</td></tr>
+    <tr><td><b>Copier OD → OG</b></td><td>Recopie l'œil droit sur l'œil gauche quand les deux sont proches ; on corrige ensuite ce qui diffère.</td></tr>
+    <tr><td><b>Reprendre les dernières mesures</b></td><td>Pour un client existant : reprend l'ordonnance de sa dernière commande.</td></tr>
+    <tr><td><b>EP, hauteur, type de vision, médecin, date, photo</b></td><td>Écart pupillaire de chaque œil, hauteur de montage, VL (de loin) / VP (de près) / VL+VP, nom du médecin, date de l'ordonnance, photo de l'ordonnance. L'opticien choisit dans <em>Paramètres › Champs personnalisés</em> lesquels sont masqués, facultatifs ou obligatoires, et peut en ajouter.</td></tr>
+  </table>
+  <p>OPTICOR refuse les valeurs impossibles (ex. une sphère qui n'est pas un multiple de 0,25, un axe sans cylindre) et l'explique sous le champ. La <strong>photo de l'ordonnance</strong> peut être prise avec le téléphone ou ajoutée plus tard depuis la fiche commande (image ou PDF).</p>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Étape 3 — Produits et paiement</h3>
+  <figure><img src="shots/s07-wizard-products.jpg"><figcaption>Étape 3 : la monture (catégorie), les verres, les traitements, le total et l'acompte.</figcaption></figure>
+  <h4>La monture</h4>
+  <p>Les montures sont gérées <strong>par catégorie de prix</strong> (Catégorie A, B, C…), pas modèle par modèle. Chaque carte affiche le nom, le prix de vente et le nombre en stock <em>dans cette succursale</em>. Une catégorie à 0 est grisée (« 0 en stock — demander un transfert » : l'admin peut en envoyer depuis une autre succursale). Si le client apporte sa propre monture, cochez <span class="ui">Monture du client</span> : rien ne sort du stock, et l'icône lunettes apparaîtra partout sur cette commande. Les onglets au-dessus donnent aussi les lentilles et accessoires (catégorie + quantité).</p>
+  <h4>Les verres</h4>
+  <p>Choisissez le <strong>type de verres</strong> (unifocal, progressif, double foyer) et les <strong>traitements</strong> (anti-reflet, lumière bleue, photochromique, durci, teinté, polarisé… — plusieurs possibles). Le champ « détails » sert aux précisions (indice, marque). Les verres n'ont pas de prix séparé : leur prix est compris dans le total.</p>
+  <h4>Le total, la remise et l'acompte</h4>
+  <ul>
+    <li><strong>Total</strong> : le prix annoncé au client pour l'ensemble. Il doit être au moins égal au prix de la monture choisie.</li>
+    <li><strong>Remise approuvée</strong> : si l'opticien a préparé une remise pour ce client, cochez-la pour l'appliquer ; elle est alors consommée (elle ne sert qu'une fois).</li>
+    <li><strong>Acompte</strong> : les boutons <span class="ui">30 %</span>, <span class="ui">50 %</span>, <span class="ui">100 %</span> le calculent, ou tapez un montant (0 possible). Choisissez le <strong>mode de paiement</strong> : espèces, carte, virement.</li>
+    <li>Le <strong>reste à payer</strong> s'affiche aussitôt ; il sera encaissé au retrait.</li>
+  </ul>
+  <h4>Confirmer</h4>
+  <figure class="half"><img src="shots/s08-wizard-done.jpg"><figcaption>Commande enregistrée : son numéro, puis ouvrir la fiche ou en créer une autre.</figcaption></figure>
+  <p>À la confirmation, tout est enregistré <strong>en une seule fois</strong> : commande, client, ordonnance, acompte et sortie de stock. Si quelque chose a changé entre-temps (la dernière monture vient d'être vendue, le N° du bon vient d'être pris), rien n'est enregistré et un message explique quoi corriger.</p>
+</section>
+
+<!-- A3 -->
+<section class="chapter">
+  <div class="eyebrow">A3 · Fiche commande <span class="role sec">secrétaire</span> <span class="role adm">admin</span></div>
+  <h2>La fiche commande : suivre, encaisser, livrer</h2>
+  <figure><img src="shots/s09-order-detail.jpg"><figcaption>La fiche d'une commande arrivée en succursale.</figcaption></figure>
+  <p>Elle s'ouvre en cliquant sur un numéro de commande (tableau, liste, recherche, fiche client, notification). On y trouve :</p>
+  <ul>
+    <li><strong>En haut</strong> : le numéro, le statut, le client (téléphone, WhatsApp), et le bouton de l'<strong>étape suivante</strong> (<span class="ui">Envoyer à l'atelier</span>, <span class="ui">Marquer comme préparée</span>, <span class="ui">Arrivée en succursale</span>, puis <span class="ui">Encaisser le reste</span>).</li>
+    <li><strong>La frise des étapes</strong> avec la date de chaque passage.</li>
+    <li><strong>L'ordonnance</strong> (OD / OG), les informations complémentaires et la <strong>photo d'ordonnance</strong> (ajouter, remplacer, ouvrir).</li>
+    <li><strong>Les produits</strong> : monture (catégorie ou « Monture du client »), type de verres, traitements.</li>
+    <li><strong>Les paiements</strong> : chaque encaissement avec date, mode et personne ; le total, le payé, la remise et le reste. <span class="ui">Ajouter un paiement</span> enregistre un paiement intermédiaire (jamais plus que le reste).</li>
+    <li><strong>L'historique</strong> : qui a fait quoi et quand.</li>
+  </ul>
+  <h3>Prévenir le client</h3>
+  <p>Quand la commande est <em>En succursale</em>, le bouton <span class="ui">Prévenir sur WhatsApp</span> ouvre WhatsApp avec un message déjà rédigé (« Bonjour …, vos lunettes sont prêtes… ») vers le numéro du client.</p>
+  <h3>Encaisser et livrer</h3>
+  <figure class="half"><img src="shots/s10-collect.jpg"><figcaption>La fenêtre d'encaissement : le reste à payer, le mode, puis Livrer.</figcaption></figure>
+  <p>Le client vient chercher ses lunettes : <span class="ui">Encaisser le reste</span> ouvre une fenêtre avec le reste à payer déjà rempli. Choisissez le mode de paiement puis <span class="ui">Encaisser et livrer</span> : le paiement est enregistré et la commande passe en <em>Livrée</em> dans le même geste. Une commande ne peut pas être livrée tant qu'il reste de l'argent dû.</p>
+  <div class="warn"><b>Erreur de manipulation ?</b>La secrétaire ne peut pas revenir en arrière ni annuler : elle demande à l'opticien, qui peut revenir d'une étape ou annuler (avec un motif), voir B4.</div>
+</section>
+
+<!-- A4 -->
+<section class="chapter">
+  <div class="eyebrow">A4 · Clients <span class="role sec">secrétaire</span> <span class="role adm">admin</span></div>
+  <h2>Les clients</h2>
+  <figure><img src="shots/s11-clients.jpg"><figcaption>La liste des clients, avec les segments en haut.</figcaption></figure>
+  <p>La liste regroupe tous les clients de toutes les succursales. La recherche trouve par nom ou téléphone ; le tri par nom, par visite récente ou par nombre de commandes. Les <strong>segments</strong> en haut :</p>
+  <table>
+    <tr><th style="width:20%">Segment</th><th>Signification</th></tr>
+    <tr><td><b>Nouveau</b></td><td>0 ou 1 commande (non annulée).</td></tr>
+    <tr><td><b>Régulier</b></td><td>Au moins 2 commandes, pas encore fidèle.</td></tr>
+    <tr><td><b>Fidèle</b> ★</td><td>A atteint le nombre de commandes <em>livrées</em> fixé par l'opticien (Paramètres › Fidélité, 5 dans l'exemple), toutes succursales confondues. Le passage en fidèle est automatique et l'équipe est prévenue par une notification.</td></tr>
+  </table>
+  <h3>La fiche client</h3>
+  <figure><img src="shots/s12-client-detail.jpg"><figcaption>La fiche d'un client fidèle : ses commandes, l'évolution de sa vue.</figcaption></figure>
+  <ul>
+    <li>Coordonnées (appeler, écrire sur WhatsApp), segment, date de la première commande, nombre de succursales visitées.</li>
+    <li>Ses <strong>commandes</strong> : la secrétaire voit le nombre total, mais le détail seulement de celles de sa succursale.</li>
+    <li><strong>L'évolution de la vue</strong> : un graphique de la sphère OD/OG au fil des commandes.</li>
+    <li><span class="ui">Nouvelle commande pour ce client</span> ouvre la saisie avec le client déjà choisi.</li>
+    <li><span class="ui">Modifier</span> corrige le nom, le téléphone ou WhatsApp.</li>
+  </ul>
+  <figure class="half"><img src="shots/s13-new-client.jpg"><figcaption>Créer un client sans commande (ex. un client qui reviendra).</figcaption></figure>
+</section>
+
+<!-- A5 -->
+<section class="chapter">
+  <div class="eyebrow">A5 · Stock <span class="role sec">secrétaire</span></div>
+  <h2>Le stock de sa succursale</h2>
+  <figure><img src="shots/s14-stock.jpg"><figcaption>Le stock de la Succursale Maârif vu par la secrétaire : quantités seulement.</figcaption></figure>
+  <p>La secrétaire voit le stock de <strong>sa</strong> succursale, en lecture : elle sait ce qu'elle peut vendre, sans voir aucun prix d'achat.</p>
+  <ul>
+    <li><strong>En haut</strong> : nombre de catégories suivies, nombre d'articles en stock, nombre de catégories sous le seuil.</li>
+    <li><strong>Filtres</strong> : type de produit (montures, lentilles, accessoires), recherche, <span class="ui">Stock bas uniquement</span>.</li>
+    <li><strong>La pastille de quantité</strong> : <span style="color:var(--red);font-weight:600">rouge</span> sous le seuil minimum, <span style="color:var(--amber);font-weight:600">orange</span> au seuil, neutre au-dessus. Le seuil est fixé par l'opticien.</li>
+  </ul>
+  <h3>L'historique d'une catégorie</h3>
+  <figure class="half"><img src="shots/s15-stock-history.jpg"><figcaption>Chaque entrée et sortie, avec le stock après le mouvement.</figcaption></figure>
+  <p>Un clic sur une ligne (ou l'icône horloge) ouvre l'historique : achat reçu, vente (avec le N° de commande), annulation, transfert reçu ou envoyé, comptage, casse — avec la date, la personne et la quantité restante après chaque mouvement. C'est utile pour comprendre un écart.</p>
+  <div class="note"><b>Une catégorie est à 0 ?</b>Demandez un transfert à l'opticien : il envoie des montures depuis une autre succursale ou le laboratoire, et elles apparaissent tout de suite dans votre stock.</div>
+</section>
+
+<!-- A6 -->
+<section class="chapter">
+  <div class="eyebrow">A6 · Notifications <span class="role sec">secrétaire</span> <span class="role adm">admin</span></div>
+  <h2>Les notifications</h2>
+  <figure class="half"><img src="shots/s16-notifications.jpg"><figcaption>La cloche : les dernières notifications, non lues en premier.</figcaption></figure>
+  <p>La cloche en haut à droite affiche le nombre de notifications non lues. Elle se met à jour <strong>en direct</strong> : une nouvelle notification fait apparaître un petit message en bas de l'écran (avec <span class="ui">Ouvrir</span>), sans recharger la page.</p>
+  <ul>
+    <li>Un clic sur une notification la marque comme lue et ouvre directement la bonne page (la commande, le client, le stock filtré…).</li>
+    <li><span class="ui">Tout marquer comme lu</span> vide le compteur ; <span class="ui">Voir toutes les notifications</span> ouvre la page complète, avec un filtre <em>Toutes / Non lues</em>.</li>
+  </ul>
+  <p>La secrétaire reçoit, pour <strong>sa</strong> succursale :</p>
+  <table>
+    <tr><th style="width:28%">Notification</th><th>Quand</th></tr>
+    <tr><td><b>Stock bas</b></td><td>Une catégorie descend au seuil minimum (une fois par passage sous le seuil).</td></tr>
+    <tr><td><b>Commande en retard</b></td><td>Une commande reste trop longtemps à la même étape (une fois par commande et par étape).</td></tr>
+    <tr><td><b>Nouveau client fidèle</b></td><td>Un client de la succursale devient fidèle à sa dernière livraison.</td></tr>
+  </table>
+  <h3>Les pages réservées</h3>
+  <figure class="half"><img src="shots/s17-access-denied.jpg"><figcaption>Une secrétaire qui ouvre une page réservée à l'opticien.</figcaption></figure>
+</section>
+
+<!-- ============================================================ PART B -->
+<section class="part">
+  <div class="num">Partie B</div>
+  <h1>Le super admin</h1>
+  <p>L'opticien pilote l'ensemble : il voit toutes les succursales, suit la fabrication à l'atelier, gère le stock entre les succursales, les achats aux fournisseurs et les dépenses, et règle le fonctionnement de l'application. Il peut aussi faire tout ce que fait une secrétaire (Partie A), dans n'importe quelle succursale.</p>
+</section>
+
+<!-- B1 -->
+<section class="chapter">
+  <div class="eyebrow">B1 · Tableau de bord <span class="role adm">admin</span></div>
+  <h2>Le tableau de bord</h2>
+  <figure><img src="shots/a01-dashboard-today.jpg"><figcaption>Le tableau de bord sur « Aujourd'hui » : le montant encaissé est mis en avant.</figcaption></figure>
+  <h3>Les filtres (en haut)</h3>
+  <ul>
+    <li><strong>Période</strong> : Aujourd'hui, 7 jours, Ce mois, Mois dernier, Cette année, ou Personnalisé (du… au…). Les journées suivent l'heure de Casablanca.</li>
+    <li><strong>Succursale</strong> : toutes, une succursale ou le laboratoire (par défaut, celle choisie dans la barre du haut).</li>
+    <li><strong>Comparaison</strong> : avec la même période le mois précédent (M−1), l'année précédente (A−1), ou aucune. Chaque carte affiche alors l'écart en % (vert en hausse, rouge en baisse) et une petite courbe.</li>
+  </ul>
+  <p>Les filtres sont dans l'adresse de la page : on peut garder un favori « ce mois, Maârif » ou l'envoyer à un associé.</p>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Les indicateurs</h3>
+  <figure><img src="shots/a03-dashboard-month.jpg"><figcaption>« Ce mois », comparé au mois précédent : cartes, graphiques et widgets.</figcaption></figure>
+  <table>
+    <tr><th style="width:24%">Indicateur</th><th>Ce qu'il mesure</th></tr>
+    <tr><td><b>Chiffre d'affaires (CA)</b></td><td>La somme des totaux des commandes <em>créées</em> sur la période, hors commandes annulées. C'est ce qui a été vendu, payé ou non.</td></tr>
+    <tr><td><b>Montant encaissé</b></td><td>L'argent réellement reçu sur la période (acomptes, paiements, soldes), remboursements déduits. C'est la carte principale sur « Aujourd'hui » : elle doit correspondre à la caisse du jour.</td></tr>
+    <tr><td><b>Charges</b></td><td>Les dépenses approuvées de la période (loyers, salaires, paiements fournisseurs…). Avec une succursale choisie : seulement ses charges ; les charges « Général » ne comptent que sous « Toutes les succursales ».</td></tr>
+    <tr><td><b>Net</b></td><td>CA − charges : le résultat de la période.</td></tr>
+    <tr><td><b>Commandes / panier moyen</b></td><td>Nombre de commandes non annulées, et CA divisé par ce nombre.</td></tr>
+    <tr><td><b>Reste à encaisser</b></td><td>Ce que les clients doivent encore sur les commandes de la période pas encore livrées.</td></tr>
+    <tr><td><b>Dû aux fournisseurs</b></td><td>Ce qui reste à payer sur tous les achats, à aujourd'hui.</td></tr>
+    <tr><td><b>Remises, taux d'annulation, casse</b></td><td>Total des remises accordées, part des commandes annulées, nombre de montures déclarées cassées.</td></tr>
+    <tr><td><b>Clients fidèles, taux de retour</b></td><td>Nombre de clients fidèles, et part des clients servis qui ont déjà au moins 2 commandes livrées.</td></tr>
+    <tr><td><b>Délais atelier</b></td><td>Durée moyenne entre la commande et l'arrivée en succursale, et jusqu'à la livraison.</td></tr>
+  </table>
+  <h3>Graphiques et widgets</h3>
+  <ul>
+    <li><strong>CA dans le temps</strong> (par heure, jour ou mois selon la période), avec la période de comparaison en pointillés.</li>
+    <li><strong>CA et net par succursale</strong>, <strong>segments de clients</strong>, <strong>ventes par catégorie de monture, type de verres et traitement</strong>, <strong>heures d'affluence</strong> (quel jour, à quelle heure les commandes sont passées), <strong>délais de l'atelier</strong>.</li>
+    <li>En bas : <span class="ui">À retirer</span> (lunettes arrivées en succursale, depuis combien de jours), <span class="ui">Charges en attente</span>, <span class="ui">Stock bas</span> — chacun avec un lien vers la page concernée.</li>
+  </ul>
+  <figure><img src="shots/a02-dashboard-year.jpg"><figcaption>« Cette année » : le CA par mois.</figcaption></figure>
+</section>
+
+<!-- B2 + B3 -->
+<section class="chapter">
+  <div class="eyebrow">B2 · Sélecteur de succursale <span class="role adm">admin</span></div>
+  <h2>Le sélecteur de succursale</h2>
+  <figure class="half"><img src="shots/a04-store-selector.jpg"><figcaption>Choisir la succursale affichée.</figcaption></figure>
+  <p>En haut à gauche, l'admin choisit ce qu'il regarde : <strong>Toutes les succursales</strong>, une succursale, ou le laboratoire. Ce choix est gardé d'une visite à l'autre et s'applique aux <em>Commandes</em>, à l'<em>Atelier</em>, à l'onglet du <em>Stock</em>, et sert de filtre par défaut au <em>Tableau de bord</em>. Avec « Toutes les succursales », chaque carte de commande indique sa succursale. Une nouvelle commande se fait toujours dans une succursale précise (choisie à l'étape 1).</p>
+
+  <div class="eyebrow" style="margin-top:8mm">B3 · Atelier <span class="role adm">admin</span></div>
+  <h2>L'atelier</h2>
+  <figure><img src="shots/a06-workshop.jpg"><figcaption>La file de l'atelier : les plus anciennes en premier.</figcaption></figure>
+  <p>L'atelier est la liste de travail du montage : toutes les commandes <em>Confirmées</em>, <em>À l'atelier</em> et <em>Préparées</em>, les plus anciennes en premier. En haut, le résumé (à envoyer, en cours, prêtes, en retard) et des filtres par étape.</p>
+  <p>Chaque carte donne tout ce qu'il faut pour monter les lunettes sans ouvrir la commande : <strong>l'ordonnance</strong> (OD / OG), la <strong>monture</strong> (catégorie ou « Monture du client »), le <strong>type de verres et les traitements</strong>, la succursale, l'âge de la commande. Les cartes <span style="color:var(--red);font-weight:600">en retard</span> sont en rouge. Le gros bouton fait avancer d'une étape : <span class="ui">Envoyer à l'atelier</span> → <span class="ui">Marquer comme préparée</span> → <span class="ui">Arrivée en succursale</span> (la commande quitte alors l'atelier et apparaît « En succursale » chez la secrétaire).</p>
+  <div class="tip"><b>Le compteur « Atelier » du menu</b>Il compte les commandes confirmées et à l'atelier : c'est le travail qui reste à faire. Une paire préparée en sort.</div>
+</section>
+
+<!-- B4 -->
+<section class="chapter">
+  <div class="eyebrow">B4 · Commandes et clients <span class="role adm">admin</span></div>
+  <h2>Ce que seul l'admin peut faire sur les commandes et les clients</h2>
+  <figure class="half"><img src="shots/a07-order-menu.jpg"><figcaption>Le menu « … » d'une commande, réservé à l'admin.</figcaption></figure>
+  <ul>
+    <li><span class="ui">Revenir en arrière</span> : corrige une étape passée par erreur (jusqu'à « Confirmée » ; jamais depuis « Livrée »).</li>
+    <li><span class="ui">Remise libre</span> : un geste commercial sur cette commande, avant la livraison, au plus le reste à payer (jamais en dessous du prix de la monture, et pas en plus d'une remise client).</li>
+    <li><span class="ui">Annuler la commande</span> : à n'importe quelle étape (même livrée, pour un retour).</li>
+  </ul>
+  <figure class="half"><img src="shots/a08-cancel-dialog.jpg"><figcaption>Annuler : motif obligatoire, remboursement éventuel.</figcaption></figure>
+  <p>L'annulation demande un <strong>motif</strong> (le client a changé d'avis, erreur de mesure, monture indisponible, délai trop long, autre) et une note. On peut enregistrer un <strong>remboursement</strong> (au plus ce qui a été payé) avec son mode. La monture revient automatiquement en stock. Une commande n'est jamais effacée : elle reste visible en « Annulée » (filtre « Afficher les annulées »).</p>
+  <h3>La remise préparée pour un client</h3>
+  <figure><img src="shots/a09-client-admin.jpg"><figcaption>Sur la fiche client, l'admin prépare une remise pour la prochaine commande.</figcaption></figure>
+  <p>Sur la fiche d'un client, <span class="ui">Approuver une remise</span> enregistre une remise (en % ou en DH, avec une note) pour <strong>sa prochaine commande</strong>. La secrétaire la voit en bandeau à l'étape 1 et l'applique à l'étape 3 ; une fois utilisée, elle disparaît. L'admin peut aussi la retirer. C'est la façon de laisser la secrétaire accorder une remise sans qu'elle ait le droit d'en décider.</p>
+</section>
+
+<!-- B5 -->
+<section class="chapter">
+  <div class="eyebrow">B5 · Stock <span class="role adm">admin</span></div>
+  <h2>Le stock : transferts, comptage, casse, seuils</h2>
+  <figure><img src="shots/a10-stock-admin.jpg"><figcaption>Le stock côté admin : un onglet par succursale et pour le laboratoire.</figcaption></figure>
+  <p>L'admin voit le stock de chaque lieu (onglets en haut). Le <strong>seuil minimum</strong> de chaque catégorie se modifie directement dans la colonne « Seuil » : en dessous, la quantité passe en rouge, la catégorie entre dans « Stock bas » et une notification part. Le stock ne se modifie jamais en tapant un chiffre : on passe par un de ces gestes, chacun enregistré dans l'historique.</p>
+  <div class="grid2">
+    <figure><img src="shots/a11-transfer.jpg"><figcaption>Transférer vers une autre succursale.</figcaption></figure>
+    <figure><img src="shots/a12-adjust.jpg"><figcaption>Ajuster au stock compté (inventaire).</figcaption></figure>
+  </div>
+  <table>
+    <tr><th style="width:24%">Geste</th><th>Quand l'utiliser</th></tr>
+    <tr><td><b>Transférer</b></td><td>Envoyer des articles d'un lieu à un autre (ex. du laboratoire vers Anfa). Plusieurs catégories en une fois ; impossible d'envoyer plus que ce qu'il y a. La sortie et l'entrée sont enregistrées ensemble.</td></tr>
+    <tr><td><b>Ajuster au comptage</b></td><td>Après un inventaire : on saisit la quantité <em>comptée</em> et un motif (inventaire, erreur de saisie, article retrouvé…). OPTICOR enregistre la différence.</td></tr>
+    <tr><td><b>Casse ou perte</b></td><td>Une monture abîmée ou perdue : quantité et raison obligatoire. Elle sort du stock et compte dans l'indicateur « Casse » du tableau de bord.</td></tr>
+    <tr><td><b>Historique</b></td><td>Tous les mouvements de la catégorie dans ce lieu, avec le stock après chaque mouvement.</td></tr>
+  </table>
+  <figure><img src="shots/a13-transfers.jpg"><figcaption>La page Transferts : l'historique de tous les transferts, et « Nouveau transfert ».</figcaption></figure>
+  <p>Les entrées de stock venant des fournisseurs se font par les <strong>Achats</strong> (B6) : chaque achat reçu ajoute ses articles au lieu de réception.</p>
+</section>
+
+<!-- B6 -->
+<section class="chapter">
+  <div class="eyebrow">B6 · Achats <span class="role adm">admin</span></div>
+  <h2>Achats et fournisseurs</h2>
+  <figure><img src="shots/a14-purchases.jpg"><figcaption>Les achats : ce qui a été acheté, payé, et ce qui reste dû.</figcaption></figure>
+  <p>En haut : le total dû aux fournisseurs, le nombre d'achats non soldés, le total acheté. Le tableau donne pour chaque achat la date, le fournisseur, le lieu de réception, le total, le payé et le reste (badge). Filtres par fournisseur et par état.</p>
+  <h3>Enregistrer un achat</h3>
+  <figure><img src="shots/a15-new-purchase.jpg"><figcaption>Nouvel achat : fournisseur, lieu de réception, lignes, paiement.</figcaption></figure>
+  <ol class="steps">
+    <li><strong>Fournisseur</strong> (ou en créer un), <strong>Reçu à</strong> (la succursale ou le laboratoire qui reçoit la marchandise), date, référence de la facture.</li>
+    <li><strong>Lignes de stock</strong> : catégorie + prix unitaire d'achat + quantité → total de la ligne. Ces articles entrent dans le stock du lieu de réception.</li>
+    <li><strong>Lignes de verres</strong> (<span class="ui">Ajouter des verres</span>) : une description et un montant, sans stock (les verres sont commandés pour des clients).</li>
+    <li><strong>Paiement maintenant</strong> : 100 %, 30 %, 50 %, un autre montant, ou rien. Le total se calcule tout seul.</li>
+  </ol>
+  <h3>La fiche d'un achat et ses paiements</h3>
+  <div class="grid2">
+    <figure><img src="shots/a16-purchase-detail.jpg"><figcaption>Le détail d'un achat.</figcaption></figure>
+    <figure><img src="shots/a17-supplier-payment.jpg"><figcaption>Ajouter un paiement (au plus le reste).</figcaption></figure>
+  </div>
+  <p><span class="ui">Ajouter un paiement</span> enregistre un versement au fournisseur (date, mode, note), jamais plus que le reste. <strong>Chaque paiement fournisseur crée automatiquement une charge</strong> « Achat fournisseur » dans les Charges, en lecture seule (on la corrige depuis l'achat, pas depuis les charges) : les dépenses du tableau de bord sont ainsi toujours complètes.</p>
+  <figure><img src="shots/a18-suppliers.jpg"><figcaption>L'onglet Fournisseurs : coordonnées et solde dû par fournisseur.</figcaption></figure>
+  <p>L'onglet <span class="ui">Fournisseurs</span> liste les fournisseurs avec ce qui leur est dû. On peut les modifier, archiver un fournisseur avec qui l'on ne travaille plus (il reste dans l'historique), ou supprimer un fournisseur jamais utilisé.</p>
+</section>
+
+<!-- B7 -->
+<section class="chapter">
+  <div class="eyebrow">B7 · Charges <span class="role adm">admin</span></div>
+  <h2>Les charges</h2>
+  <figure><img src="shots/a19-charges.jpg"><figcaption>Les charges : à approuver en haut, puis le journal de toutes les dépenses.</figcaption></figure>
+  <p>Les charges sont toutes les dépenses : loyers, salaires, électricité, internet, livraisons, verres refaits, paiements fournisseurs… Elles alimentent les indicateurs « Charges » et « Net » du tableau de bord. Filtres : période, lieu, catégorie, état ; le total de la sélection est affiché.</p>
+  <h3>D'où viennent les charges (badge « Source »)</h3>
+  <table>
+    <tr><th style="width:22%">Source</th><th>Explication</th></tr>
+    <tr><td><b>Manuelle</b></td><td>Saisie avec <span class="ui">Nouvelle charge</span> : montant, date, catégorie, lieu (une succursale, le laboratoire ou « Général » pour ce qui concerne toute l'entreprise), motif obligatoire, et éventuellement une commande liée (ex. un verre refait pour la commande MRF-01204).</td></tr>
+    <tr><td><b>Paiement fournisseur</b></td><td>Créée automatiquement par un paiement d'achat (B6). En lecture seule, avec un lien vers l'achat.</td></tr>
+    <tr><td><b>Récurrente</b></td><td>Créée chaque mois par une charge récurrente (ex. le loyer le 1<sup>er</sup>). Elle arrive « À approuver ».</td></tr>
+  </table>
+  <figure class="half"><img src="shots/a20-new-charge.jpg"><figcaption>Nouvelle charge.</figcaption></figure>
+  <h3>Les charges à approuver</h3>
+  <p>Chaque jour, OPTICOR prépare les charges récurrentes du mois (le loyer du 1<sup>er</sup>, l'internet du 5…). Elles arrivent en haut de la page, avec une pastille sur « Charges » dans le menu et une notification. <span class="ui">Approuver</span> les fait compter dans les chiffres ; on peut corriger le montant avant (ex. une facture d'électricité qui varie). Tant qu'une charge n'est pas approuvée, elle ne compte pas.</p>
+  <h3>Modifier, supprimer, historique</h3>
+  <p>Le menu « … » d'une charge permet de la <strong>modifier</strong>, de la <strong>supprimer</strong> (elle reste visible avec « Afficher les supprimées » et peut être restaurée) et de voir son <strong>historique</strong> : chaque modification est conservée avec l'auteur, l'ancienne et la nouvelle valeur.</p>
+  <figure><img src="shots/a21-recurring.jpg"><figcaption>L'onglet Récurrentes : les dépenses qui reviennent chaque mois.</figcaption></figure>
+  <p>L'onglet <span class="ui">Récurrentes</span> gère ces modèles : libellé, montant, catégorie, lieu, jour du mois, actif ou non. Désactiver un modèle arrête les prochaines charges sans toucher aux anciennes.</p>
+</section>
+
+<!-- B8 -->
+<section class="chapter">
+  <div class="eyebrow">B8 · Paramètres <span class="role adm">admin</span></div>
+  <h2>Les paramètres</h2>
+  <p>Tout ce qui règle le fonctionnement d'OPTICOR, dans le menu de gauche de la page <span class="ui">Paramètres</span>.</p>
+  <h3>Listes</h3>
+  <figure><img src="shots/a30-settings-lists.jpg"><figcaption>Les listes de choix utilisées partout dans l'application.</figcaption></figure>
+  <p>Les choix proposés dans les menus : <strong>modes de paiement, types de verres, traitements, types de vision, motifs d'annulation, motifs d'ajustement, catégories de charges</strong>. Chaque élément a un libellé français et anglais ; on les réordonne en les glissant. Un élément déjà utilisé ne se supprime pas : on l'<strong>archive</strong> (il disparaît des choix mais reste dans les anciennes commandes). Le nombre d'utilisations est affiché.</p>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Produits</h3>
+  <figure><img src="shots/a30-settings-products.jpg"><figcaption>Types de produits et catégories de prix.</figcaption></figure>
+  <p>Les <strong>types</strong> (montures, lentilles, accessoires) et leurs <strong>catégories</strong> avec le <strong>prix de vente</strong> (celui affiché à la secrétaire). Ajouter une catégorie, changer son prix (les commandes passées gardent leur prix), archiver une catégorie qu'on ne vend plus.</p>
+  <h3>Champs personnalisés</h3>
+  <figure><img src="shots/a30-settings-fields.jpg"><figcaption>Les champs de l'étape « Mesures ».</figcaption></figure>
+  <p>Onglet <span class="ui">Champs personnalisés</span>. Pour chaque champ (EP, hauteur, type de vision, médecin, date et photo d'ordonnance…) : <strong>masqué</strong>, <strong>facultatif</strong> ou <strong>obligatoire</strong>. On peut ajouter ses propres champs (texte, nombre, date, liste). Un champ obligatoire empêche de passer l'étape 2 tant qu'il n'est pas rempli.</p>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Succursales et labo</h3>
+  <figure><img src="shots/a30-settings-stores.jpg"><figcaption>Les succursales, le laboratoire, et leur préfixe de numérotation.</figcaption></figure>
+  <p>Créer une succursale avec son nom et son <strong>préfixe</strong> (3 lettres, ex. <code>MRF</code>) qui commence tous ses numéros de commande. Le préfixe est <strong>verrouillé</strong> dès la première commande, pour que les numéros ne changent jamais. Une succursale fermée se <strong>désactive</strong> (son historique reste). Le laboratoire est un lieu de stock sans commandes.</p>
+  <h3>Utilisateurs</h3>
+  <figure><img src="shots/a30-settings-users.jpg"><figcaption>Les comptes de l'équipe.</figcaption></figure>
+  <ol class="steps">
+    <li><span class="ui">Inviter</span> : nom, e-mail, rôle (secrétaire ou super admin) et, pour une secrétaire, sa succursale. La personne reçoit l'e-mail d'invitation.</li>
+    <li>Changer le rôle ou la succursale d'une personne : elle devra se reconnecter.</li>
+    <li><span class="ui">Désactiver</span> : la personne ne peut plus se connecter (ses actions passées restent signées de son nom). <span class="ui">Renvoyer l'invitation</span> si elle n'a pas reçu ou a laissé expirer l'e-mail.</li>
+  </ol>
+  <div class="warn"><b>Garde-fous</b>On ne peut pas modifier son propre rôle ni désactiver son propre compte, et il reste toujours au moins un super admin actif.</div>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Lieux de charges</h3>
+  <figure><img src="shots/a30-settings-chargeLocations.jpg"><figcaption>Les lieux auxquels on rattache une charge.</figcaption></figure>
+  <p>Chaque succursale et le laboratoire ont leur lieu (créé automatiquement) ; <strong>Général</strong> sert aux dépenses communes (salaires du siège, comptable…). On peut ajouter d'autres lieux (ex. « Véhicule ») et les archiver. Rappel : sur le tableau de bord, les charges « Général » ne comptent que dans « Toutes les succursales ».</p>
+  <div class="grid2">
+    <div>
+      <h3>Fidélité</h3>
+      <figure><img src="shots/a30-settings-loyalty.jpg"><figcaption>Le nombre de commandes livrées pour devenir fidèle.</figcaption></figure>
+      <p>Le nombre de commandes <em>livrées</em> à partir duquel un client devient fidèle. Si on baisse ce nombre, les clients qui l'atteignent déjà deviennent fidèles tout de suite (une notification résume combien).</p>
+    </div>
+    <div>
+      <h3>Notifications</h3>
+      <figure><img src="shots/a30-settings-notifications.jpg"><figcaption>Les délais avant qu'une commande soit « en retard ».</figcaption></figure>
+      <p>Pour chaque étape, le nombre de jours au-delà duquel une commande est en retard : sa carte passe en rouge et une notification « Commande en retard » part (une fois par commande et par étape).</p>
+    </div>
+  </div>
+  <h3>Rôles et permissions</h3>
+  <figure><img src="shots/a30-settings-roles.jpg"><figcaption>Le tableau des droits de chaque rôle (consultation).</figcaption></figure>
+  <p>Le tableau récapitule les droits de chaque rôle (le même que dans le chapitre 1). Il est en lecture seule dans cette version.</p>
+</section>
+
+<!-- B9 -->
+<section class="chapter">
+  <div class="eyebrow">B9 · Notifications <span class="role adm">admin</span></div>
+  <h2>Les notifications de l'admin</h2>
+  <figure><img src="shots/a40-notifications.jpg"><figcaption>La page des notifications de l'admin.</figcaption></figure>
+  <p>L'admin reçoit les notifications de <strong>toutes</strong> les succursales, plus celles qui lui sont réservées :</p>
+  <table>
+    <tr><th style="width:30%">Notification</th><th style="width:44%">Quand</th><th>Le clic ouvre</th></tr>
+    <tr><td><b>Stock bas</b></td><td>Une catégorie descend au seuil dans un lieu.</td><td>Le stock de ce lieu</td></tr>
+    <tr><td><b>Commande en retard</b></td><td>Trop de jours à la même étape.</td><td>La commande</td></tr>
+    <tr><td><b>Nouveau client fidèle</b></td><td>Un client atteint le seuil de fidélité.</td><td>La fiche client</td></tr>
+    <tr><td><b>Clients devenus fidèles</b></td><td>Après une baisse du seuil de fidélité.</td><td>Les clients fidèles</td></tr>
+    <tr><td><b>Doublon de bon bloqué</b></td><td>Quelqu'un a essayé de réutiliser un N° du bon déjà pris.</td><td>La commande existante</td></tr>
+    <tr><td><b>Charges à approuver</b></td><td>Les charges récurrentes du jour sont prêtes.</td><td>Les charges</td></tr>
+  </table>
+  <h3>Le menu personnel</h3>
+  <figure class="half"><img src="shots/a41-user-menu.jpg"><figcaption>Langue, thème, déconnexion.</figcaption></figure>
+  <p>Chacun choisit sa <strong>langue</strong> (français ou anglais : les e-mails et les écrans suivent), le <strong>thème</strong> (clair, sombre ou celui de l'appareil), et se <strong>déconnecte</strong>. Pensez à vous déconnecter sur un ordinateur partagé.</p>
+</section>
+
+<!-- ============================================================ ANNEXES -->
+<section class="chapter">
+  <div class="eyebrow">Annexes</div>
+  <h2>Glossaire</h2>
+  <table>
+    <tr><th style="width:26%">Mot</th><th>Signification dans OPTICOR</th></tr>
+    <tr><td><b>N° du bon</b></td><td>Le numéro du bon papier du carnet ; unique dans une succursale.</td></tr>
+    <tr><td><b>Numéro de commande</b></td><td>Préfixe de la succursale + N° du bon, ex. <code>MRF-01215</code>.</td></tr>
+    <tr><td><b>OD / OG</b></td><td>Œil droit / œil gauche.</td></tr>
+    <tr><td><b>SPH, CYL, AXE, ADD</b></td><td>Sphère, cylindre, axe, addition : les valeurs de l'ordonnance.</td></tr>
+    <tr><td><b>EP</b></td><td>Écart pupillaire (en mm), mesuré pour chaque œil.</td></tr>
+    <tr><td><b>VL / VP</b></td><td>Vision de loin / vision de près.</td></tr>
+    <tr><td><b>Catégorie</b></td><td>Une gamme de montures au même prix de vente (Catégorie A, B…). Le stock se compte par catégorie.</td></tr>
+    <tr><td><b>Acompte / reste</b></td><td>Ce que le client paie à la commande / ce qu'il doit encore.</td></tr>
+    <tr><td><b>Remise approuvée</b></td><td>Remise préparée par l'admin pour la prochaine commande d'un client.</td></tr>
+    <tr><td><b>Remise libre</b></td><td>Remise accordée par l'admin sur une commande précise.</td></tr>
+    <tr><td><b>Charge</b></td><td>Une dépense. Elle ne compte dans les chiffres qu'une fois approuvée.</td></tr>
+    <tr><td><b>Général</b></td><td>Le lieu de charges des dépenses communes à toute l'entreprise.</td></tr>
+    <tr><td><b>Seuil</b></td><td>La quantité minimale d'une catégorie dans un lieu, sous laquelle on est alerté.</td></tr>
+  </table>
+</section>
+
+<section class="chapter">
+  <h2>Questions fréquentes</h2>
+  <h4>« Ce N° du bon existe déjà dans cette succursale »</h4>
+  <p>Le numéro a déjà servi. Vérifiez le carnet : soit c'est une faute de frappe, soit le bon a déjà été saisi (la commande existante est affichée, ouvrez-la). L'opticien est prévenu de la tentative.</p>
+  <h4>« Stock insuffisant dans cette succursale »</h4>
+  <p>La dernière monture de cette catégorie vient d'être vendue. Choisissez une autre catégorie ou demandez un transfert à l'opticien.</p>
+  <h4>Je ne peux pas livrer la commande</h4>
+  <p>Il reste de l'argent à payer : <span class="ui">Encaisser le reste</span> puis <span class="ui">Encaisser et livrer</span> encaisse le solde et livre en même temps.</p>
+  <h4>Je me suis trompée d'étape / il faut annuler</h4>
+  <p>Demandez à l'opticien : il peut revenir d'une étape ou annuler avec un motif et un remboursement.</p>
+  <h4>« Votre session a expiré, reconnectez-vous »</h4>
+  <p>Votre rôle ou votre succursale a été modifié : reconnectez-vous pour obtenir les nouveaux droits.</p>
+  <h4>« Accès non autorisé »</h4>
+  <p>La page est réservée à l'opticien. Revenez aux Commandes avec le bouton proposé.</p>
+  <h4>Un client a changé de numéro de téléphone</h4>
+  <p>Ouvrez sa fiche client, <span class="ui">Modifier</span>, et corrigez le téléphone. Ne créez pas un nouveau client : vous perdriez son historique et sa fidélité.</p>
+  <h4>Le chiffre du jour ne correspond pas à la caisse</h4>
+  <p>Comparez la caisse avec le <strong>montant encaissé</strong> (pas le CA) sur « Aujourd'hui » et la bonne succursale. Le CA compte ce qui a été vendu, même non payé ; l'encaissé compte l'argent reçu.</p>
+  <h3>Bonnes pratiques</h3>
+  <ul>
+    <li>Saisir la commande <strong>devant le client</strong>, avec le bon papier : le N° du bon et le téléphone sont vérifiés tout de suite.</li>
+    <li>Toujours chercher le client avant d'en créer un nouveau.</li>
+    <li>Ajouter la photo de l'ordonnance : elle évite les erreurs de lecture à l'atelier.</li>
+    <li>Faire avancer les commandes au moment réel où elles changent d'étape : les retards et les délais du tableau de bord en dépendent.</li>
+    <li>Pour l'opticien : approuver les charges récurrentes chaque début de mois, faire un comptage de stock régulier, garder les seuils à jour.</li>
+  </ul>
+</section>
+
+</body>
+</html>

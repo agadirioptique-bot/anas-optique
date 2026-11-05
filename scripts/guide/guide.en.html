@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OPTICOR — User guide</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+  :root {
+    --ink: #13232b; --muted: #5b6b77; --line: #dde5e9; --primary: #0f4c5c; --primary-soft: #e8f1f3;
+    --amber: #a3410a; --amber-soft: #fdf0e6; --green: #1e7a6f; --green-soft: #e7f4f1; --red: #a5281c; --red-soft: #fbeceb;
+  }
+  * { box-sizing: border-box; }
+  html { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.5; }
+  body { margin: 0; }
+  h1, h2, h3, h4 { color: var(--ink); line-height: 1.25; margin: 0; }
+  h1 { font-size: 22pt; letter-spacing: -0.01em; }
+  h2 { font-size: 15.5pt; margin: 0 0 3mm; padding-top: 1mm; }
+  h3 { font-size: 12pt; margin: 6mm 0 2mm; }
+  h4 { font-size: 10.5pt; margin: 4mm 0 1.5mm; }
+  p { margin: 0 0 2.4mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 5.5mm; }
+  li { margin: 0 0 1.2mm; }
+  strong { font-weight: 650; }
+  code, .k { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 9pt; background: #f1f5f7; border-radius: 3px; padding: 0 1.2mm; }
+  .ui { font-weight: 600; color: var(--primary); }
+  .muted { color: var(--muted); }
+  section.chapter { break-before: page; }
+  .part { break-before: page; display: flex; flex-direction: column; justify-content: center; min-height: 240mm; }
+  .part .num { font-size: 11pt; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .part h1 { font-size: 30pt; margin: 3mm 0 5mm; color: var(--primary); }
+  .part p { font-size: 11.5pt; max-width: 140mm; color: var(--muted); }
+  .eyebrow { font-size: 8.5pt; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.5mm; }
+  .role { display: inline-block; font-size: 8pt; font-weight: 650; border-radius: 999px; padding: .4mm 2.4mm; margin-left: 2mm; vertical-align: middle; }
+  .role.sec { background: var(--green-soft); color: var(--green); }
+  .role.adm { background: var(--primary-soft); color: var(--primary); }
+  figure { margin: 3mm 0 5mm; break-inside: avoid; }
+  /* Tall screenshots are scaled down so a heading and its picture stay on one page. */
+  figure img { display: block; max-width: 100%; max-height: 150mm; width: auto; height: auto; margin: 0 auto; border: 1px solid var(--line); border-radius: 2.5mm; }
+  h2, h3, h4, .eyebrow { break-after: avoid; page-break-after: avoid; }
+  figure.half img { max-width: 62%; }
+  figure.phone img { max-width: 70%; max-height: 120mm; }
+  figcaption { font-size: 8.6pt; color: var(--muted); margin-top: 1.6mm; text-align: center; }
+  .note, .tip, .warn { border-radius: 2mm; padding: 2.6mm 3.4mm; margin: 3mm 0 4mm; break-inside: avoid; font-size: 9.6pt; }
+  .note { background: var(--primary-soft); }
+  .tip { background: var(--green-soft); }
+  .warn { background: var(--amber-soft); }
+  .note b:first-child, .tip b:first-child, .warn b:first-child { display: block; margin-bottom: .8mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.3pt; break-inside: avoid; }
+  th, td { text-align: left; vertical-align: top; padding: 1.6mm 2mm; border-bottom: 1px solid var(--line); }
+  th { font-size: 8.4pt; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; background: #f6f8f9; }
+  td.c, th.c { text-align: center; }
+  .yes { color: var(--green); font-weight: 700; }
+  .no { color: var(--red); font-weight: 700; }
+  .steps { counter-reset: s; list-style: none; padding-left: 0; }
+  .steps > li { counter-increment: s; position: relative; padding-left: 8mm; margin-bottom: 2mm; }
+  .steps > li::before { content: counter(s); position: absolute; left: 0; top: .2mm; width: 5.4mm; height: 5.4mm; border-radius: 50%; background: var(--primary); color: #fff; font-size: 8pt; font-weight: 700; display: grid; place-items: center; }
+  /* Cover */
+  .cover { min-height: 255mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 3mm; font-weight: 700; letter-spacing: .25em; font-size: 11pt; color: var(--primary); }
+  .logo { width: 11mm; height: 11mm; border-radius: 3mm; background: var(--primary); display: grid; place-items: center; }
+  .cover h1 { font-size: 40pt; color: var(--primary); margin-bottom: 4mm; }
+  .cover .sub { font-size: 14pt; color: var(--muted); max-width: 150mm; }
+  .cover .who { display: flex; gap: 4mm; margin-top: 10mm; }
+  .cover .who div { flex: 1; border: 1px solid var(--line); border-radius: 3mm; padding: 4mm 5mm; }
+  .cover .who h4 { margin-top: 0; }
+  .cover .foot { color: var(--muted); font-size: 9pt; display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 3mm; }
+  /* Table of contents */
+  .toc ol { list-style: none; padding: 0; }
+  .toc li { display: flex; gap: 2mm; border-bottom: 1px dotted var(--line); padding: 1.4mm 0; margin: 0; }
+  .toc li.part-row { font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--line); margin-top: 3mm; }
+  .toc li span:first-child { width: 10mm; color: var(--muted); }
+  /* Flow diagram */
+  .flow { display: flex; align-items: stretch; gap: 1.6mm; margin: 4mm 0 2mm; break-inside: avoid; }
+  .flow .st { flex: 1; border-radius: 2.5mm; padding: 2.6mm 2.2mm; border: 1px solid var(--line); background: #fff; font-size: 8.6pt; }
+  .flow .st b { display: block; font-size: 9.6pt; margin-bottom: 1mm; }
+  .flow .st .dot { display: inline-block; width: 2.4mm; height: 2.4mm; border-radius: 50%; margin-right: 1.2mm; vertical-align: middle; }
+  .flow .arrow { align-self: center; color: var(--muted); font-size: 12pt; }
+  .flow-foot { display: flex; gap: 3mm; font-size: 8.6pt; margin-bottom: 4mm; }
+  .flow-foot div { flex: 1; border-radius: 2mm; padding: 2mm 3mm; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .card { border: 1px solid var(--line); border-radius: 2.5mm; padding: 3mm 3.5mm; break-inside: avoid; }
+  .card h4 { margin-top: 0; }
+  .kbd { display: inline-block; border: 1px solid #c9d4da; border-bottom-width: 2px; border-radius: 1.2mm; padding: 0 1.4mm; font-size: 8.6pt; font-family: inherit; background: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ COVER -->
+<section class="cover">
+  <div class="brand">
+    <span class="logo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="6.5" cy="13" r="3.5"/><circle cx="17.5" cy="13" r="3.5"/><path d="M10 13h4M3 12 4.5 7M21 12l-1.5-5"/></svg></span>
+    OPTICOR
+  </div>
+  <div>
+    <div class="eyebrow">User manual</div>
+    <h1>User guide</h1>
+    <p class="sub">How to use OPTICOR every day: taking orders, following the glasses until the client picks them up, clients and stock — and, for the optician, running every store from one place.</p>
+    <div class="who">
+      <div><h4>Secretary <span class="role sec">Part A</span></h4><p class="muted">Orders of her store, payments, clients, stock lookup, notifications.</p></div>
+      <div><h4>Super admin <span class="role adm">Part B</span></h4><p class="muted">Dashboard, workshop, stock and transfers, purchasing and suppliers, charges, settings and users.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>OPTICOR · Multi-store ERP and reporting for opticians</span><span>Version 1 · November 2026</span></div>
+</section>
+
+<!-- ============================================================ TOC -->
+<section class="chapter toc">
+  <div class="eyebrow">Contents</div>
+  <h2>What this guide covers</h2>
+  <ol>
+    <li><span>1</span><span>OPTICOR and its two roles</span></li>
+    <li><span>2</span><span>Getting started: signing in, the main screen, search, phones</span></li>
+    <li><span>3</span><span>The journey of a pair of glasses (from order to pick-up)</span></li>
+    <li class="part-row"><span>A</span><span>Part A — The secretary</span></li>
+    <li><span>A1</span><span>Orders: board and list</span></li>
+    <li><span>A2</span><span>Creating a new order (3 steps)</span></li>
+    <li><span>A3</span><span>The order page: follow up, collect, deliver</span></li>
+    <li><span>A4</span><span>Clients</span></li>
+    <li><span>A5</span><span>The stock of her store</span></li>
+    <li><span>A6</span><span>Notifications</span></li>
+    <li class="part-row"><span>B</span><span>Part B — The super admin</span></li>
+    <li><span>B1</span><span>The dashboard and its indicators</span></li>
+    <li><span>B2</span><span>The store selector</span></li>
+    <li><span>B3</span><span>The workshop</span></li>
+    <li><span>B4</span><span>Orders and clients: what only the admin can do</span></li>
+    <li><span>B5</span><span>Stock: transfers, counts, damage, thresholds</span></li>
+    <li><span>B6</span><span>Purchasing and suppliers</span></li>
+    <li><span>B7</span><span>Charges</span></li>
+    <li><span>B8</span><span>Settings</span></li>
+    <li><span>B9</span><span>The admin's notifications</span></li>
+    <li class="part-row"><span>C</span><span>Appendices: glossary, frequent questions, good practices</span></li>
+  </ol>
+  <div class="note"><b>The examples in this guide</b>The screenshots come from a demo database: two stores (Maârif and Anfa), the optician <em>Karim Alaoui</em> (super admin) and the secretaries <em>Salma Bennani</em> (Maârif) and <em>Nadia El Idrissi</em> (Anfa). Client names are made up. Some demo data (charge reasons, categories) was typed in French; the interface itself is shown in English.</div>
+</section>
+
+<!-- ============================================================ 1 -->
+<section class="chapter">
+  <div class="eyebrow">Chapter 1</div>
+  <h2>OPTICOR</h2>
+  <p>OPTICOR replaces the slip booklet, the cash book and the Excel sheets. Every pair of glasses ordered becomes an <strong>order</strong> that follows the production steps until the client picks it up; every dirham collected, every frame taken out of stock and every expense is recorded in the same place. The optician sees what is happening in all his stores in real time.</p>
+  <p>There are two kinds of accounts:</p>
+  <div class="grid2">
+    <div class="card"><h4>The secretary <span class="role sec">secretary</span></h4><p>She works in <strong>one store only</strong>. She welcomes clients, takes orders (prescription, frame, lenses, deposit), moves orders forward, collects the balance and hands over the glasses. She sees the stock of her store (quantities, never costs).</p></div>
+    <div class="card"><h4>The super admin <span class="role adm">super admin</span></h4><p>The optician (or his partner). He sees <strong>every store and the lab</strong>, the workshop, the figures (revenue, cash collected, charges, net result), moves stock between stores, manages supplier purchases, charges and every setting. Only he can cancel an order or grant a discount.</p></div>
+  </div>
+  <h3>Who can do what</h3>
+  <table>
+    <tr><th>Action</th><th class="c">Secretary</th><th class="c">Super admin</th></tr>
+    <tr><td>See and create orders</td><td class="c"><span class="yes">✓</span> her store</td><td class="c"><span class="yes">✓</span> all</td></tr>
+    <tr><td>Move an order forward, collect, deliver</td><td class="c"><span class="yes">✓</span> her store</td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Go back one step</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Cancel an order, refund</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>See and create clients (shared by all stores)</td><td class="c"><span class="yes">✓</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Apply a discount already approved for a client</td><td class="c"><span class="yes">✓</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Grant a discount (client or order)</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>See the stock</td><td class="c"><span class="yes">✓</span> her store, quantities</td><td class="c"><span class="yes">✓</span> everywhere</td></tr>
+    <tr><td>Transfer, adjust, record damage</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>See purchase prices, suppliers, purchases, charges</td><td class="c"><span class="no">✗</span> never</td><td class="c"><span class="yes">✓</span></td></tr>
+    <tr><td>Dashboard, workshop, settings, users</td><td class="c"><span class="no">✗</span></td><td class="c"><span class="yes">✓</span></td></tr>
+  </table>
+  <div class="note"><b>Security does not depend on the screen</b>These rules are enforced by the database itself, not only by the menus: even by typing an address by hand, a secretary never gets a cost, a purchase or a charge, nor the orders of another store. If she opens a restricted page, she sees <span class="ui">Access denied</span>.</div>
+</section>
+
+<!-- ============================================================ 2 -->
+<section class="chapter">
+  <div class="eyebrow">Chapter 2</div>
+  <h2>Getting started</h2>
+  <h3>Receiving your access</h3>
+  <p>Nobody creates their own account: the super admin invites each person from <span class="ui">Settings › Users</span>. The person receives an invitation email (in French: « Votre accès à OPTICOR ») with a button to choose a password. The link works once; if it has expired, the admin sends the invitation again.</p>
+  <h3>Signing in</h3>
+  <figure class="half"><img src="shots-en/00-login.jpg"><figcaption>The sign-in page: email and password.</figcaption></figure>
+  <ul>
+    <li>The secretary lands directly on <span class="ui">Orders</span>; the super admin on the <span class="ui">Dashboard</span>.</li>
+    <li><span class="ui">Forgot password?</span> sends an email to choose a new one.</li>
+    <li>If the admin changes a person's store or role, that person is signed out ("Your session has expired"): signing in again gives the new access.</li>
+    <li>A deactivated account can no longer sign in ("This account is disabled").</li>
+    <li>The FR / EN switch (top right) changes the language; each person can also choose it in their menu.</li>
+  </ul>
+  <h3>The main screen</h3>
+  <figure><img src="shots-en/a05-orders-board.jpg"><figcaption>A super admin's screen: menu on the left, top bar, page content in the middle.</figcaption></figure>
+  <div class="grid2">
+    <div class="card"><h4>The menu on the left</h4><p>The <span class="ui">+ New order</span> button is always at the top. Below it, the pages you have access to: the secretary sees <em>Orders, Clients, Stock</em>; the admin also sees <em>Dashboard, Workshop, Purchasing, Charges, Settings</em>. Orange badges show what is waiting: orders to process in the workshop, charges to approve. <span class="ui">Collapse menu</span> folds it into icons.</p></div>
+    <div class="card"><h4>The top bar</h4><p><strong>Store</strong>: the secretary sees her store (fixed); the admin chooses "All stores" or one store (see B2). <strong>Search</strong>: finds a client or an order. <strong>Bell</strong>: live notifications. <strong>Initials</strong>: the personal menu (language, light/dark theme, sign out).</p></div>
+  </div>
+  <h3>Quick search <span class="kbd">Ctrl</span> + <span class="kbd">K</span></h3>
+  <figure class="half"><img src="shots-en/s03-search.jpg"><figcaption>Type a name, a phone number or an order number.</figcaption></figure>
+  <p>From any page, <span class="kbd">Ctrl</span>+<span class="kbd">K</span> (or a click on the search bar) opens the search. It finds <strong>clients</strong> by name or phone, and <strong>orders</strong> by number, written any way: <code>1215</code>, <code>01215</code>, <code>mrf-1215</code> or <code>MRF-01215</code>. Arrow keys to choose, <span class="kbd">Enter</span> to open. The secretary only finds the orders of her store.</p>
+  <h3>On a phone</h3>
+  <div class="grid2">
+    <figure class="phone"><img src="shots-en/m01-phone-board.jpg"><figcaption>The order board on a phone.</figcaption></figure>
+    <div>
+      <p>OPTICOR also works on phones and tablets, with nothing to install: open the address in the browser.</p>
+      <ul>
+        <li>The left menu becomes a <strong>bar at the bottom</strong> with a large <span class="ui">+</span> button for a new order; <span class="ui">More</span> opens the rest.</li>
+        <li>On order cards, a next-step button (e.g. <span class="ui">Send to workshop</span>) replaces drag and drop.</li>
+        <li>Windows (payment, new client…) open full screen, with the main button at the bottom.</li>
+        <li>For the prescription photo, the phone offers the camera directly.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 3 -->
+<section class="chapter">
+  <div class="eyebrow">Chapter 3</div>
+  <h2>The journey of a pair of glasses</h2>
+  <p>Everything in OPTICOR revolves around this journey. An order goes through five steps, always in this order; at every step the system knows where the glasses are, how much the client has paid and what is left to collect.</p>
+  <div class="flow">
+    <div class="st"><b><span class="dot" style="background:#3b82f6"></span>Confirmed</b>The slip is entered, the deposit collected, the frame taken out of stock.</div>
+    <div class="arrow">→</div>
+    <div class="st"><b><span class="dot" style="background:#8b5cf6"></span>In workshop</b>The order has gone to fitting (lenses ordered, frame sent).</div>
+    <div class="arrow">→</div>
+    <div class="st"><b><span class="dot" style="background:#f59e0b"></span>Prepared</b>The glasses are fitted and checked, ready to go to the store.</div>
+    <div class="arrow">→</div>
+    <div class="st"><b><span class="dot" style="background:#14b8a6"></span>In store</b>The glasses are waiting for the client, who is notified (WhatsApp).</div>
+    <div class="arrow">→</div>
+    <div class="st"><b><span class="dot" style="background:#22c55e"></span>Delivered</b>The client has paid the balance and picked up the glasses.</div>
+  </div>
+  <div class="flow-foot">
+    <div style="background:var(--red-soft)"><b>Cancelled</b> — only the super admin can cancel, at any step (even after delivery, for a return). The frame goes back into stock; a refund can be recorded.</div>
+    <div style="background:var(--amber-soft)"><b>Late</b> — if an order stays too long at the same step (delays set in Settings › Notifications), its card turns red and a notification is sent.</div>
+  </div>
+  <h3>What happens at each step</h3>
+  <table>
+    <tr><th style="width:18%">Step</th><th style="width:22%">Who</th><th>What the system does</th></tr>
+    <tr><td><b>Confirmed</b></td><td>Secretary (or admin) — <em>New order</em></td><td>Checks that the slip number is not already used in the store, that the frame is in stock and that the total covers at least its price. Records the prescription, the deposit (even 0 DH) and takes the frame out of stock. The order number is created: store prefix + slip number, e.g. <code>MRF-01215</code>.</td></tr>
+    <tr><td><b>In workshop</b></td><td>Secretary or admin — <span class="ui">Send to workshop</span></td><td>The order appears in the <em>Workshop</em> queue (admin). The "Workshop" counter in the menu counts confirmed and in-workshop orders.</td></tr>
+    <tr><td><b>Prepared</b></td><td>Usually the workshop (admin) — <span class="ui">Mark as prepared</span></td><td>The glasses are ready; they leave the workshop counter.</td></tr>
+    <tr><td><b>In store</b></td><td>Secretary at the front desk — <span class="ui">Arrived in store</span></td><td>The <span class="ui">Notify on WhatsApp</span> button appears (message ready to send to the client). The order shows in the "Ready for pick-up" widget of the dashboard.</td></tr>
+    <tr><td><b>Delivered</b></td><td>Secretary — <span class="ui">Collect the balance</span>, then <span class="ui">Collect and deliver</span></td><td>Only possible when the balance due is 0: the balance is collected in the same window. The delivery counts towards the client's loyalty (see A4).</td></tr>
+  </table>
+  <h3>Money and stock, in one sentence</h3>
+  <ul>
+    <li><strong>Total</strong> = what the client pays (frame + lenses + treatments); <strong>paid</strong> = the sum of the payments; <strong>balance due</strong> = total − paid − discount. The balance is shown in orange everywhere until it reaches 0.</li>
+    <li>The frame leaves the stock <strong>as soon as the order is confirmed</strong> (it is reserved for this client) and comes back if the order is cancelled. Stock is never changed "by hand": every movement (purchase, sale, transfer, count, damage, cancellation) is recorded and can be looked up.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ PART A -->
+<section class="part">
+  <div class="num">Part A</div>
+  <h1>The secretary</h1>
+  <p>The everyday work at the front desk: welcoming the client, entering the order, moving the glasses forward, collecting and delivering. Everything below also applies to the super admin, who can do the same in every store.</p>
+</section>
+
+<!-- A1 -->
+<section class="chapter">
+  <div class="eyebrow">A1 · Orders <span class="role sec">secretary</span> <span class="role adm">admin</span></div>
+  <h2>Orders: board and list</h2>
+  <figure><img src="shots-en/s01-orders-board.jpg"><figcaption>The order board of Succursale Maârif, as Salma sees it.</figcaption></figure>
+  <p>The <span class="ui">Orders</span> page is the secretary's home page. It has two views, chosen at the top: <span class="ui">Board</span> and <span class="ui">List</span>.</p>
+  <h3>The board (view by step)</h3>
+  <p>One column per step: <em>Confirmed, In workshop, Prepared, In store, Delivered</em> (deliveries of the last 7 days). The number at the top of each column is its order count. Each <strong>card</strong> shows:</p>
+  <ul>
+    <li>the order <strong>number</strong> (click it to open the order);</li>
+    <li>the <strong>client's name</strong>, the <strong>WhatsApp</strong> icon if the client has WhatsApp, the <strong>glasses</strong> icon if it is the client's own frame;</li>
+    <li>the <strong>total</strong> and the <span style="color:var(--amber);font-weight:600">Due … DH</span> badge (or "Paid");</li>
+    <li>how many days it has been at this step — in <span style="color:var(--red);font-weight:600">red</span> when it is late.</li>
+  </ul>
+  <p><strong>Moving an order forward:</strong> drag the card into the next column (with the mouse, or with the keyboard using the <span class="k">⋮⋮</span> handle: <span class="kbd">Space</span>, arrows, <span class="kbd">Space</span>). On a phone, use the card's next-step button (e.g. <span class="ui">Send to workshop</span>). An order moves one step at a time; it only becomes <em>Delivered</em> through the payment window (A3).</p>
+  <h3>The list</h3>
+  <figure><img src="shots-en/s02-orders-list.jpg"><figcaption>The List view: every order, with filters.</figcaption></figure>
+  <p>Every order in a table: number, client, date, status, total, balance. Filters: <strong>status</strong>, <strong>period</strong> (7, 30, 90 days, one year), <span class="ui">Balance due &gt; 0</span> to see who still owes money, <span class="ui">Show cancelled</span>. The search box filters by client, phone or number. A click on a row opens the order.</p>
+  <div class="tip"><b>Tip</b>At the end of the day, the List view with "Balance due &gt; 0" gives the list of clients to follow up.</div>
+</section>
+
+<!-- A2 -->
+<section class="chapter">
+  <div class="eyebrow">A2 · New order <span class="role sec">secretary</span> <span class="role adm">admin</span></div>
+  <h2>Creating a new order</h2>
+  <p>The <span class="ui">+ New order</span> button (left menu, or <span class="ui">+</span> on a phone). The order is entered in <strong>3 steps</strong>; on the right, a <strong>summary</strong> fills in as you go (client, prescription, products, amounts). <span class="ui">Next</span> moves to the next step when everything is correct, otherwise the fields to fix are shown in red; <span class="ui">Previous</span> goes back without losing anything.</p>
+
+  <h3>Step 1 — The slip and the client</h3>
+  <figure><img src="shots-en/s04-wizard-client.jpg"><figcaption>Step 1: the slip number, then the client (search for an existing client).</figcaption></figure>
+  <ol class="steps">
+    <li><strong>Slip number</strong>: the number printed on the paper slip booklet. The store prefix is already shown (<code>MRF-</code>). OPTICOR checks it at once: "Number available" in green, or "This slip number already exists in this store" with the order concerned. A number can never be used twice in the same store (the admin is notified if someone tries).</li>
+    <li><strong>Existing client</strong>: type the name or the phone number; recent clients are listed without typing anything. A click selects the client. A yellow banner flags a <strong>loyal client</strong>; an "Approved discount" banner appears if the optician has granted one (see step 3).</li>
+    <li><strong>New client</strong>: choose <span class="ui">New client</span> and enter the name and phone number (required), and tick whether the client has WhatsApp. A phone number belongs to one client only: if it already exists, OPTICOR says so and offers the existing client. It also points out names that look like existing clients, to avoid duplicates.</li>
+  </ol>
+  <figure><img src="shots-en/s05-wizard-new-client.jpg"><figcaption>New client: name, phone (Moroccan format), WhatsApp.</figcaption></figure>
+  <div class="note"><b>Clients are shared by every store</b>A client who came to Anfa is found in Maârif: their history and loyalty add up.</div>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Step 2 — Measurements (the prescription)</h3>
+  <figure><img src="shots-en/s06-wizard-measures.jpg" style="max-height:118mm"><figcaption>Step 2: the right eye (RE) and left eye (LE) prescription, then the additional information.</figcaption></figure>
+  <table>
+    <tr><th style="width:22%">Field</th><th>What to enter</th></tr>
+    <tr><td><b>SPH</b> (sphere)</td><td>The main correction, in dioptres, in steps of 0.25 (e.g. −1.75; +2.00). The − / + buttons add or remove 0.25.</td></tr>
+    <tr><td><b>CYL</b> (cylinder)</td><td>The astigmatism correction (often negative), in steps of 0.25. Empty if there is none.</td></tr>
+    <tr><td><b>AXIS</b></td><td>The orientation of the astigmatism, from 0 to 180°. Required as soon as there is a cylinder.</td></tr>
+    <tr><td><b>ADD</b> (addition)</td><td>For near-vision / progressive lenses: the extra correction for reading.</td></tr>
+    <tr><td><b>Copy RE → LE</b></td><td>Copies the right eye to the left eye when both are close; then fix what differs.</td></tr>
+    <tr><td><b>Reuse the last measurements</b></td><td>For an existing client: brings back the prescription of their last order.</td></tr>
+    <tr><td><b>PD, fitting height, vision type, doctor, date, photo</b></td><td>Pupillary distance for each eye, fitting height, distance / near / distance + near vision, doctor's name, prescription date, prescription photo. The optician decides in <em>Settings › Custom fields</em> which ones are hidden, optional or required, and can add his own.</td></tr>
+  </table>
+  <p>OPTICOR refuses impossible values (e.g. a sphere that is not a multiple of 0.25, an axis without a cylinder) and explains it under the field. The <strong>prescription photo</strong> can be taken with the phone or added later from the order page (image or PDF).</p>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Step 3 — Products and payment</h3>
+  <figure><img src="shots-en/s07-wizard-products.jpg"><figcaption>Step 3: the frame (category), lenses, treatments, total and deposit.</figcaption></figure>
+  <h4>The frame</h4>
+  <p>Frames are managed <strong>by price category</strong> (Catégorie A, B, C…), not model by model. Each card shows the name, the sale price and how many are in stock <em>in this store</em>. A category at 0 is greyed out ("Out of stock": the admin can send some from another store). If the client brings their own frame, tick <span class="ui">Client's own frame</span>: nothing leaves the stock, and the glasses icon will show everywhere on this order. The tabs above also give contact lenses and accessories (category + quantity).</p>
+  <h4>The lenses</h4>
+  <p>Choose the <strong>lens type</strong> (single vision, progressive, bifocal) and the <strong>treatments</strong> (anti-reflective, blue light, photochromic, hard coat, tinted, polarized… — several possible). The "details" field is for specifics (index, brand). Lenses have no separate price: their price is included in the total.</p>
+  <h4>Total, discount and deposit</h4>
+  <ul>
+    <li><strong>Order total</strong>: the price given to the client for everything. It must be at least the price of the chosen frame.</li>
+    <li><strong>Approved discount</strong>: if the optician has prepared a discount for this client, tick it to apply it; it is then used up (it works only once).</li>
+    <li><strong>Deposit</strong>: the <span class="ui">30%</span>, <span class="ui">50%</span>, <span class="ui">100%</span> buttons calculate it, or type an amount (0 is allowed). Choose the <strong>payment method</strong>: cash, card, bank transfer.</li>
+    <li>The <strong>balance due</strong> shows at once; it will be collected at pick-up.</li>
+  </ul>
+  <h4>Confirming</h4>
+  <figure class="half"><img src="shots-en/s08-wizard-done.jpg"><figcaption>Order saved: its number, then open it or create another one.</figcaption></figure>
+  <p>When you confirm, everything is saved <strong>in one go</strong>: order, client, prescription, deposit and stock movement. If something changed in the meantime (the last frame has just been sold, the slip number has just been taken), nothing is saved and a message explains what to fix.</p>
+</section>
+
+<!-- A3 -->
+<section class="chapter">
+  <div class="eyebrow">A3 · Order page <span class="role sec">secretary</span> <span class="role adm">admin</span></div>
+  <h2>The order page: follow up, collect, deliver</h2>
+  <figure><img src="shots-en/s09-order-detail.jpg"><figcaption>The page of an order that has arrived in store.</figcaption></figure>
+  <p>It opens with a click on an order number (board, list, search, client page, notification). It shows:</p>
+  <ul>
+    <li><strong>At the top</strong>: the number, the status, the client (phone, WhatsApp), and the button for the <strong>next step</strong> (<span class="ui">Send to workshop</span>, <span class="ui">Mark as prepared</span>, <span class="ui">Arrived in store</span>, then <span class="ui">Collect the balance</span>).</li>
+    <li><strong>The step timeline</strong> with the date of each step.</li>
+    <li><strong>The prescription</strong> (RE / LE), the additional information and the <strong>prescription photo</strong> (add, replace, open).</li>
+    <li><strong>The products</strong>: frame (category or "Client's own frame"), lens type, treatments.</li>
+    <li><strong>Payments</strong>: each payment with date, method and person; the total, paid, discount and balance. <span class="ui">Add a payment</span> records an intermediate payment (never more than the balance).</li>
+    <li><strong>History</strong>: who did what and when.</li>
+  </ul>
+  <h3>Notifying the client</h3>
+  <p>When the order is <em>In store</em>, the <span class="ui">Notify on WhatsApp</span> button opens WhatsApp with a ready-made message ("Hello …, your glasses are ready…") to the client's number.</p>
+  <h3>Collecting and delivering</h3>
+  <figure class="half"><img src="shots-en/s10-collect.jpg"><figcaption>The payment window: the balance due, the method, then deliver.</figcaption></figure>
+  <p>The client comes for their glasses: <span class="ui">Collect the balance</span> opens a window with the balance due already filled in. Choose the payment method, then <span class="ui">Collect and deliver</span>: the payment is recorded and the order becomes <em>Delivered</em> in the same move. An order cannot be delivered while money is still owed.</p>
+  <div class="warn"><b>Made a mistake?</b>The secretary cannot go back or cancel: she asks the optician, who can go back one step or cancel (with a reason), see B4.</div>
+</section>
+
+<!-- A4 -->
+<section class="chapter">
+  <div class="eyebrow">A4 · Clients <span class="role sec">secretary</span> <span class="role adm">admin</span></div>
+  <h2>Clients</h2>
+  <figure><img src="shots-en/s11-clients.jpg"><figcaption>The client list, with the segments at the top.</figcaption></figure>
+  <p>The list holds every client of every store. The search finds by name or phone; sort by name, by most recent visit or by number of orders. The <strong>segments</strong> at the top:</p>
+  <table>
+    <tr><th style="width:20%">Segment</th><th>Meaning</th></tr>
+    <tr><td><b>New</b></td><td>0 or 1 order (not cancelled).</td></tr>
+    <tr><td><b>Regular</b></td><td>At least 2 orders, not loyal yet.</td></tr>
+    <tr><td><b>Loyal</b> ★</td><td>Has reached the number of <em>delivered</em> orders set by the optician (Settings › Loyalty, 5 in the example), all stores together. Becoming loyal is automatic and the team gets a notification.</td></tr>
+  </table>
+  <h3>The client page</h3>
+  <figure><img src="shots-en/s12-client-detail.jpg"><figcaption>The page of a loyal client: their orders, how their eyesight has changed.</figcaption></figure>
+  <ul>
+    <li>Contact details (call, message on WhatsApp), segment, date of the first order, number of stores visited.</li>
+    <li>Their <strong>orders</strong>: the secretary sees the total count, but the details only of those from her store.</li>
+    <li><strong>Vision over time</strong>: a chart of the RE/LE sphere across orders.</li>
+    <li><span class="ui">New order for this client</span> opens the order form with the client already selected.</li>
+    <li><span class="ui">Edit</span> corrects the name, phone or WhatsApp.</li>
+  </ul>
+  <figure class="half"><img src="shots-en/s13-new-client.jpg"><figcaption>Create a client without an order (e.g. a client who will come back).</figcaption></figure>
+</section>
+
+<!-- A5 -->
+<section class="chapter">
+  <div class="eyebrow">A5 · Stock <span class="role sec">secretary</span></div>
+  <h2>The stock of her store</h2>
+  <figure><img src="shots-en/s14-stock.jpg"><figcaption>The stock of Succursale Maârif as the secretary sees it: quantities only.</figcaption></figure>
+  <p>The secretary sees the stock of <strong>her</strong> store, read only: she knows what she can sell, without seeing any purchase price.</p>
+  <ul>
+    <li><strong>At the top</strong>: number of tracked categories, number of items in stock, number of categories below the threshold.</li>
+    <li><strong>Filters</strong>: product type (frames, contact lenses, accessories), search, <span class="ui">Low stock only</span>.</li>
+    <li><strong>The quantity pill</strong>: <span style="color:var(--red);font-weight:600">red</span> below the minimum threshold, <span style="color:var(--amber);font-weight:600">amber</span> at the threshold, neutral above. The threshold is set by the optician.</li>
+  </ul>
+  <h3>The history of a category</h3>
+  <figure class="half"><img src="shots-en/s15-stock-history.jpg"><figcaption>Every movement in and out, with the stock after each one.</figcaption></figure>
+  <p>A click on a row (or the clock icon) opens its history: purchase received, sale (with the order number), cancellation, transfer received or sent, count, damage — with the date, the person and the quantity left after each movement. Useful to understand a difference.</p>
+  <div class="note"><b>A category is at 0?</b>Ask the optician for a transfer: he sends frames from another store or from the lab, and they appear in your stock right away.</div>
+</section>
+
+<!-- A6 -->
+<section class="chapter">
+  <div class="eyebrow">A6 · Notifications <span class="role sec">secretary</span> <span class="role adm">admin</span></div>
+  <h2>Notifications</h2>
+  <figure class="half"><img src="shots-en/s16-notifications.jpg"><figcaption>The bell: the latest notifications, unread first.</figcaption></figure>
+  <p>The bell at the top right shows the number of unread notifications. It updates <strong>live</strong>: a new notification shows a short message at the bottom of the screen (with <span class="ui">Open</span>), without reloading the page.</p>
+  <ul>
+    <li>A click on a notification marks it as read and opens the right page directly (the order, the client, the filtered stock…).</li>
+    <li><span class="ui">Mark all as read</span> clears the counter; <span class="ui">See all notifications</span> opens the full page, with an <em>All / Unread</em> filter.</li>
+  </ul>
+  <p>For <strong>her</strong> store, the secretary receives:</p>
+  <table>
+    <tr><th style="width:28%">Notification</th><th>When</th></tr>
+    <tr><td><b>Low stock</b></td><td>A category drops to its minimum threshold (once each time it goes below).</td></tr>
+    <tr><td><b>Late order</b></td><td>An order stays too long at the same step (once per order and step).</td></tr>
+    <tr><td><b>New loyal client</b></td><td>A client of the store becomes loyal at their latest delivery.</td></tr>
+  </table>
+  <h3>Restricted pages</h3>
+  <figure class="half"><img src="shots-en/s17-access-denied.jpg"><figcaption>A secretary opening a page reserved for the optician.</figcaption></figure>
+</section>
+
+<!-- ============================================================ PART B -->
+<section class="part">
+  <div class="num">Part B</div>
+  <h1>The super admin</h1>
+  <p>The optician runs the whole business: he sees every store, follows production in the workshop, manages stock between stores, supplier purchases and expenses, and sets how the application works. He can also do everything a secretary does (Part A), in any store.</p>
+</section>
+
+<!-- B1 -->
+<section class="chapter">
+  <div class="eyebrow">B1 · Dashboard <span class="role adm">admin</span></div>
+  <h2>The dashboard</h2>
+  <figure><img src="shots-en/a01-dashboard-today.jpg"><figcaption>The dashboard on "Today": cash collected comes first.</figcaption></figure>
+  <h3>The filters (at the top)</h3>
+  <ul>
+    <li><strong>Period</strong>: Today, 7 days, This month, Last month, This year, or Custom (from… to…). Days follow Casablanca time.</li>
+    <li><strong>Store</strong>: all stores, one store or the lab (by default, the one chosen in the top bar).</li>
+    <li><strong>Compare</strong>: with the same period the previous month (vs M−1), the previous year (vs Y−1), or none. Each card then shows the change in % (green up, red down) and a small curve.</li>
+  </ul>
+  <p>The filters are part of the page address: you can bookmark "this month, Maârif" or send it to a partner.</p>
+
+  <h3>The indicators</h3>
+  <figure><img src="shots-en/a03-dashboard-month.jpg"><figcaption>"This month", compared with the previous month: cards, charts and widgets.</figcaption></figure>
+  <table>
+    <tr><th style="width:24%">Indicator</th><th>What it measures</th></tr>
+    <tr><td><b>Revenue</b></td><td>The sum of the totals of the orders <em>created</em> in the period, cancelled orders excluded. What was sold, paid or not.</td></tr>
+    <tr><td><b>Cash collected</b></td><td>The money actually received in the period (deposits, payments, balances), refunds deducted. It is the main card on "Today": it should match the day's cash.</td></tr>
+    <tr><td><b>Charges</b></td><td>The approved expenses of the period (rent, salaries, supplier payments…). With one store selected: only its charges; "General" charges count only under "All stores".</td></tr>
+    <tr><td><b>Net result</b></td><td>Revenue − charges: the result of the period.</td></tr>
+    <tr><td><b>Orders / average basket</b></td><td>Number of non-cancelled orders, and revenue divided by that number.</td></tr>
+    <tr><td><b>Left to collect</b></td><td>What clients still owe on the orders of the period that are not delivered yet.</td></tr>
+    <tr><td><b>Owed to suppliers</b></td><td>What is left to pay on all purchases, as of today.</td></tr>
+    <tr><td><b>Discounts, cancellation rate, damage</b></td><td>Total discounts given, share of orders cancelled, number of frames recorded as damaged.</td></tr>
+    <tr><td><b>Loyal clients, repeat rate</b></td><td>Number of loyal clients, and share of the clients served who already have at least 2 delivered orders.</td></tr>
+    <tr><td><b>Workshop time</b></td><td>Average time from the order to its arrival in store, and to delivery.</td></tr>
+  </table>
+  <h3>Charts and widgets</h3>
+  <ul>
+    <li><strong>Revenue over time</strong> (by hour, day or month depending on the period), with the comparison period as a dotted line.</li>
+    <li><strong>Revenue and result by store</strong>, <strong>clients served</strong>, <strong>sales by frame category, lens type and treatment</strong>, <strong>busiest hours</strong> (which day and hour orders are placed), <strong>workshop lead times</strong>.</li>
+    <li>At the bottom: <span class="ui">Ready for pick-up</span> (glasses in store, and for how many days), <span class="ui">Pending charges</span>, <span class="ui">Low stock</span> — each with a link to the page concerned.</li>
+  </ul>
+  <figure><img src="shots-en/a02-dashboard-year.jpg"><figcaption>"This year": revenue by month.</figcaption></figure>
+</section>
+
+<!-- B2 + B3 -->
+<section class="chapter">
+  <div class="eyebrow">B2 · Store selector <span class="role adm">admin</span></div>
+  <h2>The store selector</h2>
+  <figure class="half"><img src="shots-en/a04-store-selector.jpg"><figcaption>Choosing the store displayed.</figcaption></figure>
+  <p>At the top left, the admin chooses what he looks at: <strong>All stores</strong>, one store, or the lab. The choice is kept from one visit to the next and applies to <em>Orders</em>, the <em>Workshop</em>, the <em>Stock</em> tab, and is the default filter of the <em>Dashboard</em>. With "All stores", each order card shows its store. A new order is always created in a specific store (chosen in step 1).</p>
+
+  <div class="eyebrow" style="margin-top:8mm">B3 · Workshop <span class="role adm">admin</span></div>
+  <h2>The workshop</h2>
+  <figure><img src="shots-en/a06-workshop.jpg"><figcaption>The workshop queue: oldest first.</figcaption></figure>
+  <p>The workshop is the fitting to-do list: every <em>Confirmed</em>, <em>In workshop</em> and <em>Prepared</em> order, oldest first. At the top, the summary (to send, in progress, ready, late) and filters by step.</p>
+  <p>Each card gives everything needed to fit the glasses without opening the order: the <strong>prescription</strong> (RE / LE), the <strong>frame</strong> (category or "Client's own frame"), the <strong>lens type and treatments</strong>, the store, the age of the order. <span style="color:var(--red);font-weight:600">Late</span> cards are red. The large button moves one step forward: <span class="ui">Send to workshop</span> → <span class="ui">Mark as prepared</span> → <span class="ui">Arrived in store</span> (the order then leaves the workshop and shows "In store" for the secretary).</p>
+  <div class="tip"><b>The "Workshop" counter in the menu</b>It counts confirmed and in-workshop orders: the work still to do. A prepared pair leaves it.</div>
+</section>
+
+<!-- B4 -->
+<section class="chapter">
+  <div class="eyebrow">B4 · Orders and clients <span class="role adm">admin</span></div>
+  <h2>What only the admin can do on orders and clients</h2>
+  <figure class="half"><img src="shots-en/a07-order-menu.jpg"><figcaption>The "…" menu of an order, reserved for the admin.</figcaption></figure>
+  <ul>
+    <li><span class="ui">Go back</span>: undoes a step passed by mistake (down to "Confirmed"; never from "Delivered").</li>
+    <li><span class="ui">Free discount</span>: a commercial gesture on this order, before delivery, at most the balance due (never below the frame price, and not on top of a client discount).</li>
+    <li><span class="ui">Cancel the order</span>: at any step (even delivered, for a return).</li>
+  </ul>
+  <figure class="half"><img src="shots-en/a08-cancel-dialog.jpg"><figcaption>Cancelling: a reason is required, refund if needed.</figcaption></figure>
+  <p>Cancelling asks for a <strong>reason</strong> (client changed their mind, measurement error, frame unavailable, delay too long, other) and a note. A <strong>refund</strong> can be recorded (at most what was paid) with its method. The frame goes back into stock automatically. An order is never erased: it stays visible as "Cancelled" ("Show cancelled" filter).</p>
+  <h3>The discount prepared for a client</h3>
+  <figure><img src="shots-en/a09-client-admin.jpg"><figcaption>On the client page, the admin prepares a discount for the next order.</figcaption></figure>
+  <p>On a client's page, <span class="ui">Approve a discount</span> records a discount (in % or in DH, with a note) for <strong>their next order</strong>. The secretary sees it as a banner in step 1 and applies it in step 3; once used, it disappears. The admin can also remove it. This is how the secretary can give a discount without having the right to decide one.</p>
+</section>
+
+<!-- B5 -->
+<section class="chapter">
+  <div class="eyebrow">B5 · Stock <span class="role adm">admin</span></div>
+  <h2>Stock: transfers, counts, damage, thresholds</h2>
+  <figure><img src="shots-en/a10-stock-admin.jpg"><figcaption>Stock on the admin side: one tab per store and for the lab.</figcaption></figure>
+  <p>The admin sees the stock of each location (tabs at the top). The <strong>minimum threshold</strong> of each category is edited directly in the "Threshold" column: below it, the quantity turns red, the category goes into "Low stock" and a notification is sent. Stock is never changed by typing a number: one of these actions is used, each recorded in the history.</p>
+  <div class="grid2">
+    <figure><img src="shots-en/a11-transfer.jpg"><figcaption>Transfer to another store.</figcaption></figure>
+    <figure><img src="shots-en/a12-adjust.jpg"><figcaption>Adjust to the counted stock (inventory).</figcaption></figure>
+  </div>
+  <table>
+    <tr><th style="width:24%">Action</th><th>When to use it</th></tr>
+    <tr><td><b>Transfer</b></td><td>Send items from one location to another (e.g. from the lab to Anfa). Several categories at once; you cannot send more than there is. The outgoing and incoming movements are recorded together.</td></tr>
+    <tr><td><b>Adjust to count</b></td><td>After an inventory: enter the <em>counted</em> quantity and a reason (physical count, entry error, item found…). OPTICOR records the difference.</td></tr>
+    <tr><td><b>Damage or loss</b></td><td>A damaged or lost frame: quantity and a required reason. It leaves the stock and counts in the dashboard's "Damaged frames" indicator.</td></tr>
+    <tr><td><b>History</b></td><td>Every movement of the category at this location, with the stock after each movement.</td></tr>
+  </table>
+  <figure><img src="shots-en/a13-transfers.jpg"><figcaption>The Transfers page: the history of every transfer, and "New transfer".</figcaption></figure>
+  <p>Stock coming from suppliers enters through <strong>Purchasing</strong> (B6): each purchase received adds its items to the receiving location.</p>
+</section>
+
+<!-- B6 -->
+<section class="chapter">
+  <div class="eyebrow">B6 · Purchasing <span class="role adm">admin</span></div>
+  <h2>Purchasing and suppliers</h2>
+  <figure><img src="shots-en/a14-purchases.jpg"><figcaption>Purchases: what was bought, paid, and what is still owed.</figcaption></figure>
+  <p>At the top: the total owed to suppliers, the number of unpaid purchases, the total bought. The table gives, for each purchase, the date, supplier, receiving location, total, paid and balance (badge). Filters by supplier and by status.</p>
+  <h3>Recording a purchase</h3>
+  <figure><img src="shots-en/a15-new-purchase.jpg"><figcaption>New purchase: supplier, receiving location, lines, payment.</figcaption></figure>
+  <ol class="steps">
+    <li><strong>Supplier</strong> (or create one), <strong>Received at</strong> (the store or lab receiving the goods), date, invoice reference.</li>
+    <li><strong>Stock lines</strong>: category + purchase unit price + quantity → line total. These items go into the stock of the receiving location.</li>
+    <li><strong>Lens lines</strong> (<span class="ui">Add lenses</span>): a description and an amount, no stock (lenses are ordered for clients).</li>
+    <li><strong>Payment now</strong>: 100%, 30%, 50%, another amount, or nothing. The total is calculated automatically.</li>
+  </ol>
+  <h3>A purchase and its payments</h3>
+  <div class="grid2">
+    <figure><img src="shots-en/a16-purchase-detail.jpg"><figcaption>The details of a purchase.</figcaption></figure>
+    <figure><img src="shots-en/a17-supplier-payment.jpg"><figcaption>Add a payment (at most the balance).</figcaption></figure>
+  </div>
+  <p><span class="ui">Add a payment</span> records a payment to the supplier (date, method, note), never more than the balance. <strong>Each supplier payment automatically creates a charge</strong> "Supplier purchase" in Charges, read only (it is corrected from the purchase, not from the charges): the dashboard's expenses are always complete.</p>
+  <figure><img src="shots-en/a18-suppliers.jpg"><figcaption>The Suppliers tab: contact details and amount owed per supplier.</figcaption></figure>
+  <p>The <span class="ui">Suppliers</span> tab lists the suppliers with what is owed to each. You can edit them, archive a supplier you no longer work with (it stays in the history), or delete a supplier never used.</p>
+</section>
+
+<!-- B7 -->
+<section class="chapter">
+  <div class="eyebrow">B7 · Charges <span class="role adm">admin</span></div>
+  <h2>Charges</h2>
+  <figure><img src="shots-en/a19-charges.jpg"><figcaption>Charges: those to approve at the top, then the ledger of every expense.</figcaption></figure>
+  <p>Charges are all the expenses: rent, salaries, electricity, internet, deliveries, remade lenses, supplier payments… They feed the dashboard's "Charges" and "Net result" indicators. Filters: period, location, category, status; the total of the selection is shown.</p>
+  <h3>Where charges come from ("Source" badge)</h3>
+  <table>
+    <tr><th style="width:22%">Source</th><th>Explanation</th></tr>
+    <tr><td><b>Manual</b></td><td>Entered with <span class="ui">New charge</span>: amount, date, category, location (a store, the lab or "General" for what concerns the whole business), a required reason, and optionally a linked order (e.g. a lens remade for order MRF-01204).</td></tr>
+    <tr><td><b>Supplier payment</b></td><td>Created automatically by a purchase payment (B6). Read only, with a link to the purchase.</td></tr>
+    <tr><td><b>Recurring</b></td><td>Created every month by a recurring charge (e.g. rent on the 1st). It arrives "To approve".</td></tr>
+  </table>
+  <figure class="half"><img src="shots-en/a20-new-charge.jpg"><figcaption>New charge.</figcaption></figure>
+  <h3>Charges to approve</h3>
+  <p>Every day, OPTICOR prepares the month's recurring charges (rent on the 1st, internet on the 5th…). They arrive at the top of the page, with a badge on "Charges" in the menu and a notification. <span class="ui">Approve</span> makes them count in the figures; you can correct the amount first (e.g. an electricity bill that varies). Until a charge is approved, it does not count.</p>
+  <h3>Edit, delete, history</h3>
+  <p>The "…" menu of a charge lets you <strong>edit</strong> it, <strong>delete</strong> it (it stays visible with "Show deleted" and can be restored) and see its <strong>history</strong>: every change is kept with its author, the old and the new value.</p>
+  <figure><img src="shots-en/a21-recurring.jpg"><figcaption>The Recurring tab: the expenses that come back every month.</figcaption></figure>
+  <p>The <span class="ui">Recurring</span> tab manages these templates: label, amount, category, location, day of the month, active or not. Deactivating a template stops the next charges without touching the past ones.</p>
+</section>
+
+<!-- B8 -->
+<section class="chapter">
+  <div class="eyebrow">B8 · Settings <span class="role adm">admin</span></div>
+  <h2>Settings</h2>
+  <p>Everything that sets how OPTICOR works, in the left menu of the <span class="ui">Settings</span> page.</p>
+  <h3>Lists</h3>
+  <figure><img src="shots-en/a30-settings-lists.jpg"><figcaption>The lists of choices used throughout the application.</figcaption></figure>
+  <p>The choices offered in the menus: <strong>payment methods, lens types, treatments, vision types, cancellation reasons, stock adjustment reasons, charge categories</strong>. Each item has a French and an English label; drag to reorder. An item already used cannot be deleted: it is <strong>archived</strong> (it disappears from the choices but stays in old orders). The number of uses is shown.</p>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Products</h3>
+  <figure><img src="shots-en/a30-settings-products.jpg"><figcaption>Product types and price categories.</figcaption></figure>
+  <p>The <strong>types</strong> (frames, contact lenses, accessories) and their <strong>categories</strong> with the <strong>sale price</strong> (the one shown to the secretary). Add a category, change its price (past orders keep their price), archive a category no longer sold. The low-stock thresholds per store are set here too.</p>
+  <h3>Custom fields</h3>
+  <figure><img src="shots-en/a30-settings-fields.jpg"><figcaption>The fields of the "Measurements" step.</figcaption></figure>
+  <p>For each field (PD, fitting height, vision type, doctor, prescription date and photo…): <strong>hidden</strong>, <strong>optional</strong> or <strong>required</strong>. You can add your own fields (text, number, date, list). A required field blocks step 2 until it is filled in.</p>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Stores and lab</h3>
+  <figure><img src="shots-en/a30-settings-stores.jpg"><figcaption>The stores, the lab, and their numbering prefix.</figcaption></figure>
+  <p>Create a store with its name and its <strong>prefix</strong> (3 letters, e.g. <code>MRF</code>) that starts all its order numbers. The prefix is <strong>locked</strong> from the first order, so numbers never change. A closed store is <strong>deactivated</strong> (its history remains). The lab is a stock location without orders.</p>
+  <h3>Users</h3>
+  <figure><img src="shots-en/a30-settings-users.jpg"><figcaption>The team's accounts.</figcaption></figure>
+  <ol class="steps">
+    <li><span class="ui">Invite</span>: name, email, role (secretary or super admin) and, for a secretary, her store. The person receives the invitation email.</li>
+    <li>Change a person's role or store: they will have to sign in again.</li>
+    <li><span class="ui">Deactivate</span>: the person can no longer sign in (their past actions keep their name). <span class="ui">Resend invitation</span> if they did not receive the email or let it expire.</li>
+  </ol>
+  <div class="warn"><b>Safeguards</b>You cannot change your own role or deactivate your own account, and there is always at least one active super admin.</div>
+</section>
+
+<section class="chapter">
+  <h3 style="margin-top:0">Charge locations</h3>
+  <figure><img src="shots-en/a30-settings-chargeLocations.jpg"><figcaption>The locations a charge can be attached to.</figcaption></figure>
+  <p>Each store and the lab have their location (created automatically); <strong>General</strong> is for shared expenses (head office salaries, accountant…). You can add other locations (e.g. "Vehicle") and archive them. Reminder: on the dashboard, "General" charges count only under "All stores".</p>
+  <div class="grid2">
+    <div>
+      <h3>Loyalty</h3>
+      <figure><img src="shots-en/a30-settings-loyalty.jpg"><figcaption>The number of delivered orders to become loyal.</figcaption></figure>
+      <p>The number of <em>delivered</em> orders from which a client becomes loyal. If you lower it, the clients who already reach it become loyal at once (a notification says how many).</p>
+    </div>
+    <div>
+      <h3>Notifications</h3>
+      <figure><img src="shots-en/a30-settings-notifications.jpg"><figcaption>The delays before an order is "late".</figcaption></figure>
+      <p>For each step, the number of days after which an order is late: its card turns red and a "Late order" notification is sent (once per order and step).</p>
+    </div>
+  </div>
+  <h3>Roles and permissions</h3>
+  <figure><img src="shots-en/a30-settings-roles.jpg"><figcaption>The table of each role's rights (read only).</figcaption></figure>
+  <p>The table summarises the rights of each role (the same as in chapter 1). It is read only in this version.</p>
+</section>
+
+<!-- B9 -->
+<section class="chapter">
+  <div class="eyebrow">B9 · Notifications <span class="role adm">admin</span></div>
+  <h2>The admin's notifications</h2>
+  <figure><img src="shots-en/a40-notifications.jpg"><figcaption>The admin's notifications page.</figcaption></figure>
+  <p>The admin receives the notifications of <strong>every</strong> store, plus those reserved for him:</p>
+  <table>
+    <tr><th style="width:30%">Notification</th><th style="width:44%">When</th><th>A click opens</th></tr>
+    <tr><td><b>Low stock</b></td><td>A category drops to its threshold at a location.</td><td>The stock of that location</td></tr>
+    <tr><td><b>Late order</b></td><td>Too many days at the same step.</td><td>The order</td></tr>
+    <tr><td><b>New loyal client</b></td><td>A client reaches the loyalty threshold.</td><td>The client page</td></tr>
+    <tr><td><b>Loyal clients</b></td><td>After the loyalty threshold is lowered.</td><td>The loyal clients</td></tr>
+    <tr><td><b>Duplicate slip blocked</b></td><td>Someone tried to reuse a slip number already taken.</td><td>The existing order</td></tr>
+    <tr><td><b>Charges to approve</b></td><td>The day's recurring charges are ready.</td><td>Charges</td></tr>
+  </table>
+  <h3>The personal menu</h3>
+  <figure class="half"><img src="shots-en/a41-user-menu.jpg"><figcaption>Language, theme, sign out.</figcaption></figure>
+  <p>Everyone chooses their <strong>language</strong> (French or English: the screens follow), the <strong>theme</strong> (light, dark or the device's), and <strong>signs out</strong>. Remember to sign out on a shared computer.</p>
+</section>
+
+<!-- ============================================================ APPENDICES -->
+<section class="chapter">
+  <div class="eyebrow">Appendices</div>
+  <h2>Glossary</h2>
+  <table>
+    <tr><th style="width:26%">Term</th><th>Meaning in OPTICOR</th></tr>
+    <tr><td><b>Slip number</b></td><td>The number of the paper slip in the booklet; unique within a store.</td></tr>
+    <tr><td><b>Order number</b></td><td>Store prefix + slip number, e.g. <code>MRF-01215</code>.</td></tr>
+    <tr><td><b>RE / LE</b></td><td>Right eye / left eye (OD / OG in French).</td></tr>
+    <tr><td><b>SPH, CYL, AXIS, ADD</b></td><td>Sphere, cylinder, axis, addition: the values of the prescription.</td></tr>
+    <tr><td><b>PD</b></td><td>Pupillary distance (in mm), measured for each eye.</td></tr>
+    <tr><td><b>Distance / near</b></td><td>Distance vision / near vision (VL / VP in French).</td></tr>
+    <tr><td><b>Category</b></td><td>A range of frames with the same sale price (Catégorie A, B…). Stock is counted by category.</td></tr>
+    <tr><td><b>Deposit / balance due</b></td><td>What the client pays when ordering / what they still owe.</td></tr>
+    <tr><td><b>Approved discount</b></td><td>A discount prepared by the admin for a client's next order.</td></tr>
+    <tr><td><b>Free discount</b></td><td>A discount granted by the admin on one specific order.</td></tr>
+    <tr><td><b>Charge</b></td><td>An expense. It counts in the figures only once approved.</td></tr>
+    <tr><td><b>General</b></td><td>The charge location for expenses shared by the whole business.</td></tr>
+    <tr><td><b>Threshold</b></td><td>The minimum quantity of a category at a location, below which you are alerted.</td></tr>
+  </table>
+</section>
+
+<section class="chapter">
+  <h2>Frequent questions</h2>
+  <h4>"This slip number already exists in this store."</h4>
+  <p>The number has already been used. Check the booklet: either it is a typo, or the slip has already been entered (the existing order is shown, open it). The optician is notified of the attempt.</p>
+  <h4>"Not enough stock in this store. Ask for a transfer."</h4>
+  <p>The last frame of this category has just been sold. Choose another category or ask the optician for a transfer.</p>
+  <h4>I cannot deliver the order</h4>
+  <p>Money is still owed: <span class="ui">Collect the balance</span> then <span class="ui">Collect and deliver</span> collects the balance and delivers at the same time.</p>
+  <h4>I chose the wrong step / the order must be cancelled</h4>
+  <p>Ask the optician: he can go back one step, or cancel with a reason and a refund.</p>
+  <h4>"Your session has expired."</h4>
+  <p>Your role or your store has been changed: sign in again to get your new access.</p>
+  <h4>"Access denied"</h4>
+  <p>The page is reserved for the optician. Go back to Orders with the button offered.</p>
+  <h4>A client has changed phone number</h4>
+  <p>Open their client page, <span class="ui">Edit</span>, and correct the phone number. Do not create a new client: you would lose their history and loyalty.</p>
+  <h4>The day's figure does not match the cash register</h4>
+  <p>Compare the cash with <strong>Cash collected</strong> (not Revenue) on "Today" and the right store. Revenue counts what was sold, even unpaid; Cash collected counts the money received.</p>
+  <h3>Good practices</h3>
+  <ul>
+    <li>Enter the order <strong>in front of the client</strong>, with the paper slip: the slip number and phone are checked right away.</li>
+    <li>Always search for the client before creating a new one.</li>
+    <li>Add the prescription photo: it avoids reading mistakes in the workshop.</li>
+    <li>Move orders forward when they actually change step: late alerts and the dashboard's lead times depend on it.</li>
+    <li>For the optician: approve recurring charges at the start of each month, count the stock regularly, keep the thresholds up to date.</li>
+  </ul>
+</section>
+
+</body>
+</html>
