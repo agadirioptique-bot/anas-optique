@@ -346,6 +346,8 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 
 **Order detail**: keep demo layout (timeline, prescription, products, client card, payments, additional info, history). **Remove the "Costs and margin" panel.** Super admin extra actions in "…" menu: cancel (dialog with reason + refund), move back one step, free discount (before delivery only).
 
+**Secretary → admin on WhatsApp** (2026-11-13): when a secretary confirms a new order (wizard success) or moves an order to *En succursale* (board, order page), a prompt offers "Prévenir {admin} sur WhatsApp" for each active super admin with a WhatsApp number; it opens `wa.me` with the message ready (number, client, store, total/deposit or balance due) and she taps Send. "Plus tard" skips it; a "Prévenir l'admin" button stays on the order page while the order is *Confirmée* or *En succursale*. Nothing is sent automatically. Super admins never get the prompt.
+
 **Clients**: list with chips All / New / Regular / Loyal (counts = non-cancelled orders across all stores; Loyal = `is_loyal`; New = 0–1 order; Regular = 2..N−1), client file (orders across stores: secretary sees count — via `client_order_stats(client_id)` security definer RPC returning counts only — + only her store's rows), "Vision over time" chart, "New order for this client". Super admin: set/clear pending discount.
 
 **Stock**: location tabs (secretary: only her store, no tabs), KPI strip (tracked categories, items in stock, below threshold — **no money value**), search + product type chips + "Low stock only", table: category, type, quantity pill (red < min, amber = min), threshold (super admin edits it inline). Row click / history icon opens the movement history drawer for **both roles** (secretary: her store; kind, ±qty, level after, date, user, order N°). Super admin row actions: adjust (count), damage, transfer; header button "Transfers" (history + new transfer).
@@ -363,7 +365,7 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 - *Products* (product types + categories: name, sale price, archive; thresholds per store)
 - *Custom fields* (built-in measurement fields + custom ones, visibility hidden/optional/required)
 - *Stores and lab* (create, edit, prefix — locked badge once used, deactivate)
-- *Users* (invite, role, store, deactivate, resend invite)
+- *Users* (invite, role, store, deactivate, resend invite; WhatsApp number of each super admin, used by the secretary → admin prompt)
 - *Charge locations* (labels, archive)
 - *Loyalty* (number of delivered orders)
 - *Notifications* (stuck-order days per status)
@@ -517,6 +519,11 @@ Phase 13 — Hardening & production (2026-11-04):
 - Route states: skeleton `loading.tsx` (board and dashboard variants), `error.tsx` with "Réessayer" + digest reference (no error text from the server), `global-error.tsx`, translated 404 for unknown paths.
 - Accessibility target WCAG 2.1 AA, checked by axe on every page and role (`e2e/a11y.spec.ts`, serious/critical = failure) plus a no-sideways-scroll check at 375 px. Dialogs return focus to what opened them (`useReturnFocus`). Board cards drag by pointer anywhere, by keyboard from the ⋮⋮ handle. Archived rows are tinted, not faded with opacity.
 - E2E data on dev: `npm run e2e:accounts` cancels the open orders older than an hour in the test stores (TSA/TSB), so boards don't fill up across runs.
+
+Secretary → admin WhatsApp (2026-11-13):
+- `profiles.whatsapp_e164` (E.164, optional), set only by a super admin through `set_user_whatsapp(user, phone | null)` in Settings › Users (super admin rows, his own included).
+- Secretaries read the numbers only through `admin_contacts()` (any role, security definer): active super admins with a number, never the caller, and only id, name and number. Profiles stay unreadable to secretaries otherwise. Both RPCs are classified in `tests/db/security.test.ts` (advisor 0029, accepted like the others).
+- Free `wa.me` links (no WhatsApp Business API): the secretary sends the message herself. Messages are translated (`notifyAdmin.messages.*`) in her language.
 
 ## 12. Later (design for it, don't build it)
 
