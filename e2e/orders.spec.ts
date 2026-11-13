@@ -102,6 +102,9 @@ test("secretary: create → workshop → prepared → in store → collect → d
     await page.getByTestId("next-step").filter({ hasText: button }).click();
     await expect(page.getByTestId("order-status")).toContainText(status);
   }
+  // Arrived in store: the secretary is offered to tell the admin (e2e/notify-admin.spec.ts); skip it here.
+  await page.getByTestId("notify-admin-later").click();
+  await expect(page.getByTestId("notify-admin")).toBeHidden();
   await expect(page.getByRole("link", { name: "Prévenir sur WhatsApp" })).toBeVisible();
   await shot(page, "detail-in-store");
 
