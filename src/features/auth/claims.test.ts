@@ -22,6 +22,8 @@ describe("canSetPassword", () => {
   const now = 1_800_000_000;
 
   it("accepts a session opened by an invite or reset link within the hour", () => {
+    // What Supabase actually records for /auth/confirm (verifyOtp with a token hash).
+    expect(canSetPassword({ amr: [{ method: "otp", timestamp: now - 60 }] }, now)).toBe(true);
     expect(canSetPassword({ amr: [{ method: "invite", timestamp: now - 60 }] }, now)).toBe(true);
     expect(canSetPassword({ amr: [{ method: "recovery", timestamp: now - PASSWORD_LINK_MAX_AGE_SECONDS }] }, now)).toBe(true);
   });

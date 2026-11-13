@@ -11,7 +11,11 @@ export function claimsMatchProfile(
   return claims.app_role === profile.role && (claims.store_id || null) === profile.store_id;
 }
 
-/** Sign-in methods (JWT `amr`) that prove the user holds the mailbox: invite or reset link. */
+/**
+ * Sign-in methods (JWT `amr`) that prove the user holds the mailbox. Supabase records the
+ * token-hash links of /auth/confirm (invite, reset) as `otp` (seen on dev, 2026-11-13); the other
+ * names are kept in case Auth reports the link type itself.
+ */
 const EMAIL_LINK_METHODS = new Set(["invite", "recovery", "otp", "magiclink", "email/signup"]);
 
 /** How long after opening the email link the password can be chosen (= the link's own lifetime). */
