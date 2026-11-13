@@ -21,6 +21,7 @@ import { readyMessage, whatsappLink } from "@/lib/whatsapp";
 import { addOrderPayment, applyFreeDiscount, cancelOrder, changeOrderStatus, deliverOrder } from "../actions";
 import type { Labeled } from "../new/data";
 import type { OrderRow } from "../queries";
+import { NotifyAdminDialog } from "./notify-admin";
 
 type FlowStatus = (typeof ORDER_FLOW)[number];
 
@@ -306,7 +307,12 @@ function DiscountDialog({ row, onClose }: { row: OrderRow; onClose: () => void }
   );
 }
 
-type Dialog = { kind: "collect"; row: OrderRow; deliver: boolean } | { kind: "cancel"; row: OrderRow } | { kind: "discount"; row: OrderRow } | { kind: "back"; row: OrderRow };
+type Dialog =
+  | { kind: "collect"; row: OrderRow; deliver: boolean }
+  | { kind: "cancel"; row: OrderRow }
+  | { kind: "discount"; row: OrderRow }
+  | { kind: "back"; row: OrderRow }
+  | { kind: "notify"; row: OrderRow };
 
 export function OrderActionsProvider({
   children,
@@ -341,6 +347,8 @@ export function OrderActionsProvider({
             toast.success(t("orders.movedTo", { number: row.displayNumber, status: t(`status.${next}`) }));
             return;
           }
+          // A secretary tells the optician the glasses have arrived (she can skip it).
+          if (!isSuperAdmin) setDialog({ kind: "notify", row: { ...row, status: next } });
           const href = readyWhatsAppHref({ ...row, status: next });
           toast.success(t("orders.readyToast", { number: row.displayNumber }), {
             duration: 12000,
@@ -350,7 +358,7 @@ export function OrderActionsProvider({
         },
       );
     },
-    [run, t],
+    [run, t, isSuperAdmin],
   );
 
   const value = useMemo<OrderActions>(
@@ -371,6 +379,9 @@ export function OrderActionsProvider({
   return (
     <Ctx.Provider value={value}>
       {children}
+      {dialog?.kind === "notify" && (
+        <NotifyAdminDialog open onOpenChange={(o) => !o && close()} step="in_store" order={dialog.row} />
+      )}
       {dialog?.kind === "collect" && <CollectDialog key={dialog.row.id} row={dialog.row} deliver={dialog.deliver} methods={methods} onClose={close} />}
       {dialog?.kind === "cancel" && <CancelDialog row={dialog.row} methods={methods} reasons={reasons} onClose={close} />}
       {dialog?.kind === "discount" && <DiscountDialog row={dialog.row} onClose={close} />}

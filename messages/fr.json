@@ -175,6 +175,24 @@
       }
     }
   },
+  "notifyAdmin": {
+    "button": "Prévenir l'admin",
+    "title": {
+      "confirmed": "Prévenir l'admin : commande confirmée",
+      "in_store": "Prévenir l'admin : arrivée en succursale"
+    },
+    "description": "Commande {number} · {client}",
+    "hint": "WhatsApp s'ouvre avec le message prêt : il ne reste qu'à l'envoyer.",
+    "sendTo": "Prévenir {name} sur WhatsApp",
+    "later": "Plus tard",
+    "close": "Fermer",
+    "loading": "Chargement…",
+    "noAdmins": "Aucun admin n'a de numéro WhatsApp. Demandez à l'opticien de l'ajouter dans Paramètres › Utilisateurs.",
+    "messages": {
+      "confirmed": "Bonjour {admin}, nouvelle commande {number} confirmée à {store} : {client}, total {total}, acompte {paid}.",
+      "in_store": "Bonjour {admin}, la commande {number} ({client}) est arrivée à {store}.{hasBalance, select, yes { Reste à payer : {balance}.} other {}}"
+    }
+  },
   "unauthorized": {
     "title": "Accès non autorisé",
     "body": "Votre rôle ne donne pas accès à cette page. Si vous pensez que c'est une erreur, demandez à l'opticien de vérifier vos permissions.",
@@ -248,6 +266,7 @@
     "noStock": "Stock insuffisant dans cette succursale. Demandez un transfert.",
     "duplicateSlip": "Ce N° du bon existe déjà dans cette succursale.",
     "phoneExists": "Un client existe déjà avec ce numéro de téléphone.",
+    "phoneInvalid": "Ce numéro de téléphone n'est pas valide.",
     "requiredFieldMissing": "Un champ obligatoire n’est pas rempli.",
     "invalidPrescription": "La prescription est invalide (vérifiez les axes et les valeurs).",
     "totalBelowItems": "Le total doit être au moins égal au prix des produits.",
@@ -370,7 +389,12 @@
       "deactivate": "Désactiver",
       "deactivated": "{name} désactivé",
       "activated": "{name} réactivé",
-      "you": "vous"
+      "you": "vous",
+      "whatsapp": "WhatsApp",
+      "whatsappPlaceholder": "06 12 34 56 78",
+      "whatsappHint": "Les secrétaires l'utilisent pour vous prévenir sur WhatsApp (commande confirmée, arrivée en succursale).",
+      "whatsappSaved": "Numéro WhatsApp de {name} enregistré",
+      "whatsappCleared": "Numéro WhatsApp de {name} retiré"
     },
     "lists": {
       "title": "Listes déroulantes",

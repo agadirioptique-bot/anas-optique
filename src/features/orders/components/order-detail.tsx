@@ -19,6 +19,8 @@ import type { OrderDetailData } from "../detail";
 import type { Labeled } from "../new/data";
 import { uploadPrescriptionPhoto } from "../lib/photo-upload";
 import { nextStatus, OrderActionsProvider, previousStatus, readyWhatsAppHref, useOrderActions } from "./order-actions";
+import { adminNotifyStep } from "../notify";
+import { NotifyAdminButton } from "./notify-admin";
 import { PrescriptionTable } from "./prescription";
 import { StatusTimeline } from "./status-timeline";
 
@@ -99,6 +101,8 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
   const whatsapp = row.status === "in_store" ? readyWhatsAppHref(row) : null;
   const active = row.status !== "cancelled" && row.status !== "delivered";
   const canCollect = row.status !== "cancelled" && row.balance > 0;
+  // A secretary tells the optician about a confirmed or arrived order (SPEC §8).
+  const notifyStep = isSuperAdmin ? null : adminNotifyStep(row.status);
   const canDiscount = isSuperAdmin && active && row.balance > 0 && order.discountSource !== "client_pending";
   const frame = data.items.find((i) => i.type?.is_frame);
   const others = data.items.filter((i) => !i.type?.is_frame);
@@ -132,6 +136,7 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
         }
         actions={
           <>
+            {notifyStep && <NotifyAdminButton step={notifyStep} order={row} />}
             {whatsapp && (
               <Button asChild variant="whatsapp">
                 <a href={whatsapp} target="_blank" rel="noopener noreferrer">

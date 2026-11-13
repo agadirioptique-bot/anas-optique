@@ -5,7 +5,7 @@ import { authErrorCode, dbErrorCode, fail, ok, type ActionResult } from "@/lib/e
 import { createAdminClient } from "@/lib/supabase/admin";
 import { siteUrl } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
-import { inviteUserSchema, resendInviteSchema, updateUserAccessSchema } from "./schemas";
+import { inviteUserSchema, resendInviteSchema, setUserWhatsappSchema, updateUserAccessSchema } from "./schemas";
 
 /** Long enough to mean "until reactivated". */
 const BAN_FOREVER = "876000h";
@@ -90,4 +90,18 @@ export async function updateUserAccess(input: unknown): Promise<ActionResult> {
     ban_duration: isActive ? "none" : BAN_FOREVER,
   });
   return banError ? fail(authErrorCode(banError)) : ok(undefined);
+}
+
+/** WhatsApp number of an account (super admin only, checked again by `set_user_whatsapp`). */
+export async function setUserWhatsapp(input: unknown): Promise<ActionResult<{ whatsapp: string | null }>> {
+  if (!(await getSuperAdmin())) return fail("forbidden");
+  const parsed = setUserWhatsappSchema.safeParse(input);
+  if (!parsed.success) return fail("phoneInvalid");
+  const { userId, phone } = parsed.data;
+  const { error } = await (await createClient()).rpc("set_user_whatsapp", {
+    p_user_id: userId,
+    // Generated types don't mark RPC args nullable; null clears the number.
+    p_phone: phone as string,
+  });
+  return error ? fail(dbErrorCode(error)) : ok({ whatsapp: phone });
 }

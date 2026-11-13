@@ -27,6 +27,7 @@ export const ERROR_CODES = [
   "noStock",
   "duplicateSlip",
   "phoneExists",
+  "phoneInvalid",
   "requiredFieldMissing",
   "invalidPrescription",
   "totalBelowItems",
