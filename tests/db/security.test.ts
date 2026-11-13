@@ -39,6 +39,7 @@ const SUPER_ADMIN_ONLY: Record<string, Call> = {
   record_damage: (f) => ({ p_store_id: f.storeA, p_category_id: some(), p_qty: 1, p_reason: "x" }),
   set_client_discount: (_, c) => ({ p_client_id: c.client, p_type: "percent", p_value: 50, p_note: null }),
   set_loyalty_threshold: () => ({ p_orders: 1 }),
+  set_user_whatsapp: (f) => ({ p_user_id: f.adminId, p_phone: "+212600000000" }),
 };
 
 /** SECURITY DEFINER, `private.require_store_access(store)` → a secretary of another store gets OPTICOR:FORBIDDEN. */
@@ -52,6 +53,7 @@ const STORE_SCOPED: Record<string, Call> = {
 
 /** SECURITY DEFINER, `private.require_role()` → any active profile; anon refused. Shared data only. */
 const ANY_ROLE: Record<string, Call> = {
+  admin_contacts: () => ({}),
   auth_role: () => ({}),
   auth_store_id: () => ({}),
   client_directory: () => ({ p_q: "", p_segment: "all", p_sort: "name", p_limit: 1, p_offset: 0 }),

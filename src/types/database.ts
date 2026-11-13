@@ -1076,6 +1076,7 @@ export type Database = {
           locale: Database["public"]["Enums"]["app_locale"]
           role: Database["public"]["Enums"]["app_role"]
           store_id: string | null
+          whatsapp_e164: string | null
         }
         Insert: {
           created_at?: string
@@ -1086,6 +1087,7 @@ export type Database = {
           locale?: Database["public"]["Enums"]["app_locale"]
           role?: Database["public"]["Enums"]["app_role"]
           store_id?: string | null
+          whatsapp_e164?: string | null
         }
         Update: {
           created_at?: string
@@ -1096,6 +1098,7 @@ export type Database = {
           locale?: Database["public"]["Enums"]["app_locale"]
           role?: Database["public"]["Enums"]["app_role"]
           store_id?: string | null
+          whatsapp_e164?: string | null
         }
         Relationships: [
           {
@@ -2352,6 +2355,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_contacts: {
+        Args: never
+        Returns: {
+          full_name: string
+          id: string
+          whatsapp_e164: string
+        }[]
+      }
       admin_list_users: {
         Args: never
         Returns: {
@@ -2366,6 +2377,7 @@ export type Database = {
           locale: Database["public"]["Enums"]["app_locale"]
           role: Database["public"]["Enums"]["app_role"]
           store_id: string
+          whatsapp_e164: string
         }[]
       }
       admin_update_user_access: {
@@ -2502,6 +2514,10 @@ export type Database = {
       set_loyalty_threshold: { Args: { p_orders: number }; Returns: number }
       set_prescription_photo: {
         Args: { p_order_id: string; p_path: string }
+        Returns: undefined
+      }
+      set_user_whatsapp: {
+        Args: { p_phone: string; p_user_id: string }
         Returns: undefined
       }
       similar_clients: {
