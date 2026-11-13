@@ -77,7 +77,7 @@ export function NotifyAdminDialog({ open, onOpenChange, step, order }: { open: b
             <ul className="space-y-2">
               {contacts.map((admin) => (
                 <li key={admin.id}>
-                  <Button asChild variant="whatsapp" size="lg" className="h-auto w-full justify-start gap-3 py-3">
+                  <Button asChild variant="whatsapp" size="lg" className="h-auto w-full justify-start gap-3 py-3 whitespace-normal">
                     <a
                       href={whatsappLink(admin.whatsapp, message(admin))}
                       target="_blank"
@@ -87,7 +87,7 @@ export function NotifyAdminDialog({ open, onOpenChange, step, order }: { open: b
                     >
                       <WhatsAppIcon className="size-5" />
                       <span className="min-w-0 text-left">
-                        <span className="block truncate">{t("sendTo", { name: admin.name })}</span>
+                        <span className="block">{t("sendTo", { name: admin.name })}</span>
                         <span className="num block text-xs font-normal opacity-90">{formatPhone(admin.whatsapp)}</span>
                       </span>
                     </a>
