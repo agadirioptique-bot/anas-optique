@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-export const PASSWORD_MIN = 8;
+/** Same minimum as Supabase Auth on dev and prod (DEPLOY.md §3.1). */
+export const PASSWORD_MIN = 10;
 
 /** Trimmed + lower-cased before the format check (zod runs checks in order). */
 export const emailField = z.string().trim().toLowerCase().max(254).pipe(z.email());

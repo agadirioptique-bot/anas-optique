@@ -68,7 +68,7 @@ Rules:
   - Invite email template uses the SSR token-hash flow:
     `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/set-password` (the confirm route adds the user's locale)
   - `/auth/confirm` route verifies the OTP (`verifyOtp`), then redirects to set-password; user chooses a password; then lands on their home (secretary → Orders, super admin → Dashboard).
-- Sign-in: email + password. "Forgot password" → reset email (same token-hash pattern, `type=recovery`).
+- Sign-in: email + password. "Forgot password" → reset email (same token-hash pattern, `type=recovery`). Both are rate-limited by the app (per email and per IP), and choosing a password needs a session opened by the invite / reset link within the hour — see §11 "Security review 2".
 - Custom SMTP is required for real emails (e.g. Resend) — Supabase's built-in mailer is for testing only.
 - **Custom Access Token Hook** (`public.custom_access_token_hook`) adds claims `app_role` and `store_id` from `profiles` to the JWT. RLS reads them via helpers:
   - `public.auth_role() returns text` → `auth.jwt() ->> 'app_role'`
@@ -512,11 +512,18 @@ Phase 13 — Hardening & production (2026-11-04):
 - Security review written up in `docs/SECURITY-REVIEW.md`; production steps in `docs/DEPLOY.md` (replaces `AUTH-SETUP.md`). Production is only ever touched by the owner, following DEPLOY.md.
 - `anon` has no privilege in `public` (tables, views, sequences, functions, and by default for new objects): the app never queries signed out. Views are read-only for `authenticated`. Trigger functions aren't callable.
 - Supabase advisor 0029 ("signed-in users can execute SECURITY DEFINER function", 26 RPCs) is **accepted**: the RPCs are the write API (secretaries have no direct write on orders/payments/stock) and each checks role/store first. `tests/db/security.test.ts` reads the exposed RPCs and relations from the API's OpenAPI and fails if a new one isn't classified (super admin only / store-scoped / any role / invoker / server-only).
-- Security headers on every response (`X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS), no `X-Powered-By`. **No CSP yet** (needs nonces for Next's inline scripts and the Supabase origins); revisit after launch.
+- Security headers on every response (`X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS), no `X-Powered-By`. ~~No CSP yet~~ → CSP added in security review 2 (below).
 - Every Server Action input goes through zod, including search boxes and ids (`src/lib/schemas.ts`).
 - Route states: skeleton `loading.tsx` (board and dashboard variants), `error.tsx` with "Réessayer" + digest reference (no error text from the server), `global-error.tsx`, translated 404 for unknown paths.
 - Accessibility target WCAG 2.1 AA, checked by axe on every page and role (`e2e/a11y.spec.ts`, serious/critical = failure) plus a no-sideways-scroll check at 375 px. Dialogs return focus to what opened them (`useReturnFocus`). Board cards drag by pointer anywhere, by keyboard from the ⋮⋮ handle. Archived rows are tinted, not faded with opacity.
 - E2E data on dev: `npm run e2e:accounts` cancels the open orders older than an hour in the test stores (TSA/TSB), so boards don't fill up across runs.
+
+Security review 2 (2026-11-13) — see `docs/SECURITY-REVIEW.md` §6:
+- **Brute force**: the sign-in and forgot-password Server Actions call Supabase Auth from the server, so Auth's per-IP limits see the host's IPs. The app counts attempts itself in `private.auth_attempts` (keys = sha256 of client IP / of email, 15-minute window): sign-in = **wrong passwords only**, 10 per email and 30 per IP; password reset = every request, 3 per email and 10 per IP. Over the limit → `rateLimited`. Functions `auth_attempt_counts` / `auth_record_attempt` are service-role only (`src/features/auth/throttle.ts`); if the database can't be reached the attempt is allowed and logged (fail open).
+- **Set password**: only a session opened by an invite / reset link within the hour (JWT `amr` = `invite` / `recovery`) may choose a password (`canSetPassword`, page + action). A plain signed-in session gets "ask for a new link": nobody at an unattended, signed-in computer can change the password. Minimum length 10 (= Supabase Auth setting).
+- **CSP** on every response (`next.config.ts`), static: `default-src 'self'`; scripts/styles self + `'unsafe-inline'` (Next / next-themes inline scripts; `'unsafe-eval'` in dev only); `connect-src` self + the Supabase project (https + wss); `img-src` self, data:, blob:, Supabase; `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`; vercel.live allowed on preview deployments only. Zod is jitless in the browser (`src/instrumentation-client.ts`) so no eval is needed. Nonce-based `script-src` = later. Also `Cross-Origin-Opener-Policy: same-origin`.
+- Session cookies: `Secure` in production builds, `SameSite=Lax`, path `/` (`authCookieOptions`, same for server, proxy and browser clients).
+- `clients.full_name` ≤ 120 and `clients.notes` ≤ 500 characters in the database too (secretaries may write those columns through the API without the app).
 
 ## 12. Later (design for it, don't build it)
 

@@ -59,7 +59,8 @@ successful run of each.
    - Redirect URLs: `https://<prod-domain>/**`. On the **dev** project: `http://localhost:3000/**` and
      `https://*-<vercel-team>.vercel.app/**` for previews.
 3. **Password security** (Attack Protection): **Leaked password protection: ON** (HaveIBeenPwned). Minimum
-   length 10. (Also turn it on for dev; it is the one open Supabase security advisor finding there.)
+   length 10 (the app asks for 10 too). (Also turn it on for dev; it is the one open Supabase security
+   advisor finding there.) Do the same on **dev**, and check *Allow new users to sign up* is **OFF** there too.
 4. **Rate limits**: keep the defaults; after SMTP is set, emails sent per hour ≥ 30.
 
 ### 3.2 SMTP (Resend)
@@ -156,8 +157,13 @@ Vercel → Project → **Settings** → **Environment Variables**. Values come f
 | `SUPABASE_SERVICE_ROLE_KEY` | prod service role / secret key | dev | dev | **server only**: mark *Sensitive*; never prefix with `NEXT_PUBLIC_` |
 
 - Only these four are read by the app (`src/lib/supabase/env.ts`, `src/lib/supabase/admin.ts`).
-- The service role key is used only to send invitations (Paramètres › Utilisateurs). If it leaks, rotate
-  it in Supabase (Settings → API → *Roll*), then update Vercel and redeploy.
+- The service role key is used to send invitations (Paramètres › Utilisateurs) and by the sign-in /
+  forgot-password rate limit (`src/features/auth/throttle.ts`). If it leaks, rotate it in Supabase
+  (Settings → API → *Roll*), then update Vercel and redeploy.
+- `NEXT_PUBLIC_SUPABASE_URL` must be set **at build time** too: the Content-Security-Policy in
+  `next.config.ts` allows that Supabase origin only (without it, it falls back to `*.supabase.co`).
+- Production builds mark the session cookies `Secure`: a production build only works over HTTPS (or
+  `http://localhost`), not on a plain-HTTP LAN address.
 - `E2E_*` and `.env.local` are for local tests on dev only; never add them to Vercel Production.
 
 **Check:** a Production deployment's *Build Logs* show no "Missing environment variable"; the login page
@@ -215,6 +221,10 @@ secretary of another store → refused.
 - [ ] **Domain:** Vercel → Domains → add the domain, DNS as shown, HTTPS certificate issued. The app sends
       HSTS, so serve it over HTTPS only.
 - [ ] **Email:** invitation and password reset received from your domain (§3.2, §3.4).
+- [ ] **Headers:** `curl -sI https://<prod-domain>/fr/login` shows `content-security-policy`,
+      `strict-transport-security`, `x-frame-options`; the browser console on the dashboard, an order with a
+      photo and the stock page shows no "Content Security Policy" error.
+- [ ] **Brute force:** 11 wrong passwords in a row for one email → "Trop de tentatives…" (then wait 15 min).
 - [ ] **Lighthouse** on the prod domain, see below.
 
 ### Rollback

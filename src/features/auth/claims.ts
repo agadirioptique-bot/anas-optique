@@ -10,3 +10,28 @@ export function claimsMatchProfile(
 ): boolean {
   return claims.app_role === profile.role && (claims.store_id || null) === profile.store_id;
 }
+
+/** Sign-in methods (JWT `amr`) that prove the user holds the mailbox: invite or reset link. */
+const EMAIL_LINK_METHODS = new Set(["invite", "recovery", "otp", "magiclink", "email/signup"]);
+
+/** How long after opening the email link the password can be chosen (= the link's own lifetime). */
+export const PASSWORD_LINK_MAX_AGE_SECONDS = 60 * 60;
+
+/**
+ * Choosing a password needs a session opened by an invite or reset link within the hour, not just
+ * any session: otherwise anyone at a signed-in, unattended computer could change the password
+ * without knowing it and take the account over (SPEC §4).
+ */
+export function canSetPassword(claims: { amr?: unknown }, nowSeconds: number): boolean {
+  if (!Array.isArray(claims.amr)) return false;
+  return claims.amr.some((entry: unknown) => {
+    if (!entry || typeof entry !== "object") return false;
+    const { method, timestamp } = entry as { method?: unknown; timestamp?: unknown };
+    return (
+      typeof method === "string" &&
+      EMAIL_LINK_METHODS.has(method) &&
+      typeof timestamp === "number" &&
+      nowSeconds - timestamp <= PASSWORD_LINK_MAX_AGE_SECONDS
+    );
+  });
+}

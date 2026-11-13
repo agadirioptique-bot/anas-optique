@@ -2385,6 +2385,14 @@ export type Database = {
         Args: { p_amount?: number; p_charge_id: string }
         Returns: undefined
       }
+      auth_attempt_counts: {
+        Args: { p_keys: string[]; p_window_seconds: number }
+        Returns: {
+          attempts: number
+          key: string
+        }[]
+      }
+      auth_record_attempt: { Args: { p_keys: string[] }; Returns: undefined }
       auth_role: { Args: never; Returns: string }
       auth_store_id: { Args: never; Returns: string }
       business_date: { Args: { ts: string }; Returns: string }

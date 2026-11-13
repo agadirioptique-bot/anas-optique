@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
 import { SetPasswordForm } from "@/features/auth/components/set-password-form";
-import { getSessionUser } from "@/features/auth/session";
+import { getPasswordSetupUser } from "@/features/auth/session";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -13,10 +13,13 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/set-pass
   return { title: t("setPasswordTitle") };
 }
 
-/** Reached from an invite or reset link (/auth/confirm opened the session). */
+/**
+ * Reached from an invite or reset link (/auth/confirm opened the session). Any other session — e.g. a
+ * signed-in computer left unattended — gets "ask for a new link" instead of the form.
+ */
 export default async function Page() {
   const t = await getTranslations("auth");
-  const user = await getSessionUser();
+  const user = await getPasswordSetupUser();
   return (
     <AuthCard title={t("setPasswordTitle")} subtitle={user ? t("setPasswordSubtitle") : t("setPasswordNoSession")}>
       {user ? (

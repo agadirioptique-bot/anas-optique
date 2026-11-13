@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { claimsMatchProfile } from "./claims";
+import { canSetPassword, claimsMatchProfile } from "./claims";
 import type { SessionUser, StoreSummary } from "./types";
 
 /**
@@ -30,6 +30,17 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
     storeId: profile.store_id,
   };
 });
+
+/**
+ * The signed-in user, only if the session was opened by an invite or reset link within the hour
+ * (`canSetPassword`). Gate of the set-password page and action.
+ */
+export async function getPasswordSetupUser(): Promise<SessionUser | null> {
+  const user = await getSessionUser();
+  if (!user) return null;
+  const { data } = await (await createClient()).auth.getClaims();
+  return data?.claims && canSetPassword(data.claims, Math.floor(Date.now() / 1000)) ? user : null;
+}
 
 /** Active stores and lab the user can see (secretary: only her store). RLS scopes the query too. */
 export const getVisibleStores = cache(async (user: SessionUser): Promise<StoreSummary[]> => {

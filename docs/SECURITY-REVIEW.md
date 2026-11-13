@@ -39,7 +39,7 @@ Run on the **dev** project and this repository. Production is set up from [DEPLO
 | Errors don't leak SQL | ✅ actions return `ActionResult` codes via `dbErrorCode` → translated `errors.*`; error boundaries show a generic text + digest only | `src/lib/errors.ts`, `route-states.tsx` |
 | Auth links | ✅ `/auth/confirm` validates `type` with zod and only redirects to allow-listed paths (`safeConfirmNext`) | `features/auth/schemas.ts` |
 | Security headers | ✅ `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS; no `X-Powered-By` | `next.config.ts`, `curl -I` |
-| CSP | ⏸ not yet (Next inline scripts need nonces; Supabase REST/Realtime/Storage origins). Decision in SPEC §11 | — |
+| CSP | ✅ since review 2 (§6): static policy, `'unsafe-inline'` scripts; nonces still to do | `next.config.ts` |
 | Dependencies | ✅ `npm audit --omit=dev`: 0 vulnerabilities. Dev-only tooling (eslint, shadcn's MCP SDK, lighthouse) has advisories that don't ship | `npm audit` |
 
 ## 3. UX states, accessibility, phones
@@ -67,3 +67,37 @@ the Supabase round trips. Charts (recharts) are already loaded lazily.
 - Unit: `npm run test` · DB (RLS/RPC, incl. the security matrix): `npm run test:db` · E2E: `npm run e2e:accounts`
   then `E2E_BASE_URL=http://localhost:3000 npm run test:e2e` — the full suite (29 tests, a11y included)
   passes with nothing skipped.
+
+## 6. Security review 2 (2026-11-13)
+
+Full pass over the repository against the usual web checklist (OWASP Top 10 / ASVS level 1): access
+control, injection, auth and sessions, secrets, headers, uploads, dependencies, error handling.
+Database access control (§1) and the application rules (§2) held up; no data a secretary must not see
+was reachable. Gaps found and fixed:
+
+| # | Finding | Risk | Fix |
+|---|---|---|---|
+| 1 | **No brute-force limit that sees the visitor.** Sign-in and "forgot password" are Server Actions, so Supabase Auth's per-IP limits count the host's (Vercel's) IPs: an attacker gets many more guesses than intended, and legitimate users can be throttled together with him. Reset requests could also use up the project's hourly email quota. | High | `private.auth_attempts` + `auth_attempt_counts` / `auth_record_attempt` (service role only), `src/features/auth/throttle.ts`: 10 wrong passwords per email / 30 per IP, 3 reset emails per email / 10 per IP, per 15 min → "Trop de tentatives". Hashed keys, purged after a day. |
+| 2 | **Password change without the old password from any session.** `/set-password` and its action accepted any signed-in session: someone at an unattended, signed-in shop computer could set a new password and keep the account. | High | `canSetPassword`: only a session opened by an invite / reset link within the hour (JWT `amr`). Others see "ask for a new link". |
+| 3 | No Content-Security-Policy. | Medium (defence in depth: React already escapes output, no `dangerouslySetInnerHTML`) | Static CSP in `next.config.ts` (scripts/styles self + inline, network only to self + Supabase, no plugins/framing/foreign form posts) + `Cross-Origin-Opener-Policy: same-origin`. Zod jitless in the browser so production needs no eval. |
+| 4 | Session cookies without `Secure`. | Low (HSTS already forces HTTPS) | `Secure` in production, `SameSite=Lax`, path `/` for the server, proxy and browser clients. |
+| 5 | App minimum password length 8 vs 10 asked of Supabase in DEPLOY.md. | Low | `PASSWORD_MIN = 10`. |
+| 6 | `clients.full_name` / `notes` unbounded in the database (a secretary can write them through the API without the app's zod). | Low | CHECK ≤ 120 / ≤ 500 (`NOT VALID`: new writes only). |
+
+Checked and fine: open redirects (`safeConfirmNext`, locale-only redirects), CSRF (Server Actions check
+`Origin`; the only GET with side effects, `/auth/sign-out`, never signs out a valid session), SQL injection
+(no string-built SQL outside allow-listed `format('%I')`), XSS sinks (none), uploads (private bucket, MIME
+allow-list without SVG/HTML, 10 MB, path tied to an order the caller can see, no overwrite), secrets (none
+tracked or in history; service role only in `admin.ts`), `npm audit --omit=dev` = 0.
+
+### Still open (owner decisions / dashboard settings)
+
+- **MFA (TOTP) for super admins** — they see all money and can invite users. Supabase TOTP is free; needs
+  an enrolment screen, a code step at sign-in and `aal2` required for super-admin RLS. Recommended next phase.
+- **Idle sessions on shared shop computers** — sessions last until sign-out. Supabase *Sessions → Inactivity
+  timeout* (Pro plan) or a shorter app-side idle sign-out.
+- **Nonce-based CSP** (drop `'unsafe-inline'` from `script-src`): needs the nonce set in `src/proxy.ts` and
+  every page rendered dynamically (they already are).
+- **Leaked password protection + minimum length 10 + sign-ups OFF** on **dev** as on prod (DEPLOY.md §3.1).
+- **Personal data (law 09-08, CNDP)**: clients' phones and prescriptions (health data) — declaration to the
+  CNDP, a privacy notice, and a retention period for old orders/photos.

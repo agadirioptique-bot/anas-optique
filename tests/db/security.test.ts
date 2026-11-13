@@ -73,8 +73,13 @@ const INVOKER: Record<string, Call> = {
   storage_order_id: () => ({ p_name: "x" }),
 };
 
-/** pg_cron jobs and the Auth hook: no API role may call them, not even a super admin. */
+/**
+ * pg_cron jobs, the Auth hook and the sign-in throttle (service role, src/features/auth/throttle.ts):
+ * no API role may call them, not even a super admin.
+ */
 const SERVER_ONLY: Record<string, Call> = {
+  auth_attempt_counts: () => ({ p_keys: ["signIn:email:test"], p_window_seconds: 60 }),
+  auth_record_attempt: () => ({ p_keys: ["signIn:email:test"] }),
   custom_access_token_hook: (f) => ({ event: { user_id: f.secretaryId, claims: {} } }),
   generate_recurring_charges: () => ({}),
   notify_stuck_orders: () => ({}),
@@ -171,6 +176,22 @@ describe.skipIf(!hasDbEnv)("security matrix", () => {
         expect(error?.code, name).toBe("42501");
       }
     }
+  });
+
+  it("the sign-in throttle counts attempts per key for the service role", async () => {
+    const key = `test:${randomUUID()}`;
+    const other = `test:${randomUUID()}`;
+    const counts = async () => {
+      const { data, error } = await f.service.rpc("auth_attempt_counts", { p_keys: [key, other], p_window_seconds: 60 });
+      if (error) throw error;
+      return Object.fromEntries((data ?? []).map((r) => [r.key, r.attempts]));
+    };
+    expect(await counts()).toEqual({ [key]: 0, [other]: 0 });
+    for (let i = 0; i < 2; i++) {
+      const { error } = await f.service.rpc("auth_record_attempt", { p_keys: [key] });
+      expect(error).toBeNull();
+    }
+    expect(await counts()).toEqual({ [key]: 2, [other]: 0 });
   });
 
   it("a secretary is refused every super-admin RPC (advisor 0029)", async () => {
