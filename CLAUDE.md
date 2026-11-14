@@ -37,5 +37,6 @@ Multi-store ERP + BI for an optician (Morocco). Next.js App Router + Supabase + 
 - Small steps; after each step run `npm run typecheck && npm run lint && npm run test`.
 - For UI work, check the page in the browser (desktop + mobile width) against the demo.
 - Conventional commits at the end of each working step (`feat(orders): …`). Don't push unless asked.
+- Branches: work on `develop`; `main` is production and only changes through a PR `develop → main` (`docs/DEPLOY.md`).
 - If the spec is ambiguous or you must deviate, ask me — and update `docs/SPEC.md` in the same change.
 - Keep this file short; put details in `docs/`.

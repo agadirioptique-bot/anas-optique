@@ -6,6 +6,18 @@ Development → dev database. Do the steps in order the first time; afterwards a
 
 Each step ends with a **Check**.
 
+**Repository and branches** — `github.com/agadirioptique-bot/anas-optique` (private, owned by the
+optician's account; the developers are collaborators).
+
+| Branch | Role | Vercel | Supabase |
+|---|---|---|---|
+| `develop` | day-to-day work (push here, or to a feature branch merged into it) | Preview deployments | dev |
+| `main` | **production**, changed only by a pull request `develop → main` | Production branch | prod |
+
+A release: §1 (migrations to prod, if any) → pull request `develop → main` → **merged from the optician's
+GitHub account** with *Create a merge commit* (not squash). On Vercel Hobby only commits authored by the
+account owner deploy, so the merge commit is what triggers the production deployment.
+
 ---
 
 ## 1. Push the migrations to opticor-prod
