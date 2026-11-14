@@ -50,7 +50,7 @@ export interface Fixtures {
   requiredFields: Record<string, unknown>;
   /** A frame category created for this run (starts with 0 stock everywhere); archived by cleanup(). */
   newFrameCategory(label: string): Promise<string>;
-  /** Archives what the run created so it doesn't show up in the app on dev. */
+  /** Archives what the run created so it doesn't show up in the app on dev, and puts the test stores back as found. */
   cleanup(): Promise<void>;
   /** Unique slip number for this run. */
   nextSlip(): number;
@@ -73,6 +73,30 @@ export async function ensureStore(service: Db, prefix: string, name: string): Pr
   const { data: created, error } = await service.from("stores").insert({ prefix, name, kind: "store" }).select("id").single();
   if (error) throw error;
   return created.id;
+}
+
+/**
+ * A test store has to be active (orders) with an open charge location (charges) while tests use it.
+ * Someone may have switched it off on dev to hide it in the app: this opens it and returns a function
+ * that puts back exactly what it changed.
+ */
+export async function openTestStore(service: Db, storeId: string): Promise<() => Promise<void>> {
+  const { data: store, error } = await service.from("stores").select("is_active").eq("id", storeId).single();
+  if (error) throw error;
+  const { data: location } = await service.from("charge_locations").select("id, is_archived").eq("store_id", storeId).maybeSingle();
+  const reactivated = !store.is_active;
+  const unarchived = location?.is_archived ? location.id : null;
+  if (reactivated) await must(service.from("stores").update({ is_active: true }).eq("id", storeId));
+  if (unarchived) await must(service.from("charge_locations").update({ is_archived: false }).eq("id", unarchived));
+  return async () => {
+    if (reactivated) await must(service.from("stores").update({ is_active: false }).eq("id", storeId));
+    if (unarchived) await must(service.from("charge_locations").update({ is_archived: true }).eq("id", unarchived));
+  };
+}
+
+async function must(query: PromiseLike<{ error: unknown }>): Promise<void> {
+  const { error } = await query;
+  if (error) throw error;
 }
 
 export async function ensureUser(
@@ -139,6 +163,7 @@ export async function setupFixtures(): Promise<Fixtures> {
   const service = createAdminClient();
   const storeA = await ensureStore(service, TEST_STORES[0].prefix, TEST_STORES[0].name);
   const storeB = await ensureStore(service, TEST_STORES[1].prefix, TEST_STORES[1].name);
+  const restoreStores = [await openTestStore(service, storeA), await openTestStore(service, storeB)];
 
   const password = randomBytes(24).toString("base64url");
   const secretaryId = await ensureUser(service, TEST_USERS.secretary, storeA, password);
@@ -197,6 +222,7 @@ export async function setupFixtures(): Promise<Fixtures> {
     async cleanup() {
       if (created.length) await admin.from("product_categories").update({ is_archived: true }).in("id", created);
       await admin.from("suppliers").update({ is_archived: true }).eq("id", ids.supplier);
+      for (const restore of restoreStores) await restore();
     },
     nextSlip: () => ++slip,
     newPhone: () => `+2126${randomInt(10_000_000, 99_999_999)}`,

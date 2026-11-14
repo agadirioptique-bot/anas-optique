@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Database } from "@/types/database";
-import { ensureStore, expectDbError, hasDbEnv, setupFixtures, type Db, type Fixtures } from "./fixtures";
+import { ensureStore, expectDbError, hasDbEnv, openTestStore, setupFixtures, type Db, type Fixtures } from "./fixtures";
 
 type OrderInsert = Omit<Database["public"]["Tables"]["orders"]["Insert"], "store_id" | "slip_number">;
 
@@ -26,6 +26,7 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
   let f: Fixtures;
   let tsk: string;
   let lab: string;
+  let restoreTsk: () => Promise<void>;
   let ids: { o1: string; o2: string; o3: string; o4: string };
 
   const JAN = { from: "2001-01-01", to: "2001-01-31" };
@@ -61,8 +62,8 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     f = await setupFixtures();
     const s = f.service;
     tsk = await ensureStore(s, "TSK", "Test KPI");
-    // Active only while the tests run (orders need an active store); hidden from the app otherwise.
-    await s.from("stores").update({ is_active: true }).eq("id", tsk);
+    // Active (orders) with an open charge location (charges) only while the tests run; put back as found.
+    restoreTsk = await openTestStore(s, tsk);
     lab = (await s.from("stores").select("id").eq("kind", "lab").eq("is_active", true).single()).data!.id;
     const one = async <T,>(p: PromiseLike<{ data: T; error: unknown }>): Promise<NonNullable<T>> => {
       const { data, error } = await p;
@@ -191,7 +192,8 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
   afterAll(async () => {
     if (!tsk || !f) return;
     await removeFixture();
-    await f.service.from("stores").update({ is_active: false }).eq("id", tsk);
+    await restoreTsk?.();
+    await f.cleanup();
   });
 
   describe("store TSK, January 2001", () => {

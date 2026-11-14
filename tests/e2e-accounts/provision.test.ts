@@ -3,7 +3,7 @@ import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, it } from "vitest";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { ensureStore, ensureUser, hasDbEnv, signIn } from "../db/fixtures";
+import { ensureStore, ensureUser, hasDbEnv, openTestStore, signIn } from "../db/fixtures";
 
 /**
  * `npm run e2e:accounts` — DEV only. Resets the Playwright users (TSA secretary + super admin, and a
@@ -11,11 +11,13 @@ import { ensureStore, ensureUser, hasDbEnv, signIn } from "../db/fixtures";
  * fresh random password and writes them to the git-ignored e2e/.auth/accounts.json. Also makes sure
  * TSA has a stocked frame category for the order flow, and creates a pending recurring charge for
  * the charges flow, and cancels the open orders earlier runs left in the test stores (TSA/TSB only)
- * so the board doesn't fill up. Nobody types or sees the passwords.
+ * so the board doesn't fill up. Nobody types or sees the passwords. TSA/TSB are left active (with their
+ * charge location open) for the Playwright run, even if someone switched them off on dev.
  */
 it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   const service = createAdminClient();
   const storeA = await ensureStore(service, "TSA", "Test Succursale A");
+  await openTestStore(service, storeA);
   const password = randomBytes(24).toString("base64url");
   const secretary = { email: "opticor-e2e-secretary@example.com", fullName: "E2E Secrétaire", role: "secretary" as const };
   const admin = { email: "opticor-e2e-admin@example.com", fullName: "E2E Super Admin", role: "super_admin" as const };
@@ -25,6 +27,7 @@ it.skipIf(!hasDbEnv)("provisions the Playwright accounts", async () => {
   const mover = { email: "opticor-e2e-mover@example.com", fullName: "E2E Secrétaire mobile", role: "secretary" as const };
   await ensureUser(service, mover, storeA, password);
   const storeB = await ensureStore(service, "TSB", "Test Succursale B");
+  await openTestStore(service, storeB);
 
   // A frame category with stock at TSA (topped up each run).
   const adminDb = await signIn(admin.email, password);
