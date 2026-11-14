@@ -175,6 +175,24 @@
       }
     }
   },
+  "notifyAdmin": {
+    "button": "Notify the admin",
+    "title": {
+      "confirmed": "Notify the admin: order confirmed",
+      "in_store": "Notify the admin: arrived in store"
+    },
+    "description": "Order {number} · {client}",
+    "hint": "WhatsApp opens with the message ready: you just have to send it.",
+    "sendTo": "Notify {name} on WhatsApp",
+    "later": "Later",
+    "close": "Close",
+    "loading": "Loading…",
+    "noAdmins": "No admin has a WhatsApp number. Ask the optician to add it in Settings › Users.",
+    "messages": {
+      "confirmed": "Hello {admin}, new order {number} confirmed at {store}: {client}, total {total}, deposit {paid}.",
+      "in_store": "Hello {admin}, order {number} ({client}) has arrived at {store}.{hasBalance, select, yes { Balance due: {balance}.} other {}}"
+    }
+  },
   "unauthorized": {
     "title": "Access denied",
     "body": "Your role does not give access to this page. If you think this is a mistake, ask the optician to check your permissions.",
@@ -248,6 +266,7 @@
     "noStock": "Not enough stock in this store. Ask for a transfer.",
     "duplicateSlip": "This slip number already exists in this store.",
     "phoneExists": "A client already exists with this phone number.",
+    "phoneInvalid": "This phone number is not valid.",
     "requiredFieldMissing": "A required field is empty.",
     "invalidPrescription": "The prescription is invalid (check the axes and values).",
     "totalBelowItems": "The total must be at least the price of the products.",
@@ -370,7 +389,12 @@
       "deactivate": "Deactivate",
       "deactivated": "{name} deactivated",
       "activated": "{name} reactivated",
-      "you": "you"
+      "you": "you",
+      "whatsapp": "WhatsApp",
+      "whatsappPlaceholder": "06 12 34 56 78",
+      "whatsappHint": "Secretaries use it to notify you on WhatsApp (order confirmed, arrived in store).",
+      "whatsappSaved": "{name}'s WhatsApp number saved",
+      "whatsappCleared": "{name}'s WhatsApp number removed"
     },
     "lists": {
       "title": "Dropdown lists",

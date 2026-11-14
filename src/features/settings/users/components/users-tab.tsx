@@ -4,19 +4,22 @@ import { Loader2, RotateCw, UserPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { WhatsAppIcon } from "@/components/shared/badges";
 import { ConfirmDialog } from "@/components/shared/dialogs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import type { StoreSummary } from "@/features/auth/types";
 import { useRouter } from "@/i18n/navigation";
 import type { ActionResult } from "@/lib/errors";
 import { initials } from "@/lib/format";
+import { formatPhone, formatPhoneTyping } from "@/lib/phone";
 import { ROLES, type AppRole } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
-import { resendInvite, updateUserAccess } from "../actions";
+import { resendInvite, setUserWhatsapp, updateUserAccess } from "../actions";
 import type { UserRow, UserStatus } from "../queries";
 import { InviteDialog } from "./invite-dialog";
 
@@ -30,6 +33,62 @@ function StatusPill({ status }: { status: UserStatus }) {
     active: "bg-success/10 text-success-text",
   }[status];
   return <span className={cn("inline-flex h-6 items-center rounded-full px-2.5 text-xs font-medium whitespace-nowrap", tone)}>{t(status)}</span>;
+}
+
+/** A super admin's WhatsApp number: secretaries notify him on it. Saved when the field is left. */
+function WhatsappField({ user }: { user: UserRow }) {
+  const t = useTranslations("settings.users");
+  const te = useTranslations("errors");
+  const router = useRouter();
+  const [value, setValue] = useState(formatPhone(user.whatsapp));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const id = `whatsapp-${user.id}`;
+
+  const save = async () => {
+    if (value.trim() === formatPhone(user.whatsapp)) return;
+    setSaving(true);
+    const result = await setUserWhatsapp({ userId: user.id, phone: value });
+    setSaving(false);
+    if (!result.ok) {
+      setError(te(result.error));
+      return;
+    }
+    setError(null);
+    setValue(formatPhone(result.data.whatsapp));
+    toast.success(result.data.whatsapp ? t("whatsappSaved", { name: user.fullName }) : t("whatsappCleared", { name: user.fullName }));
+    router.refresh();
+  };
+
+  return (
+    <div className="space-y-1 lg:col-span-5 lg:pl-[3.25rem]">
+      <label htmlFor={id} className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+        <WhatsAppIcon className="size-3.5 text-whatsapp-text" />
+        {t("whatsapp")}
+      </label>
+      <div className="flex max-w-xs items-center gap-2">
+        <Input
+          id={id}
+          type="tel"
+          inputMode="tel"
+          autoComplete="off"
+          className="num"
+          placeholder={t("whatsappPlaceholder")}
+          value={value}
+          aria-invalid={!!error}
+          aria-describedby={`${id}-hint`}
+          onChange={(e) => setValue(formatPhoneTyping(e.target.value))}
+          onBlur={() => void save()}
+          onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+          data-testid={`user-whatsapp-${user.email}`}
+        />
+        {saving && <Loader2 className="size-4 animate-spin text-muted-foreground" aria-hidden="true" />}
+      </div>
+      <p id={`${id}-hint`} className={cn("text-xs", error ? "text-destructive" : "text-muted-foreground")}>
+        {error ?? t("whatsappHint")}
+      </p>
+    </div>
+  );
 }
 
 export function UsersTab({ users, stores, currentUserId }: { users: UserRow[]; stores: StoreSummary[]; currentUserId: string }) {
@@ -146,6 +205,7 @@ export function UsersTab({ users, stores, currentUserId }: { users: UserRow[]; s
                     onCheckedChange={(v) => (v ? update(u, { isActive: true }, t("activated", { name: u.fullName })) : setDeactivating(u))}
                   />
                 </label>
+                {u.role === "super_admin" && <WhatsappField user={u} />}
               </li>
             );
           })}

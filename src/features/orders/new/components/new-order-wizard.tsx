@@ -6,16 +6,19 @@ import { useTranslations } from "next-intl";
 import { useMemo, useRef, useState } from "react";
 import { FormProvider, useForm, useWatch, type FieldPath } from "react-hook-form";
 import { toast } from "sonner";
+import { WhatsAppIcon } from "@/components/shared/badges";
 import { ResponsiveDialog } from "@/components/shared/dialogs";
 import { PageHeader } from "@/components/shared/page";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useShell } from "@/components/layout/shell-context";
 import { Link } from "@/i18n/navigation";
 import type { ErrorCode } from "@/lib/errors";
 import { useFormat } from "@/lib/use-format";
 import { cn } from "@/lib/utils";
 import { uploadPrescriptionPhoto } from "@/features/orders/lib/photo-upload";
+import { NotifyAdminDialog } from "@/features/orders/components/notify-admin";
 import { createOrder } from "../actions";
 import type { NewOrderData } from "../data";
 import { buildOrderSchema, defaultValues, discountAmount, STEP_FIELDS, STEPS, toPayload, type OrderFormValues } from "../form";
@@ -67,6 +70,8 @@ interface Created {
   displayNumber: string;
   clientName: string;
   storeName: string;
+  total: number;
+  paid: number;
   reste: number;
   photo: "none" | "uploading" | "done" | "failed";
 }
@@ -74,6 +79,11 @@ interface Created {
 function SuccessScreen({ created, onAnother }: { created: Created; onAnother: () => void }) {
   const t = useTranslations("wizard");
   const f = useFormat();
+  // A secretary is asked right away to tell the optician (she can skip it); the button stays.
+  const tn = useTranslations("notifyAdmin");
+  const isSecretary = useShell().user.role !== "super_admin";
+  const [notifyOpen, setNotifyOpen] = useState(isSecretary);
+  const notifyOrder = { displayNumber: created.displayNumber, clientName: created.clientName, storeName: created.storeName, total: created.total, paid: created.paid, balance: created.reste };
   return (
     <div className="mx-auto flex max-w-lg flex-col items-center py-10 text-center sm:py-16" role="status" aria-live="polite" data-testid="order-created">
       <svg viewBox="0 0 52 52" className="size-24 text-success" aria-hidden="true">
@@ -101,6 +111,15 @@ function SuccessScreen({ created, onAnother }: { created: Created; onAnother: ()
           <Link href={`/orders/${created.orderId}`}>{t("viewOrder")}</Link>
         </Button>
       </div>
+      {isSecretary && (
+        <>
+          <Button variant="ghost" className="mt-3" onClick={() => setNotifyOpen(true)} data-testid="notify-admin-open">
+            <WhatsAppIcon className="text-whatsapp-text" />
+            {tn("button")}
+          </Button>
+          <NotifyAdminDialog open={notifyOpen} onOpenChange={setNotifyOpen} step="confirmed" order={notifyOrder} />
+        </>
+      )}
     </div>
   );
 }
@@ -171,6 +190,8 @@ function Wizard() {
           displayNumber: result.displayNumber,
           clientName: values.clientMode === "existing" ? (ctx.client?.full_name ?? "") : values.newClient.fullName.trim(),
           storeName: store?.name ?? "",
+          total: Math.max(0, (values.total ?? 0) - discount),
+          paid: values.deposit ?? 0,
           reste,
           photo: photo ? "uploading" : "none",
         };
