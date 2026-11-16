@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EMPTY_EYE, normalizeEye, validatePrescription, type EyePrescription } from "@/features/orders/lib/prescription";
+import { EMPTY_EYE, normalizeEye, RX_FIELDS, validatePrescription, type EyePrescription } from "@/features/orders/lib/prescription";
 import { normalizePhone } from "@/lib/phone";
 import type { NewOrderData } from "./data";
 import type { CreateOrderPayload } from "./schemas";
@@ -43,6 +43,19 @@ export const STEP_FIELDS = [
   ["od", "og", "fieldValues"],
   ["frameCategoryId", "items", "total", "deposit", "paymentMethodId"],
 ] as const;
+
+const RX_PATHS = (["od", "og"] as const).flatMap((eye) => RX_FIELDS.map((f) => `${eye}.${f}`));
+
+/**
+ * Paths to validate before leaving a step, always down to the leaves ("od.axis", "fieldValues.distance").
+ * react-hook-form's trigger() drops the error of an object path that has no registered input ("od",
+ * "fieldValues") while still reporting the step as invalid: the step would refuse to move on and show
+ * no message.
+ */
+export function stepFields(step: number, data: Pick<NewOrderData, "fields">): string[] {
+  if (step === 1) return [...RX_PATHS, ...data.fields.map((f) => `fieldValues.${f.key}`)];
+  return [...(STEP_FIELDS[step] ?? [])];
+}
 
 export function defaultValues(data: NewOrderData): OrderFormValues {
   return {
