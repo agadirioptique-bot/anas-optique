@@ -89,6 +89,19 @@ Dashboard → **Authentication** → **Emails** → **SMTP Settings** → Enable
 
 **Check:** invite yourself (§5); the email arrives from `no-reply@…`, not from Supabase.
 
+**Free alternative (in use since 2026-11-16): the optician's Gmail.** No domain needed; Gmail sends about
+500 emails a day, far more than invitations and resets need.
+1. Google account → **Security** → **2-Step Verification: ON** (app passwords need it).
+2. <https://myaccount.google.com/apppasswords> → name `Supabase OPTICOR` → **Create** → copy the
+   16-character password (shown once; it stays in Supabase, never in the repo, Vercel or a chat).
+3. Supabase SMTP Settings: sender email = that Gmail address (Gmail rewrites any other sender), sender
+   name `OPTICOR`, host `smtp.gmail.com`, port `465`, username = the Gmail address, password = the app
+   password.
+
+Custom SMTP is required anyway: without it Supabase only sends to the organization's members and does
+not let you edit the templates, and the default templates link to Supabase's own verify page, which
+`/auth/confirm` does not accept.
+
 ### 3.3 Access token hook (role + store in the JWT)
 The migration `20261103111907_auth.sql` creates `public.custom_access_token_hook` and grants it to
 `supabase_auth_admin`. Enable it: **Authentication** → **Hooks** → **Add hook** → *Customize Access Token
@@ -101,8 +114,9 @@ Without it every signed-in user is treated as having no role: RLS hides everythi
 token refresh (≤ 1 h) or by signing in again.
 
 ### 3.4 Email templates (French)
-Dashboard → **Authentication** → **Emails** → **Templates**. The links use the token-hash flow handled by
-`/auth/confirm`, which then opens the page in the user's language.
+Dashboard → **Authentication** → **Emails** → **Templates** (editable only once custom SMTP is on, §3.2).
+The links use the token-hash flow handled by `/auth/confirm`, which then opens the page in the user's
+language. Paste the bodies in the **Source** tab, not Preview.
 
 #### Invite user
 
