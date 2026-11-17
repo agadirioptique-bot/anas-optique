@@ -1,7 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createFormControl, type FieldPath } from "react-hook-form";
 import { describe, expect, it } from "vitest";
 import { createOrderPayloadSchema } from "./schemas";
 import type { NewOrderData } from "./data";
-import { buildOrderSchema, defaultValues, discountAmount, displayNumber, itemsPrice, toPayload, type OrderFormValues } from "./form";
+import { buildOrderSchema, defaultValues, discountAmount, displayNumber, itemsPrice, stepFields, toPayload, type OrderFormValues } from "./form";
 
 const STORE = "a75dbe63-27ca-40ce-be75-108492cfe040";
 const FRAME = "11111111-1111-4111-8111-111111111111";
@@ -88,6 +90,23 @@ describe("order form", () => {
     expect(payload.custom_values).toEqual({ distance: 40 });
     expect(payload.deposit).toEqual({ amount: 500, method_id: CASH });
     expect(toPayload(filled({ ownFrame: true }), data).items).toEqual([{ category_id: LENS, qty: 2 }]);
+  });
+
+  it("shows the measurement errors that block step 2 (CYL without AXE, required field)", async () => {
+    const form = createFormControl<OrderFormValues>({ resolver: zodResolver(schema()), defaultValues: filled() });
+    form.setValue("od", { sph: -0.5, cyl: -0.5, axis: null, add: null });
+    form.setValue("fieldValues", { ep_re: "", doctor_name: "", distance: "" });
+
+    const ok = await form.trigger(stepFields(1, data) as FieldPath<OrderFormValues>[]);
+
+    expect(ok).toBe(false);
+    // Both errors must reach formState, or the wizard says "check the flagged fields" with none flagged.
+    expect(form.control._formState.errors.od?.axis?.message).toBe("rx.errors.axisRequired");
+    expect(form.control._formState.errors.fieldValues?.distance?.message).toBe("wizard.fieldRequired");
+    expect(stepFields(1, data)).toEqual([
+      "od.sph", "od.cyl", "od.axis", "od.add", "og.sph", "og.cyl", "og.axis", "og.add",
+      "fieldValues.ep_re", "fieldValues.doctor_name", "fieldValues.distance",
+    ]);
   });
 
   it("formats the display number like the database", () => {

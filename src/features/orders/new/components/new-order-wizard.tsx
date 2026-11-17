@@ -21,7 +21,7 @@ import { uploadPrescriptionPhoto } from "@/features/orders/lib/photo-upload";
 import { NotifyAdminDialog } from "@/features/orders/components/notify-admin";
 import { createOrder } from "../actions";
 import type { NewOrderData } from "../data";
-import { buildOrderSchema, defaultValues, discountAmount, STEP_FIELDS, STEPS, toPayload, type OrderFormValues } from "../form";
+import { buildOrderSchema, defaultValues, discountAmount, STEP_FIELDS, stepFields, STEPS, toPayload, type OrderFormValues } from "../form";
 import { NewOrderProvider, useNewOrder } from "./context";
 import { OrderSummary } from "./order-summary";
 import { StepClient } from "./step-client";
@@ -162,7 +162,7 @@ function Wizard() {
   };
 
   const next = async () => {
-    const ok = await form.trigger(STEP_FIELDS[step] as unknown as FieldPath<OrderFormValues>[], { shouldFocus: true });
+    const ok = await form.trigger(stepFields(step, data) as FieldPath<OrderFormValues>[], { shouldFocus: true });
     if (!ok) {
       toast.error(t("wizard.fixErrors"));
       return;
