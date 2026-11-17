@@ -13,7 +13,7 @@ export interface Labeled {
 export interface ClientForOrder {
   id: string;
   full_name: string;
-  phone_e164: string;
+  phone_e164: string | null;
   has_whatsapp: boolean;
   is_loyal: boolean;
   loyal_since: string | null;

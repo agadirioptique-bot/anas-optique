@@ -16,19 +16,23 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
 import { formatPhone, formatPhoneTyping, normalizePhone } from "@/lib/phone";
-import { createClientRecord, findSimilarClients, updateClientRecord } from "../actions";
+import { createClientRecord, findClientsByPhone, findSimilarClients, updateClientRecord } from "../actions";
 
 export interface EditableClient {
   id: string;
   full_name: string;
-  phone_e164: string;
+  phone_e164: string | null;
   has_whatsapp: boolean;
   notes: string | null;
 }
 
-type Similar = { id: string; full_name: string; phone_e164: string };
+type Similar = { id: string; full_name: string; phone_e164: string | null };
 
-/** Create or edit a client (contact fields). New clients get a "similar name" warning. */
+/**
+ * Create or edit a client (contact fields). New clients get a "similar name" warning; a phone
+ * already used by someone else (a family) is a warning, not an error (SPEC §5.3). The phone is
+ * required, except when editing an imported client that never had one.
+ */
 export function ClientFormDialog({
   open,
   onOpenChange,
@@ -41,15 +45,16 @@ export function ClientFormDialog({
   onSaved?: (id: string) => void;
 }) {
   const t = useTranslations();
+  const phoneOptional = !!client && client.phone_e164 === null;
   const schema = useMemo(
     () =>
       z.object({
         fullName: z.string().trim().min(2, { message: t("clients.nameRequired") }),
-        phone: z.string().refine((v) => normalizePhone(v) !== null, { message: t("clients.phoneInvalid") }),
+        phone: z.string().refine((v) => (phoneOptional && !v.trim()) || normalizePhone(v) !== null, { message: t("clients.phoneInvalid") }),
         hasWhatsapp: z.boolean(),
         notes: z.string().max(500),
       }),
-    [t],
+    [t, phoneOptional],
   );
   type Values = z.infer<typeof schema>;
   const form = useForm<Values>({
@@ -66,6 +71,9 @@ export function ClientFormDialog({
   const phone = useWatch({ control: form.control, name: "phone" });
   const fullName = useWatch({ control: form.control, name: "fullName" });
   const [similar, setSimilar] = useState<Similar[]>([]);
+  const [samePhone, setSamePhone] = useState<{ phone: string; clients: Similar[] } | null>(null);
+  const e164 = normalizePhone(phone);
+  const sharedWith = samePhone && samePhone.phone === e164 ? samePhone.clients.filter((c) => c.id !== client?.id) : [];
 
   // Similar names (new clients only), checked a moment after typing stops.
   useEffect(() => {
@@ -75,10 +83,20 @@ export function ClientFormDialog({
     return () => clearTimeout(timer);
   }, [fullName, client, open]);
 
+  // Other clients on the same number (shared family phone): shown, never blocking.
+  useEffect(() => {
+    if (!open || !e164 || e164 === client?.phone_e164) return;
+    let alive = true;
+    void findClientsByPhone(e164).then((rows) => alive && setSamePhone({ phone: e164, clients: rows }));
+    return () => {
+      alive = false;
+    };
+  }, [e164, open, client?.phone_e164]);
+
   const submit = form.handleSubmit(async (v) => {
     const result = client ? await updateClientRecord({ id: client.id, ...v }) : await createClientRecord(v);
     if (!result.ok) {
-      if (result.error === "phoneExists" || result.error === "invalidInput") form.setError("phone", { message: t(`errors.${result.error}`) });
+      if (result.error === "phoneExists" || result.error === "phoneRequired" || result.error === "invalidInput") form.setError("phone", { message: t(`errors.${result.error}`) });
       else toast.error(t(`errors.${result.error}`));
       return;
     }
@@ -121,7 +139,7 @@ export function ClientFormDialog({
                     <Link href={`/clients/${s.id}`} className="underline underline-offset-2" onClick={() => onOpenChange(false)}>
                       {s.full_name}
                     </Link>{" "}
-                    <span className="num">· {formatPhone(s.phone_e164)}</span>
+                    {s.phone_e164 && <span className="num">· {formatPhone(s.phone_e164)}</span>}
                   </li>
                 ))}
               </ul>
@@ -129,7 +147,10 @@ export function ClientFormDialog({
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="client-phone">{t("wizard.phone")}</Label>
+          <Label htmlFor="client-phone">
+            {t("wizard.phone")}
+            {phoneOptional && <span className="font-normal text-muted-foreground"> {t("clients.phoneOptional")}</span>}
+          </Label>
           <Input
             id="client-phone"
             type="tel"
@@ -141,6 +162,24 @@ export function ClientFormDialog({
             onChange={(e) => form.setValue("phone", formatPhoneTyping(e.target.value), { shouldValidate: form.formState.isSubmitted })}
           />
           {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
+          {sharedWith.length > 0 && (
+            <div className="space-y-1 rounded-xl bg-attention/10 p-3 text-sm text-attention-text" role="status">
+              <p className="flex items-center gap-1.5 font-medium">
+                <AlertTriangle className="size-4" aria-hidden="true" />
+                {t("clients.samePhoneTitle")}
+              </p>
+              <ul className="space-y-0.5">
+                {sharedWith.map((s) => (
+                  <li key={s.id}>
+                    <Link href={`/clients/${s.id}`} className="underline underline-offset-2" onClick={() => onOpenChange(false)}>
+                      {s.full_name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-xs">{t("clients.samePhoneHint")}</p>
+            </div>
+          )}
         </div>
         <label htmlFor="client-whatsapp" className="flex cursor-pointer items-center gap-3 rounded-xl border p-3">
           <WhatsAppIcon className="size-5 text-whatsapp" />

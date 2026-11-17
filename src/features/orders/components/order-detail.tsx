@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Ban, Banknote, BadgePercent, Camera, ExternalLink, Glasses, Loader2, MoreHorizontal, Phone, Plus, ReceiptText } from "lucide-react";
+import { ArrowLeft, ArrowRight, Ban, Banknote, BadgePercent, Camera, ExternalLink, Glasses, History, Loader2, MoreHorizontal, Phone, Plus, ReceiptText } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -99,8 +99,10 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
   const next = nextStatus(row.status);
   const back = isSuperAdmin ? previousStatus(row.status) : null;
   const whatsapp = row.status === "in_store" ? readyWhatsAppHref(row) : null;
-  const active = row.status !== "cancelled" && row.status !== "delivered";
-  const canCollect = row.status !== "cancelled" && row.balance > 0;
+  // Imported history (SPEC §12): read only, no action at all.
+  const legacy = order.legacy;
+  const active = !legacy && row.status !== "cancelled" && row.status !== "delivered";
+  const canCollect = !legacy && row.status !== "cancelled" && row.balance > 0;
   // A secretary tells the optician about a confirmed or arrived order (SPEC §8).
   const notifyStep = isSuperAdmin ? null : adminNotifyStep(row.status);
   const canDiscount = isSuperAdmin && active && row.balance > 0 && order.discountSource !== "client_pending";
@@ -157,7 +159,7 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
                 <ArrowRight />
               </Button>
             )}
-            {row.status !== "cancelled" && (canCollect || isSuperAdmin) && (
+            {!legacy && row.status !== "cancelled" && (canCollect || isSuperAdmin) && (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon" aria-label={t("detail.actions")} data-testid="order-menu">
@@ -202,6 +204,19 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
           <StatusBadge status={row.status} />
         </div>
       </PageHeader>
+
+      {legacy && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl bg-muted px-4 py-3 text-sm" data-testid="legacy-banner">
+          <History className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <div className="space-y-0.5">
+            <p className="font-medium">{t("detail.legacyTitle")}</p>
+            <p className="text-muted-foreground">
+              {t("detail.legacyBody", { row: legacy.row ?? "—", carnet: legacy.carnet ?? "—" })}
+              {!legacy.dateExact && ` ${t("detail.legacyDateEstimated")}`}
+            </p>
+          </div>
+        </div>
+      )}
 
       {row.status === "cancelled" && (
         <p className="mb-6 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive-text">
@@ -274,6 +289,8 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
               </dl>
             </CardContent>
           </Card>
+
+          {legacy && <LegacyCard legacy={legacy} />}
 
           <Card>
             <CardHeader>
@@ -390,12 +407,14 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
                   {data.client.notes && <p className="mt-1 text-sm text-muted-foreground">{data.client.notes}</p>}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button asChild variant="outline" size="sm">
-                    <a href={`tel:${data.client.phone_e164}`}>
-                      <Phone />
-                      <span className="num">{formatPhone(data.client.phone_e164)}</span>
-                    </a>
-                  </Button>
+                  {data.client.phone_e164 && (
+                    <Button asChild variant="outline" size="sm">
+                      <a href={`tel:${data.client.phone_e164}`}>
+                        <Phone />
+                        <span className="num">{formatPhone(data.client.phone_e164)}</span>
+                      </a>
+                    </Button>
+                  )}
                   <Button asChild variant="ghost" size="sm">
                     <Link href={`/clients/${data.client.id}`}>
                       <ExternalLink />
@@ -410,6 +429,41 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
         </div>
       </div>
     </>
+  );
+}
+
+const LEGACY_FIELDS = ["nom", "tel", "od", "og", "add", "traitement", "prix", "avance", "reste"] as const;
+
+/** The original Excel line of an imported order, as typed, with what the import flagged. */
+function LegacyCard({ legacy }: { legacy: NonNullable<OrderDetailData["order"]["legacy"]> }) {
+  const t = useTranslations("detail");
+  const f = useFormat();
+  const rest = legacy.restOrigin === "POYE" ? t("legacyRestPaid") : legacy.restOrigin !== null ? f.money(legacy.restOrigin) : null;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("legacyOriginal")}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 text-sm">
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
+          {LEGACY_FIELDS.filter((k) => legacy.raw[k] || (k === "reste" && rest)).map((k) => (
+            <Info key={k} label={t(`legacyFields.${k}`)}>
+              <span className="num break-words">{k === "reste" && rest ? `${legacy.raw[k] ?? ""}${legacy.raw[k] ? " · " : ""}${rest}` : legacy.raw[k]}</span>
+            </Info>
+          ))}
+        </dl>
+        {legacy.anomalies.length > 0 && (
+          <div className="rounded-xl bg-attention/10 p-3 text-attention-text">
+            <p className="font-medium">{t("legacyAnomalies")}</p>
+            <ul className="mt-1 list-disc space-y-0.5 pl-5">
+              {legacy.anomalies.map((a) => (
+                <li key={a}>{a}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

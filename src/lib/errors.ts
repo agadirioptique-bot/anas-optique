@@ -28,6 +28,8 @@ export const ERROR_CODES = [
   "duplicateSlip",
   "phoneExists",
   "phoneInvalid",
+  "phoneRequired",
+  "legacyReadOnly",
   "requiredFieldMissing",
   "invalidPrescription",
   "totalBelowItems",

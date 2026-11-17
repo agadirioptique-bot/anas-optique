@@ -336,6 +336,7 @@ export type Database = {
           has_whatsapp: boolean
           id: string
           is_loyal: boolean
+          legacy_key: string | null
           loyal_since: string | null
           notes: string | null
           pending_discount_note: string | null
@@ -344,7 +345,7 @@ export type Database = {
             | Database["public"]["Enums"]["discount_type"]
             | null
           pending_discount_value: number | null
-          phone_e164: string
+          phone_e164: string | null
         }
         Insert: {
           created_at?: string
@@ -354,6 +355,7 @@ export type Database = {
           has_whatsapp?: boolean
           id?: string
           is_loyal?: boolean
+          legacy_key?: string | null
           loyal_since?: string | null
           notes?: string | null
           pending_discount_note?: string | null
@@ -362,7 +364,7 @@ export type Database = {
             | Database["public"]["Enums"]["discount_type"]
             | null
           pending_discount_value?: number | null
-          phone_e164: string
+          phone_e164?: string | null
         }
         Update: {
           created_at?: string
@@ -372,6 +374,7 @@ export type Database = {
           has_whatsapp?: boolean
           id?: string
           is_loyal?: boolean
+          legacy_key?: string | null
           loyal_since?: string | null
           notes?: string | null
           pending_discount_note?: string | null
@@ -380,7 +383,7 @@ export type Database = {
             | Database["public"]["Enums"]["discount_type"]
             | null
           pending_discount_value?: number | null
-          phone_e164?: string
+          phone_e164?: string | null
         }
         Relationships: [
           {
@@ -722,6 +725,7 @@ export type Database = {
           le_axis: number | null
           le_cyl: number | null
           le_sph: number | null
+          legacy: Json | null
           lens_details: string | null
           lens_revenue: number | null
           lens_type_id: string | null
@@ -763,6 +767,7 @@ export type Database = {
           le_axis?: number | null
           le_cyl?: number | null
           le_sph?: number | null
+          legacy?: Json | null
           lens_details?: string | null
           lens_revenue?: number | null
           lens_type_id?: string | null
@@ -804,6 +809,7 @@ export type Database = {
           le_axis?: number | null
           le_cyl?: number | null
           le_sph?: number | null
+          legacy?: Json | null
           lens_details?: string | null
           lens_revenue?: number | null
           lens_type_id?: string | null
@@ -2470,6 +2476,7 @@ export type Database = {
         Args: { p_final_payment?: Json; p_order_id: string }
         Returns: undefined
       }
+      finish_legacy_import: { Args: { p_prefix?: string }; Returns: Json }
       format_order_number: {
         Args: {
           booklet: string
@@ -2480,6 +2487,7 @@ export type Database = {
         Returns: string
       }
       generate_recurring_charges: { Args: { p_date?: string }; Returns: number }
+      import_legacy_batch: { Args: { p: Json }; Returns: Json }
       is_super_admin: { Args: never; Returns: boolean }
       is_valid_diopter: { Args: { value: number }; Returns: boolean }
       kpi_breakdown: {

@@ -32,3 +32,6 @@ e2e/.auth/
 
 # Lighthouse reports (npm run lighthouse)
 /reports/
+
+# Python (scripts/legacy-import)
+__pycache__/

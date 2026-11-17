@@ -7,6 +7,30 @@ import { toOrderRow } from "./queries";
 
 type Labeled = { label_fr: string; label_en: string };
 
+/** What the Excel import kept of the original line (orders.legacy, SPEC §12). */
+export interface LegacyInfo {
+  row: number | null;
+  carnet: string | null;
+  dateExact: boolean;
+  restOrigin: number | "POYE" | null;
+  raw: Record<string, string>;
+  anomalies: string[];
+}
+
+function toLegacy(value: unknown): LegacyInfo | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const v = value as Record<string, unknown>;
+  const raw = v.raw && typeof v.raw === "object" && !Array.isArray(v.raw) ? (v.raw as Record<string, unknown>) : {};
+  return {
+    row: typeof v.row === "number" ? v.row : null,
+    carnet: typeof v.carnet === "string" ? v.carnet : null,
+    dateExact: v.date_exact === true,
+    restOrigin: typeof v.reste_origine === "number" || v.reste_origine === "POYE" ? (v.reste_origine as number | "POYE") : null,
+    raw: Object.fromEntries(Object.entries(raw).filter(([, x]) => typeof x === "string" && x !== "")) as Record<string, string>,
+    anomalies: Array.isArray(v.anomalies) ? v.anomalies.filter((x): x is string => typeof x === "string") : [],
+  };
+}
+
 /** Everything the order page shows, read with the user's own client (RLS decides). */
 export async function getOrderDetail(id: string) {
   const db = await createClient();
@@ -62,6 +86,7 @@ export async function getOrderDetail(id: string) {
       cancelledAt: o.cancelled_at,
       createdBy: o.created_by ? (name.get(o.created_by) ?? null) : null,
       photoPath: o.prescription_photo_path,
+      legacy: o.source === "legacy" ? toLegacy(o.legacy) : null,
     },
     photoUrl: photo && "data" in photo ? (photo.data?.signedUrl ?? null) : null,
     items: (items.data ?? []).map((i) => ({
