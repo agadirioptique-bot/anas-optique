@@ -38,7 +38,8 @@ function PhotoCard({ data }: { data: OrderDetailData }) {
   const tw = useTranslations("wizard");
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const cancelled = data.row.status === "cancelled";
+  // No new photo on a cancelled order, nor on imported history (read only, SPEC §12).
+  const locked = data.row.status === "cancelled" || !!data.order.legacy;
   return (
     <Card>
       <CardHeader>
@@ -57,7 +58,7 @@ function PhotoCard({ data }: { data: OrderDetailData }) {
         ) : (
           <p className="text-sm text-muted-foreground">{t("noPhoto")}</p>
         )}
-        {!cancelled && (
+        {!locked && (
           <label className={cn("inline-flex h-9 cursor-pointer items-center gap-2 rounded-lg border px-3 text-sm font-medium hover:bg-muted", busy && "pointer-events-none opacity-60")}>
             {busy ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <Camera className="size-4" aria-hidden="true" />}
             {data.photoUrl ? t("replacePhoto") : t("addPhoto")}
@@ -438,7 +439,8 @@ const LEGACY_FIELDS = ["nom", "tel", "od", "og", "add", "traitement", "prix", "a
 function LegacyCard({ legacy }: { legacy: NonNullable<OrderDetailData["order"]["legacy"]> }) {
   const t = useTranslations("detail");
   const f = useFormat();
-  const rest = legacy.restOrigin === "POYE" ? t("legacyRestPaid") : legacy.restOrigin !== null ? f.money(legacy.restOrigin) : null;
+  // RESTE as typed; « POYE » (paid) spelled out.
+  const rest = legacy.restOrigin === "POYE" ? t("legacyRestPaid") : (legacy.raw.reste ?? (legacy.restOrigin !== null ? f.money(legacy.restOrigin) : null));
   return (
     <Card>
       <CardHeader>
@@ -448,7 +450,7 @@ function LegacyCard({ legacy }: { legacy: NonNullable<OrderDetailData["order"]["
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
           {LEGACY_FIELDS.filter((k) => legacy.raw[k] || (k === "reste" && rest)).map((k) => (
             <Info key={k} label={t(`legacyFields.${k}`)}>
-              <span className="num break-words">{k === "reste" && rest ? `${legacy.raw[k] ?? ""}${legacy.raw[k] ? " · " : ""}${rest}` : legacy.raw[k]}</span>
+              <span className="num break-words">{k === "reste" ? rest : legacy.raw[k]}</span>
             </Info>
           ))}
         </dl>
