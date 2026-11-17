@@ -76,14 +76,16 @@ const INVOKER: Record<string, Call> = {
 };
 
 /**
- * pg_cron jobs, the Auth hook and the sign-in throttle (service role, src/features/auth/throttle.ts):
- * no API role may call them, not even a super admin.
+ * pg_cron jobs, the Auth hook, the sign-in throttle (service role, src/features/auth/throttle.ts) and the
+ * Excel history import (SQL editor, SPEC §12): no API role may call them, not even a super admin.
  */
 const SERVER_ONLY: Record<string, Call> = {
   auth_attempt_counts: () => ({ p_keys: ["signIn:email:test"], p_window_seconds: 60 }),
   auth_record_attempt: () => ({ p_keys: ["signIn:email:test"] }),
   custom_access_token_hook: (f) => ({ event: { user_id: f.secretaryId, claims: {} } }),
+  finish_legacy_import: () => ({ p_prefix: "ZZZZZ" }),
   generate_recurring_charges: () => ({}),
+  import_legacy_batch: () => ({ p: { store: { name: "x", prefix: "ZZZZZ" }, clients: [], orders: [] } }),
   notify_stuck_orders: () => ({}),
 };
 
