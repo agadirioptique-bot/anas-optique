@@ -6,7 +6,7 @@ import type { ClientSort, SegmentFilter } from "./schemas";
 export interface ClientListRow {
   id: string;
   full_name: string;
-  phone_e164: string;
+  phone_e164: string | null;
   has_whatsapp: boolean;
   is_loyal: boolean;
   has_pending_discount: boolean;

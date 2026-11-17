@@ -265,7 +265,7 @@
     "secretaryStoreInvalid": "Une secrétaire doit être rattachée à une succursale active (pas au laboratoire).",
     "noStock": "Stock insuffisant dans cette succursale. Demandez un transfert.",
     "duplicateSlip": "Ce N° du bon existe déjà dans cette succursale.",
-    "phoneExists": "Un client existe déjà avec ce numéro de téléphone.",
+    "phoneExists": "Un client avec ce nom et ce numéro existe déjà.",
     "phoneInvalid": "Ce numéro de téléphone n'est pas valide.",
     "requiredFieldMissing": "Un champ obligatoire n’est pas rempli.",
     "invalidPrescription": "La prescription est invalide (vérifiez les axes et les valeurs).",
@@ -284,7 +284,9 @@
     "duplicateName": "Ce nom existe déjà.",
     "prefixTaken": "Ce préfixe est déjà utilisé par une autre succursale.",
     "labExists": "Il existe déjà un laboratoire.",
-    "inUse": "Cet élément est utilisé : archivez-le plutôt que de le supprimer."
+    "inUse": "Cet élément est utilisé : archivez-le plutôt que de le supprimer.",
+    "phoneRequired": "Le numéro de téléphone est obligatoire pour ce client.",
+    "legacyReadOnly": "Commande historique (importée du fichier Excel) : elle ne peut pas être modifiée."
   },
   "placeholder": {
     "title": "Bientôt disponible",
@@ -844,7 +846,7 @@
     "discountBanner": "Remise approuvée : {value}",
     "discountBannerHint": "Approuvée par l’opticien pour cette commande.",
     "applyDiscount": "Appliquer",
-    "phoneTaken": "Ce numéro appartient déjà à {name}.",
+    "phoneTaken": "Ce numéro est déjà utilisé par :",
     "photo": "Photo de l’ordonnance",
     "photoPick": "Prendre ou choisir une photo",
     "photoRemove": "Retirer la photo",
@@ -870,7 +872,8 @@
     "duplicateTitle": "Ce N° du bon existe déjà",
     "duplicateBody": "Le bon {number} a déjà été enregistré pour {client} le {date}. La commande n’a pas été créée.",
     "duplicateNotified": "L’opticien a été prévenu. Vérifiez le numéro sur la fiche papier.",
-    "duplicateFix": "Corriger le numéro"
+    "duplicateFix": "Corriger le numéro",
+    "phoneSharedHint": "Même famille ? Vous pouvez aussi créer un nouveau client avec ce numéro."
   },
   "detail": {
     "title": "Commande N° {number}",
@@ -923,7 +926,24 @@
     "prescriptionDate": "Date de l’ordonnance",
     "freeDiscount": "Remise libre",
     "discountFree": "dont remise libre −{amount}",
-    "discountClient": "dont remise client −{amount}"
+    "discountClient": "dont remise client −{amount}",
+    "legacyTitle": "Commande historique",
+    "legacyBody": "Importée du fichier Excel (ligne {row}, carnet {carnet}). Lecture seule.",
+    "legacyDateEstimated": "Date estimée d’après le N° du bon.",
+    "legacyOriginal": "Valeurs d’origine (fichier Excel)",
+    "legacyRestPaid": "payé (POYE)",
+    "legacyAnomalies": "À vérifier",
+    "legacyFields": {
+      "od": "OD",
+      "og": "OG",
+      "add": "ADD",
+      "traitement": "Traitement",
+      "prix": "Prix",
+      "avance": "Avance",
+      "reste": "Reste",
+      "nom": "Nom",
+      "tel": "Téléphone"
+    }
   },
   "collect": {
     "title": "Encaisser le reste",
@@ -1049,7 +1069,11 @@
       "clearTitle": "Retirer la remise approuvée ?",
       "clearBody": "La prochaine commande de ce client sera au prix normal.",
       "cleared": "Remise retirée"
-    }
+    },
+    "samePhoneTitle": "Ce numéro est aussi celui de :",
+    "samePhoneHint": "Vous pouvez quand même enregistrer (même famille, par exemple).",
+    "phoneOptional": "(facultatif : client importé sans numéro)",
+    "noPhone": "Pas de téléphone"
   },
   "money": {
     "resteShort": "Reste {amount}",

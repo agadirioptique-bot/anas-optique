@@ -10,7 +10,7 @@ import { createOrderPayloadSchema, photoSchema, slipCheckSchema } from "./schema
 export interface ClientHit {
   id: string;
   full_name: string;
-  phone_e164: string;
+  phone_e164: string | null;
   has_whatsapp: boolean;
   is_loyal: boolean;
   orders: number;

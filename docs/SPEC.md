@@ -163,13 +163,20 @@ transfer_lines  id, transfer_id, category_id, qty int > 0
 
 ```
 clients
-  id, full_name, phone_e164 text UNIQUE NOT NULL, has_whatsapp bool default true,
+  id, full_name, phone_e164 text null, has_whatsapp bool default true,
   first_store_id, notes,
   is_loyal bool default false, loyal_since timestamptz null,
   pending_discount_type ('percent' | 'amount') null, pending_discount_value numeric null,
   pending_discount_note text null, pending_discount_set_by uuid null,
   created_at, created_by
-  -- on create: warn if a similar name exists (trigram similarity); phone must be unique
+  legacy_key text null unique,                 -- key of the client in the Excel import (§12), else null
+  -- one phone may be shared by several clients (a family), never twice under the same name:
+  --   UNIQUE (phone_e164, private.name_key(full_name)) where phone_e164 is not null
+  --   (name_key = lower case, single spaces) → OPTICOR:PHONE_EXISTS / errors.phoneExists
+  -- phone required for clients created in the app (trigger → OPTICOR:PHONE_REQUIRED);
+  --   only imported clients (legacy_key set) may have none
+  -- on create: warn if a similar name exists (trigram similarity) and list the other clients
+  --   already on that phone (warning, not an error)
 
 orders
   id uuid,
@@ -194,6 +201,7 @@ orders
   frame_revenue numeric(12,2),   -- snapshot of frame/product items sum
   lens_revenue numeric(12,2),    -- GENERATED = total − frame_revenue, CHECK ≥ 0
   source ('app' | 'legacy') default 'app',   -- see §12
+  legacy jsonb null,             -- imported orders only: Excel row, carnet, original values, anomalies (§12)
   client_own_frame bool default false,   -- when true: no frame-type order_item allowed; frame_revenue = other items only
   -- lifecycle
   cancelled_at, cancelled_by, cancel_reason_id, cancel_note,
@@ -318,7 +326,7 @@ Triggers:
   - `stores`: select active stores (names/prefix only).
   - `profiles`: select own row.
   - `clients`: select all, insert, update contact fields (not discount fields — column privileges or RPC).
-  - `orders`, `order_items`, `order_treatments`, `order_status_history`, `payments`: select where `store_id = auth_store_id()` (via join for child tables). Writes only through RPCs.
+  - `orders`, `order_items`, `order_treatments`, `order_status_history`, `payments`: select where `store_id = auth_store_id()` (via join for child tables), **plus every imported order (`source = 'legacy'`, read only)** and the name/prefix of their (deactivated) history store. Writes only through RPCs.
   - `product_types`, `product_categories`, `settings_list_items`, `custom_fields`, `app_settings` (non-sensitive keys): select.
   - `stock_levels` / `stock_movements`: select own store only.
   - `notifications`: select/update own rows.
@@ -528,12 +536,30 @@ Security review 2 (2026-11-13) — see `docs/SECURITY-REVIEW.md` §6:
 - Session cookies: `Secure` in production builds, `SameSite=Lax`, path `/` (`authCookieOptions`, same for server, proxy and browser clients).
 - `clients.full_name` ≤ 120 and `clients.notes` ≤ 500 characters in the database too (secretaries may write those columns through the API without the app).
 
+Clients without phone / shared phones and the Excel history (2026-11-17), see §12:
+- `clients.phone_e164` nullable and no longer unique: unique per (phone, name). New clients in the app still need a phone; a phone already used by another client shows a warning (client form, new order) with that client, never an error. An imported client without a phone may be saved without one.
+- New order wizard: a phone matching several clients lists them all (« Utiliser : … »); creating another client on the same number stays possible.
+
 Secretary → admin WhatsApp (2026-11-13):
 - `profiles.whatsapp_e164` (E.164, optional), set only by a super admin through `set_user_whatsapp(user, phone | null)` in Settings › Users (super admin rows, his own included).
 - Secretaries read the numbers only through `admin_contacts()` (any role, security definer): active super admins with a number, never the caller, and only id, name and number. Profiles stay unreadable to secretaries otherwise. Both RPCs are classified in `tests/db/security.test.ts` (advisor 0029, accepted like the others).
 - Free `wa.me` links (no WhatsApp Business API): the secretary sends the message herself. Messages are translated (`notifyAdmin.messages.*`) in her language.
 
-## 12. Later (design for it, don't build it)
+## 12. Import historique (Excel 2021–2023, decided 2026-11-17)
 
-- Excel history import (~2,270 orders 2021–2023, prescriptions as text like `-1.75(-2 a 69)`, treatments like AR / BL / BLEU CAT / PGX / PROG / DF / LENTILLE): imported orders get `source = 'legacy'` column (add now, default `'app'`), status delivered, no stock movements, count toward loyalty when phone matches.
+The optician's sheet (one tab: DATE, NOM et PRENOM, N : BON, TELEPHONE, OD, OG, ADD, TRAITEMENT, PRIX, AVANCE, RESTE) is imported once per database by `scripts/legacy-import/build_import.py` (Python, rules + tests in `legacy_parse.py` / `test_legacy_parse.py`; the Excel and the generated SQL stay out of git, in `_import/`).
+
+- **What**: every client and every order (2279 orders, ~2100 clients); one line without slip number, name or phone is skipped and listed in the report.
+- **Store**: all orders go to a store **« Historique » (prefix HIS)**, created by the import and **deactivated** at the end (`finish_legacy_import`). Carnet A (slips 250→2750) → booklet `''`, carnet B (the sheet restarts at 1 after 4040; filled slips 394→440) → booklet `B`, a slip seen twice in a carnet → booklet `D` (`E`…): `HIS-02067`, `HIS-B-00394`, `HIS-D-00300`.
+- **Same client**: same phone + same person (case, spacing, word order and small typos ignored, e.g. « Maryam Fakrach » / « Fagrach Maryam ») = one client; different people on one phone (family) = separate clients sharing the phone. No phone: merged only when the full name (2 words or more) is identical; a first name alone is never merged. Phones normalised to E.164 (9 digits → `+212…`, letter O typed for 0); unreadable phones → no phone, original text in the client notes. Clients already typed in the app are reused when phone + name match.
+- **Orders**: `source = 'legacy'`, status `delivered`, `delivered_at = created_at`, no stock movement, no item (frame_revenue 0), lens type and treatments mapped by code (AR anti-reflet, BL blanc, BLEU CAT lumière bleue, PGX/PHOX photochromique, SOLAIRE teinté, PROG progressif, DF double foyer, else unifocal; LENTILLE / indice / prisme / verre neutre → lens details). Prescriptions parsed from `SPH(CYL a AXE)`; a value the table refuses (not a 0.25 step, cylinder without axis, axis > 180) is left empty, the original text stays in `orders.legacy`.
+- **Money**: total = PRIX (sums like `150+80` added); payments in cash: AVANCE (deposit) + the rest (balance) on the order date. A RESTE not marked « POYE » is **considered paid**; the original RESTE is kept in `orders.legacy.reste_origine`.
+- **Dates**: the 90 dated lines are exact; the others are estimated on the slip number between the dated lines, from 2021-01-01 (first slip) to 2023-12-31 (last slip), 12:00 Casablanca; `orders.legacy.date_exact = false` and the order page says « date estimée ».
+- **Read only**: trigger `legacy_read_only` refuses any change to a legacy order and any payment / item / treatment / history row on it (`OPTICOR:LEGACY_READ_ONLY`), except inside the import (transaction-local flag). Every signed-in user (secretaries included) reads the history; the order page shows a « Commande historique » banner and the original values, without actions.
+- **Loyalty**: `finish_legacy_import` sets `is_loyal` / `loyal_since` (date of the Nth delivered order) for clients reaching the threshold, without notification.
+- **KPIs**: imported orders count in revenue, payments and client segments of their (2021–2023) periods; they are left out of the workshop times and of the busiest-hours heatmap (made-up hours).
+- **Running it**: `import_legacy_batch(jsonb)` and `finish_legacy_import(text)` are callable from the SQL editor only (execute revoked from anon / authenticated). The generated files start with a guard: `--target prod` stops on the DEV database (test stores TSA/TSB exist), `--target dev` stops anywhere else and carries anonymised names and phones (no patient data on DEV). Re-running a batch skips what is already imported (`clients.legacy_key`, `orders.legacy->>'key'`).
+
+## 13. Later (design for it, don't build it)
+
 - Custom roles UI, exports, invoices, per-order costs.

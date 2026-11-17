@@ -6,7 +6,7 @@ import { searchInput } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 
 export interface SearchResults {
-  clients: { id: string; full_name: string; phone_e164: string; is_loyal: boolean }[];
+  clients: { id: string; full_name: string; phone_e164: string | null; is_loyal: boolean }[];
   orders: { id: string; display_number: string; client_name: string; status: OrderStatus; created_at: string }[];
 }
 

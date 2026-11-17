@@ -3,6 +3,7 @@
 import { getSuperAdmin } from "@/features/auth/guards";
 import { getSessionUser } from "@/features/auth/session";
 import { dbErrorCode, fail, ok, type ActionResult } from "@/lib/errors";
+import { normalizePhone } from "@/lib/phone";
 import { searchInput, uuidInput } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 import { clientSchema, discountSchema, updateClientSchema } from "./schemas";
@@ -35,10 +36,18 @@ export async function updateClientRecord(input: unknown): Promise<ActionResult> 
 }
 
 /** "A client with a similar name already exists" while typing a new client. */
-export async function findSimilarClients(name: unknown): Promise<{ id: string; full_name: string; phone_e164: string }[]> {
+export async function findSimilarClients(name: unknown): Promise<{ id: string; full_name: string; phone_e164: string | null }[]> {
   const parsed = searchInput(120, 3).safeParse(name);
   if (!parsed.success || !(await getSessionUser())) return [];
   const { data } = await (await createClient()).rpc("similar_clients", { p_name: parsed.data });
+  return data ?? [];
+}
+
+/** Clients already on this phone number (a family may share one): a warning, not an error. */
+export async function findClientsByPhone(phone: unknown): Promise<{ id: string; full_name: string; phone_e164: string | null }[]> {
+  const e164 = typeof phone === "string" ? normalizePhone(phone) : null;
+  if (!e164 || !(await getSessionUser())) return [];
+  const { data } = await (await createClient()).from("clients").select("id, full_name, phone_e164").eq("phone_e164", e164).order("full_name").limit(10);
   return data ?? [];
 }
 

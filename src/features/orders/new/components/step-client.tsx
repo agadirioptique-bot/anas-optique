@@ -317,18 +317,29 @@ function NewClientFields() {
   const newClient = useWatch({ control: form.control, name: "newClient" });
   const { errors } = form.formState;
   const e164 = normalizePhone(newClient.phone);
-  const [lookup, setLookup] = useState<{ phone: string; hit: ClientHit | null } | null>(null);
-  const existing = lookup && lookup.phone === e164 ? lookup.hit : null;
+  const [lookup, setLookup] = useState<{ phone: string; hits: ClientHit[] } | null>(null);
+  const existing = lookup && lookup.phone === e164 ? lookup.hits : [];
 
-  // Same phone already registered → offer to use that client (phones are unique).
+  // Same phone already registered (a family may share one): offer to use that client,
+  // creating another client on the same number stays possible (SPEC §5.3).
   useEffect(() => {
     if (!e164) return;
     let alive = true;
-    void searchClientsForOrder(e164).then((rows) => alive && setLookup({ phone: e164, hit: rows.find((r) => r.phone_e164 === e164) ?? null }));
+    void searchClientsForOrder(e164).then((rows) => alive && setLookup({ phone: e164, hits: rows.filter((r) => r.phone_e164 === e164) }));
     return () => {
       alive = false;
     };
   }, [e164]);
+
+  const pickExisting = async (id: string) => {
+    const c = await getClientForOrder(id);
+    if (!c) return;
+    setClient(c);
+    form.setValue("clientMode", "existing");
+    form.setValue("clientId", c.id);
+    form.setValue("pendingDiscount", c.pendingDiscount ? { type: c.pendingDiscount.type, value: c.pendingDiscount.value } : null);
+    form.setValue("applyDiscount", !!c.pendingDiscount);
+  };
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -354,31 +365,25 @@ function NewClientFields() {
           autoComplete="off"
           placeholder={t("phonePlaceholder")}
           className="num"
-          aria-invalid={!!errors.newClient?.phone || !!existing}
+          aria-invalid={!!errors.newClient?.phone}
           value={newClient.phone}
           onChange={(e) => form.setValue("newClient.phone", formatPhoneTyping(e.target.value), { shouldValidate: form.formState.isSubmitted })}
         />
         {errors.newClient?.phone && <p className="text-sm text-destructive">{errors.newClient.phone.message}</p>}
-        {existing && (
-          <div className="space-y-2 text-sm">
-            <p className="text-destructive">{t("phoneTaken", { name: existing.full_name })}</p>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                const c = await getClientForOrder(existing.id);
-                if (!c) return;
-                setClient(c);
-                form.setValue("clientMode", "existing");
-                form.setValue("clientId", c.id);
-                form.setValue("pendingDiscount", c.pendingDiscount ? { type: c.pendingDiscount.type, value: c.pendingDiscount.value } : null);
-    form.setValue("applyDiscount", !!c.pendingDiscount);
-              }}
-            >
-              {t("useExisting")}
-              {tc("colon")} {existing.full_name}
-            </Button>
+        {existing.length > 0 && (
+          <div className="space-y-2 rounded-xl bg-attention/10 p-3 text-sm text-attention-text" role="status">
+            <p className="font-medium">{t("phoneTaken")}</p>
+            <ul className="space-y-1.5">
+              {existing.map((hit) => (
+                <li key={hit.id}>
+                  <Button type="button" variant="outline" size="sm" onClick={() => void pickExisting(hit.id)}>
+                    {t("useExisting")}
+                    {tc("colon")} {hit.full_name}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs">{t("phoneSharedHint")}</p>
           </div>
         )}
       </div>
