@@ -968,7 +968,7 @@
     "stock": "the frame goes back into stock ({location});",
     "lensStock": "the lenses go back into stock where they came from;",
     "refund": "the {amount} deposit is recorded as refunded;",
-    "revenue": "the order leaves revenue and statistics.",
+    "revenue": "the order leaves the statistics; money kept (not refunded) stays in revenue.",
     "confirm": "Cancel the order",
     "done": "Order No. {number} cancelled",
     "doneBody": "{amount} refunded, stock updated.",
@@ -1607,6 +1607,7 @@
     "kpis": {
       "revenue": "Revenue",
       "revenueHint": "Non-cancelled orders of the period",
+      "revenueHintKept": "Incl. {amount} kept on cancelled orders",
       "collected": "Cash collected",
       "collectedHint": "Payments received, refunds deducted",
       "charges": "Charges",

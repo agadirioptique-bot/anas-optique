@@ -385,12 +385,12 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 
 | KPI | Formula |
 |---|---|
-| CA (Chiffre d'affaires) | `sum(orders.total)` where `status ≠ 'cancelled'` and business date of `created_at` in period |
+| CA (Chiffre d'affaires) | sales + kept: `sum(orders.total)` where `status ≠ 'cancelled'`, **plus the money kept on cancelled orders** (`sum(payments.amount)` of each cancelled order, refunds included, i.e. paid − refunded), both by business date of the order's `created_at` in period (decided 2026-11-20: a deposit the shop keeps is income). The card says « dont X gardés sur des commandes annulées » when X > 0 |
 | Montant encaissé | `sum(payments.amount)` by business date of `received_at` (refunds negative). Shown for every period; **primary card when period = Today** |
 | Charges | `sum(charges.amount)` where `status = 'approved'` and `is_deleted = false` and `charge_date` in period. Store filter: charges whose location belongs to that store; **'Général' and non-store locations only under "All stores"** (lab charges also when the lab is selected) |
 | NET | CA − Charges |
 | Orders | count non-cancelled orders |
-| Average basket | CA / Orders |
+| Average basket | sales (non-cancelled totals, without the kept money) / Orders |
 | Balance to collect | sum of remaining balance of non-cancelled, non-delivered orders created in period |
 | Owed to suppliers | sum of `purchase_balances.remaining` (all time, as of today) |
 | Discounts given | `sum(discount_amount)` |

@@ -968,7 +968,7 @@
     "stock": "la monture retourne en stock ({location}) ;",
     "lensStock": "les verres retournent en stock à leur provenance ;",
     "refund": "l'avance de {amount} sera enregistrée comme remboursée ;",
-    "revenue": "la commande sort du chiffre d'affaires et des statistiques.",
+    "revenue": "la commande sort des statistiques ; l'argent gardé (non remboursé) reste dans le chiffre d'affaires.",
     "confirm": "Annuler la commande",
     "done": "Commande N° {number} annulée",
     "doneBody": "{amount} remboursés, stock remis à jour.",
@@ -1607,6 +1607,7 @@
     "kpis": {
       "revenue": "Chiffre d'affaires",
       "revenueHint": "Commandes non annulées de la période",
+      "revenueHintKept": "Dont {amount} gardés sur des commandes annulées",
       "collected": "Montant encaissé",
       "collectedHint": "Paiements reçus, remboursements déduits",
       "charges": "Charges",

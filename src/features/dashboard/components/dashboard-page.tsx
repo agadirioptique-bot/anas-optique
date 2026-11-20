@@ -89,8 +89,11 @@ export function DashboardPage({ data, filters, stores, storeName }: { data: Dash
   };
 
   // Today: what came in the till matters more than what was sold (SPEC §9).
-  const heroKey: CardKey = filters.period === "today" ? "collected" : "revenue";
-  const second: CardKey = heroKey === "revenue" ? "collected" : "revenue";
+  const heroKey: "revenue" | "collected" = filters.period === "today" ? "collected" : "revenue";
+  const second: "revenue" | "collected" = heroKey === "revenue" ? "collected" : "revenue";
+  // CA: say how much of it is money kept on cancelled orders (not refunded).
+  const hint = (key: "revenue" | "collected") =>
+    key === "revenue" && k.kept_on_cancelled > 0 ? t("kpis.revenueHintKept", { amount: f.money(k.kept_on_cancelled) }) : t(`kpis.${key}Hint`);
 
   return (
     <>
@@ -108,8 +111,8 @@ export function DashboardPage({ data, filters, stores, storeName }: { data: Dash
 
       <div className={cn("space-y-6 transition-opacity", busy && "opacity-60")}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {card(heroKey, { hero: true, className: "sm:col-span-2", hint: t(`kpis.${heroKey}Hint`) })}
-          {card(second, { hint: t(`kpis.${second}Hint`) })}
+          {card(heroKey, { hero: true, className: "sm:col-span-2", hint: hint(heroKey) })}
+          {card(second, { hint: hint(second) })}
           {card("charges", { hint: t("kpis.chargesHint") })}
           {card("net", { hint: t("kpis.netHint") })}
           {card("orders")}

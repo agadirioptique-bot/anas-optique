@@ -243,17 +243,34 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     expect((data as { general_charges: number }).general_charges).toBe(200);
   });
 
-  describe("cancelled orders (SPEC §9 as written: a cancelled order leaves the CA, its money stays in 'collected')", () => {
-    it("cancelled WITHOUT refund (O8): out of CA, orders and NET; the kept deposit shows only in Montant encaissé", async () => {
-      const k = await summary(f.admin, { from: "2001-02-01", to: "2001-02-28" }, tsk);
-      expect([k.revenue, k.orders, k.net, k.balance_to_collect]).toEqual([200, 1, 200, 200]); // O6 only
+  describe("cancelled orders: the money the shop keeps counts in the CA (decided 2026-11-20)", () => {
+    const FEB = { from: "2001-02-01", to: "2001-02-28" };
+
+    it("cancelled WITHOUT refund (O8): the kept 150 is in CA and NET, not in orders, basket or balance", async () => {
+      const k = await summary(f.admin, FEB, tsk);
+      expect([k.sales, k.kept_on_cancelled, k.revenue, k.net]).toEqual([200, 150, 350, 350]); // O6 + O8's deposit; O9 kept 0
+      expect([k.orders, k.avg_basket, k.balance_to_collect]).toEqual([1, 200, 200]); // O6 only
       expect(k.collected).toBe(150 + 300); // O8 kept deposit + O9 paid in February (refunded in March)
       expect([k.created, k.cancelled, k.cancellation_rate]).toEqual([3, 2, 0.6667]);
+    });
+
+    it("fully refunded (O4 in January): nothing kept, the CA is the sales", async () => {
+      const k = await summary(f.admin, JAN, tsk);
+      expect([k.sales, k.kept_on_cancelled, k.revenue]).toEqual([2300, 0, 2300]);
     });
 
     it("refund in a later month (O9): February keeps the payment, March gets the negative refund", async () => {
       const k = await summary(f.admin, { from: "2001-03-01", to: "2001-03-31" }, tsk);
       expect([k.revenue, k.orders, k.created, k.collected, k.net]).toEqual([0, 0, 0, -300, 0]);
+    });
+
+    it("the day chart and the store breakdown count the kept money on the order's day", async () => {
+      const days = await f.admin.rpc("kpi_timeseries", { p_from: FEB.from, p_to: FEB.to, p_store_id: tsk });
+      const points = (days.data as { points: { at: string; revenue: number; kept_on_cancelled: number; orders: number; avg_basket: number | null }[] }).points;
+      expect(points.find((p) => p.at === "2001-02-10")).toMatchObject({ revenue: 150, kept_on_cancelled: 150, orders: 0, avg_basket: null });
+      expect(points.find((p) => p.at === "2001-02-20")).toMatchObject({ revenue: 0, kept_on_cancelled: 0 });
+      const { data } = await f.admin.rpc("kpi_breakdown", { p_from: FEB.from, p_to: FEB.to, p_store_id: tsk });
+      expect((data as { stores: { revenue: number; orders: number; net: number }[] }).stores[0]).toMatchObject({ revenue: 350, orders: 1, net: 350 });
     });
   });
 
@@ -282,7 +299,7 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     const months = await f.admin.rpc("kpi_timeseries", { p_from: "2001-01-01", p_to: "2001-12-31", p_store_id: tsk });
     const m = months.data as typeof d;
     expect([m.bucket, m.points.length]).toEqual(["month", 12]);
-    expect(m.points.slice(0, 3).map((p) => p.revenue)).toEqual([2300, 200, 0]);
+    expect(m.points.slice(0, 3).map((p) => p.revenue)).toEqual([2300, 350, 0]); // February: O6 200 + 150 kept on O8
   });
 
   it("breakdown: by store, frame categories, treatments, lens types, segments, busiest hours, lead times", async () => {

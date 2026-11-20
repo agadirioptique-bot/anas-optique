@@ -8,7 +8,10 @@ type Db = Awaited<ReturnType<typeof createClient>>;
 
 /** kpi_summary (SPEC §9). Money values are numeric(12,2) summed in SQL. */
 export interface KpiSummary {
+  /** CA = sales + kept_on_cancelled (money paid and not refunded on cancelled orders). */
   revenue: number;
+  sales: number;
+  kept_on_cancelled: number;
   collected: number;
   charges: number;
   net: number;
@@ -33,6 +36,7 @@ export interface KpiSummary {
 export interface KpiPoint {
   at: string;
   revenue: number;
+  kept_on_cancelled: number;
   collected: number;
   charges: number;
   net: number;
