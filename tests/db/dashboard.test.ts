@@ -18,7 +18,9 @@ type OrderInsert = Omit<Database["public"]["Tables"]["orders"]["Insert"], "store
  *   damage: 1 "KPI Monture A" frame (20 Jan)
  *   charges: TSK 300 approved, TSK 999 pending, TSK 444 deleted, Général 200, TSB 150, Lab 120 (all approved, Jan)
  * December 2000 at TSK: O5 C2 300 delivered + paid, O7 C1 250 delivered + paid, charge TSK 50.
- * February 2001 at TSK: O6 C3 200 confirmed.
+ * February 2001 at TSK: O6 C3 200 confirmed;
+ *   O8 C2 10 Feb total 400, deposit 150 (10 Feb), CANCELLED 12 Feb WITHOUT refund (the shop keeps 150);
+ *   O9 C2 20 Feb total 300, paid 300 (20 Feb), CANCELLED 2 Mar with a full refund −300 (2 Mar).
  * C1 is loyal and has 2 delivered orders (O1, O7); C2 has 1 (O5); C3 none.
  * Purchase received at TSK (created once, kept): 2 × 100, paid 50 → owed 150.
  */
@@ -120,6 +122,8 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     const o5 = await order({ client_id: c2, subtotal: 300, status: "delivered", created_at: "2000-12-05T10:00:00Z", delivered_at: "2000-12-10T10:00:00Z" });
     const o7 = await order({ client_id: c1, subtotal: 250, status: "delivered", created_at: "2000-12-20T10:00:00Z", delivered_at: "2000-12-27T10:00:00Z" });
     await order({ client_id: c3, subtotal: 200, status: "confirmed", created_at: "2001-02-03T10:00:00Z" });
+    const o8 = await order({ client_id: c2, subtotal: 400, status: "cancelled", created_at: "2001-02-10T10:00:00Z", cancelled_at: "2001-02-12T10:00:00Z" });
+    const o9 = await order({ client_id: c2, subtotal: 300, status: "cancelled", created_at: "2001-02-20T10:00:00Z", cancelled_at: "2001-03-02T10:00:00Z" });
     ids = { o1, o2, o3, o4 };
 
     await one(s.from("order_items").insert([
@@ -147,6 +151,9 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
       { order_id: o4, amount: -100, kind: "refund", method_id: cash, received_at: "2001-01-23T10:00:00Z" },
       { order_id: o5, amount: 300, kind: "deposit", method_id: cash, received_at: "2000-12-05T10:00:00Z" },
       { order_id: o7, amount: 250, kind: "deposit", method_id: cash, received_at: "2000-12-20T10:00:00Z" },
+      { order_id: o8, amount: 150, kind: "deposit", method_id: cash, received_at: "2001-02-10T10:05:00Z" },
+      { order_id: o9, amount: 300, kind: "deposit", method_id: cash, received_at: "2001-02-20T10:05:00Z" },
+      { order_id: o9, amount: -300, kind: "refund", method_id: cash, received_at: "2001-03-02T10:00:00Z" },
     ]).select("id"));
 
     // --- purchase (created once: supplier-payment charges are read-only, so never deleted) ---
@@ -234,6 +241,20 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     expect((await summary(f.admin, JAN, lab)).charges).toBe(120);
     const { data } = await f.admin.rpc("kpi_breakdown", { p_from: JAN.from, p_to: JAN.to });
     expect((data as { general_charges: number }).general_charges).toBe(200);
+  });
+
+  describe("cancelled orders (SPEC §9 as written: a cancelled order leaves the CA, its money stays in 'collected')", () => {
+    it("cancelled WITHOUT refund (O8): out of CA, orders and NET; the kept deposit shows only in Montant encaissé", async () => {
+      const k = await summary(f.admin, { from: "2001-02-01", to: "2001-02-28" }, tsk);
+      expect([k.revenue, k.orders, k.net, k.balance_to_collect]).toEqual([200, 1, 200, 200]); // O6 only
+      expect(k.collected).toBe(150 + 300); // O8 kept deposit + O9 paid in February (refunded in March)
+      expect([k.created, k.cancelled, k.cancellation_rate]).toEqual([3, 2, 0.6667]);
+    });
+
+    it("refund in a later month (O9): February keeps the payment, March gets the negative refund", async () => {
+      const k = await summary(f.admin, { from: "2001-03-01", to: "2001-03-31" }, tsk);
+      expect([k.revenue, k.orders, k.created, k.collected, k.net]).toEqual([0, 0, 0, -300, 0]);
+    });
   });
 
   it("comparison period: the same formulas on December 2000", async () => {
