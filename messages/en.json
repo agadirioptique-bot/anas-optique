@@ -708,7 +708,7 @@
     "seeAllDelivered": "See all delivered",
     "moreInColumn": "+ {count} more in the list",
     "moveOneStep": "An order moves forward one step at a time.",
-    "dragHint": "Drag a card to the next column, or use the “Next step” button.",
+    "dragHint": "Drag a card to the next column, or use the button at the bottom of the card.",
     "moveCard": "Move order {number}",
     "movedTo": "Order No. {number}: {status}",
     "whatsappNotify": "Notify on WhatsApp",
@@ -739,6 +739,7 @@
       "thisYear": "This year"
     },
     "count": "{count, plural, =0 {No orders} one {# order} other {# orders}}",
+    "countTruncated": "Latest {shown} of {total, number} orders · refine with the search",
     "exportName": "orders",
     "stepBack": "Go back",
     "stepBackTitle": "Move {number} back to “{status}”?",
@@ -967,7 +968,7 @@
     "stock": "the frame goes back into stock ({location});",
     "lensStock": "the lenses go back into stock where they came from;",
     "refund": "the {amount} deposit is recorded as refunded;",
-    "revenue": "the order leaves revenue and statistics.",
+    "revenue": "the order leaves the statistics; money kept (not refunded) stays in revenue.",
     "confirm": "Cancel the order",
     "done": "Order No. {number} cancelled",
     "doneBody": "{amount} refunded, stock updated.",
@@ -1104,8 +1105,9 @@
     "title": "Free discount — {number}",
     "description": "Lowers the balance before delivery. The order cannot go below the frame and products price.",
     "amount": "Discount amount",
-    "hint": "At most the balance due: {amount}.",
+    "hint": "At most: {amount}.",
     "tooHigh": "The discount is more than the balance ({amount}).",
+    "tooHighProducts": "At most {amount}: the order cannot go below the frame and products price.",
     "confirm": "Give the discount",
     "done": "Discount of {amount} given"
   },
@@ -1139,6 +1141,7 @@
     "minShort": "min {min}",
     "threshold": {
       "edit": "Edit the threshold of {category}",
+      "editValue": "Threshold {min} · edit the threshold of {category}",
       "saved": "Threshold saved: {min}",
       "cleared": "Threshold removed: no more alerts",
       "hint": "Leave empty for no alert."
@@ -1604,6 +1607,7 @@
     "kpis": {
       "revenue": "Revenue",
       "revenueHint": "Non-cancelled orders of the period",
+      "revenueHintKept": "Incl. {amount} kept on cancelled orders",
       "collected": "Cash collected",
       "collectedHint": "Payments received, refunds deducted",
       "charges": "Charges",

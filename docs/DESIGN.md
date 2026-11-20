@@ -66,7 +66,7 @@ When in doubt about a screen, open the live demo (or the screenshots in `docs/ui
 - Right: bell with orange count badge, avatar circle with initials (menu: name, role, language FR/EN, theme, sign out).
 - (Demo-only "DEMO · Super admin" switcher is removed.)
 
-**Mobile (< md)**: sidebar hidden; bottom bar with Orders, Clients, big round **+** (new order), Stock, Notifications. Board columns swipe horizontally; each card has a "Next step" button.
+**Mobile (< md)**: sidebar hidden; bottom bar with Orders, Clients, big round **+** (new order), Stock, Notifications. Board columns swipe horizontally; each card has a "Next step" button (shown on desktop too since 2026-11-20, where the five columns share the width from `xl`).
 
 **Page header**: H1 (bold, ~28px) + muted subtitle (e.g. "Orders of Succursale Centre."), primary action top-right.
 

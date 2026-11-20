@@ -345,7 +345,7 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 
 **Shell**: remove DEMO switcher / Reset demo / Settings › Demo. Top bar: store selector (super admin: All stores / each store / lab, persisted in a cookie; it filters Orders, Workshop, the Stock tab and is the default Dashboard store filter; secretary: fixed pill with her store), global search (Ctrl K → `search_global`), notifications bell (Realtime), avatar menu (language FR/EN, theme, sign out).
 
-**Orders** (both roles) — keep as in demo: Board (5 columns + drag & drop + "Next step" button) / List, search, "Balance due > 0", "Show cancelled". Card shows display number `CNT-00832`.
+**Orders** (both roles) — keep as in demo: Board (5 columns + drag & drop + "Next step" button) / List, search, "Balance due > 0", "Show cancelled". The list shows the newest 500 matches with the real total; its search runs on the server (name, phone, N° in any form) so the 2021–2023 history is found too. Card shows display number `CNT-00832`.
 
 **New order** (3 steps, sticky summary on the right):
 1. *Client*: store (secretary: fixed), **"N° du bon" (required, integer, shows the prefix before the input: `CNT-` [00832])**, existing client search (name/phone) or new client (name, phone required + unique, WhatsApp toggle). Loyal client → yellow banner; pending discount → banner "Remise approuvée : 10 %" with "Appliquer".
@@ -385,12 +385,12 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 
 | KPI | Formula |
 |---|---|
-| CA (Chiffre d'affaires) | `sum(orders.total)` where `status ≠ 'cancelled'` and business date of `created_at` in period |
+| CA (Chiffre d'affaires) | sales + kept: `sum(orders.total)` where `status ≠ 'cancelled'`, **plus the money kept on cancelled orders** (`sum(payments.amount)` of each cancelled order, refunds included, i.e. paid − refunded), both by business date of the order's `created_at` in period (decided 2026-11-20: a deposit the shop keeps is income). The card says « dont X gardés sur des commandes annulées » when X > 0 |
 | Montant encaissé | `sum(payments.amount)` by business date of `received_at` (refunds negative). Shown for every period; **primary card when period = Today** |
 | Charges | `sum(charges.amount)` where `status = 'approved'` and `is_deleted = false` and `charge_date` in period. Store filter: charges whose location belongs to that store; **'Général' and non-store locations only under "All stores"** (lab charges also when the lab is selected) |
 | NET | CA − Charges |
 | Orders | count non-cancelled orders |
-| Average basket | CA / Orders |
+| Average basket | sales (non-cancelled totals, without the kept money) / Orders |
 | Balance to collect | sum of remaining balance of non-cancelled, non-delivered orders created in period |
 | Owed to suppliers | sum of `purchase_balances.remaining` (all time, as of today) |
 | Discounts given | `sum(discount_amount)` |

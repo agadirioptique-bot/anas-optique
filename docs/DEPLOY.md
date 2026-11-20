@@ -270,3 +270,43 @@ npm run lighthouse                         # reports in reports/lighthouse/ (git
 
 `LH_BASE_URL` points it elsewhere (it signs in with the dev E2E account, so only against a deployment that
 uses the dev database, e.g. a Vercel preview).
+
+## 8. Moving production to another Supabase project
+
+For when the database must live in another account (done once, 2026-11: from the optician's first Gmail to
+a new one). Schema comes from the migrations; data (`public` + `auth`: accounts keep their passwords) from
+a copy of the old project. Prescription photos (Storage) are not in the copy: if `files` > 0 in the counts,
+copy them before pausing the old project.
+
+**Before (no downtime)**
+1. New account → new project (Free, West EU), generate the database password and keep it.
+2. New project → Authentication: sign-ups OFF, password minimum 10, URL Configuration (Site URL +
+   `https://<prod-domain>/**`), SMTP (§3.2), templates (§3.4).
+3. Old project → SQL Editor: run `scripts/move-project/counts.sql`, keep the numbers.
+4. Start Docker Desktop; `docker pull postgres:17` (same major version as `postgres` in the counts).
+
+**Switch (the app is not used meanwhile, ~30 min)**
+```powershell
+$d = "$HOME\Documents\opticor-backups"; New-Item -ItemType Directory -Force $d | Out-Null
+# 1. copy the data of the OLD project (CLI still logged in to the old account and linked to it)
+npx supabase db dump --linked --data-only --use-copy --schema public,auth -f "$d\prod-data.sql"
+Copy-Item scripts\move-project\prepare-target.sql $d
+# 2. schema on the NEW project
+npx supabase logout
+npx supabase login                               # with the new account
+npx supabase link --project-ref <NEW_REF>
+npx supabase db push                             # every migration; do NOT run seed.sql (the copy has it)
+# 3. load the copy (session pooler URI from the new project's "Connect" button, without the password part;
+#    psql asks for it). One transaction: on any error nothing is kept.
+docker run --rm -it -v "${d}:/b" postgres:17 psql "postgresql://postgres.<NEW_REF>@<pooler-host>:5432/postgres" `
+  -1 -v ON_ERROR_STOP=1 -f /b/prepare-target.sql -c "set session_replication_role = replica" -f /b/prod-data.sql
+```
+4. New project → SQL Editor: `counts.sql` gives the same numbers as the old one.
+5. New project → Authentication → Hooks: the access token hook (§3.3).
+6. Vercel → Environment Variables (Production): the new `NEXT_PUBLIC_SUPABASE_URL`,
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` → **Redeploy** (the URL is built into
+   the CSP).
+7. Sign in on the prod domain (everyone signs in again: the new project has its own signing keys; passwords
+   are unchanged). `curl -sI https://<prod-domain>/fr/login`: the CSP names the new project.
+8. Old project → Settings → General → **Pause project** (nothing can write to it any more); delete it after
+   a week without problems. Delete `prod-data.sql` once the new project is checked: it holds personal data.

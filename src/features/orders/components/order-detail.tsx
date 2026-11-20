@@ -106,7 +106,9 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
   const canCollect = !legacy && row.status !== "cancelled" && row.balance > 0;
   // A secretary tells the optician about a confirmed or arrived order (SPEC §8).
   const notifyStep = isSuperAdmin ? null : adminNotifyStep(row.status);
-  const canDiscount = isSuperAdmin && active && row.balance > 0 && order.discountSource !== "client_pending";
+  // Free discount: at most the balance, and the total never goes below the frame + products price.
+  const maxDiscount = Math.max(0, Math.round(Math.min(row.balance, row.total - order.frameRevenue) * 100) / 100);
+  const canDiscount = isSuperAdmin && active && maxDiscount > 0 && order.discountSource !== "client_pending";
   const frame = data.items.find((i) => i.type?.is_frame);
   const others = data.items.filter((i) => !i.type?.is_frame);
   const builtinShown = data.fields.filter((fd) => fd.isBuiltin);
@@ -181,7 +183,7 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
                     </DropdownMenuItem>
                   )}
                   {canDiscount && (
-                    <DropdownMenuItem onSelect={() => actions.discount(row)}>
+                    <DropdownMenuItem onSelect={() => actions.discount(row, maxDiscount)}>
                       <BadgePercent />
                       {t("detail.freeDiscount")}
                     </DropdownMenuItem>
@@ -349,7 +351,8 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
                     className={cn("num mt-1 text-lg font-bold", row.status === "cancelled" ? "text-muted-foreground" : row.balance > 0 ? "text-attention-text" : "text-success-text")}
                     data-testid="detail-balance"
                   >
-                    {f.money(row.balance)}
+                    {/* A cancelled order owes nothing (refunds are in the payments above). */}
+                    {row.status === "cancelled" ? "—" : f.money(row.balance)}
                   </dd>
                 </div>
               </dl>

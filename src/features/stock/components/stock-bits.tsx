@@ -64,7 +64,8 @@ export function ThresholdCell({
           setEditing(true);
         }}
         className="num min-w-10 rounded-md border border-dashed border-transparent px-2 py-1 text-muted-foreground hover:border-border hover:text-foreground pointer-coarse:min-h-10"
-        aria-label={t("edit", { category: categoryName })}
+        // The visible number stays part of the name (WCAG 2.5.3 label in name).
+        aria-label={value === null ? t("edit", { category: categoryName }) : t("editValue", { min: value, category: categoryName })}
         title={t("hint")}
       >
         {value ?? "—"}

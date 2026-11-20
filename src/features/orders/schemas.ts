@@ -25,5 +25,7 @@ export const orderListFiltersSchema = z.object({
   view: z.enum(ORDER_VIEWS).catch("board"),
   status: z.enum([...ORDER_STATUSES, "all"]).catch("all"),
   period: z.enum(ORDER_PERIODS).catch("any"),
+  /** List view search, run on the server so every order (history included) can be found. */
+  q: z.string().trim().max(80).catch(""),
 });
 export type OrderListFilters = z.infer<typeof orderListFiltersSchema>;

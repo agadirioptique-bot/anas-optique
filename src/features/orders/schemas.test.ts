@@ -17,8 +17,8 @@ describe("order action schemas", () => {
   });
 
   it("read board/list filters from the URL with safe defaults", () => {
-    expect(orderListFiltersSchema.parse({})).toEqual({ view: "board", status: "all", period: "any" });
-    expect(orderListFiltersSchema.parse({ view: "list", status: "delivered", period: "30" })).toEqual({ view: "list", status: "delivered", period: "30" });
-    expect(orderListFiltersSchema.parse({ view: "x", status: "y", period: "z" })).toEqual({ view: "board", status: "all", period: "any" });
+    expect(orderListFiltersSchema.parse({})).toEqual({ view: "board", status: "all", period: "any", q: "" });
+    expect(orderListFiltersSchema.parse({ view: "list", status: "delivered", period: "30", q: " HIS-00250 " })).toEqual({ view: "list", status: "delivered", period: "30", q: "HIS-00250" });
+    expect(orderListFiltersSchema.parse({ view: "x", status: "y", period: "z", q: ["a", "b"] })).toEqual({ view: "board", status: "all", period: "any", q: "" });
   });
 });

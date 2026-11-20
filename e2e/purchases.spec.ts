@@ -142,3 +142,21 @@ test("secretary: Access denied on purchasing", async ({ page }) => {
   await page.goto("/fr/purchases");
   await expect(page.getByText("Accès non autorisé")).toBeVisible();
 });
+
+test("phone width: the new purchase form fits the screen, from its title to its save button", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await signIn(page, "admin");
+  await page.goto("/fr/purchases");
+  await page.getByRole("button", { name: "Nouvel achat" }).first().click();
+  const form = page.getByRole("dialog");
+  // The sheet used to grow past the top of the screen, hiding the supplier field (2026-11-20).
+  await expect(form.getByRole("heading", { name: "Nouvel achat" })).toBeInViewport();
+  await expect(form.getByRole("combobox", { name: "Fournisseur" })).toBeInViewport();
+  await expect(form.getByRole("button", { name: "Enregistrer l'achat" })).toBeInViewport();
+  // Measured once the slide-in animation is over.
+  await expect.poll(async () => {
+    const box = await form.boundingBox();
+    return box && box.y >= 0 && box.y + box.height <= 812 + 1;
+  }).toBe(true);
+  await shot(page, "purchases-new-phone");
+});
