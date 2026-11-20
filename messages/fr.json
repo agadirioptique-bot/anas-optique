@@ -708,7 +708,7 @@
     "seeAllDelivered": "Voir toutes les livrées",
     "moreInColumn": "+ {count} autres dans la liste",
     "moveOneStep": "Une commande avance d'une étape à la fois.",
-    "dragHint": "Glissez une carte vers la colonne suivante, ou utilisez le bouton « Étape suivante ».",
+    "dragHint": "Glissez une carte vers la colonne suivante, ou utilisez le bouton en bas de la carte.",
     "moveCard": "Déplacer la commande {number}",
     "movedTo": "Commande N° {number} : {status}",
     "whatsappNotify": "Prévenir sur WhatsApp",
@@ -739,6 +739,7 @@
       "thisYear": "Cette année"
     },
     "count": "{count, plural, =0 {Aucune commande} one {# commande} other {# commandes}}",
+    "countTruncated": "Les {shown} plus récentes sur {total, number} commandes · précisez avec la recherche",
     "exportName": "commandes",
     "stepBack": "Revenir en arrière",
     "stepBackTitle": "Remettre {number} à « {status} » ?",
@@ -1104,8 +1105,9 @@
     "title": "Remise libre — {number}",
     "description": "Réduit le reste à payer avant la livraison. La commande ne peut pas descendre sous le prix de la monture et des produits.",
     "amount": "Montant de la remise",
-    "hint": "Au maximum le reste à payer : {amount}.",
+    "hint": "Au maximum : {amount}.",
     "tooHigh": "La remise dépasse le reste à payer ({amount}).",
+    "tooHighProducts": "Au maximum {amount} : la commande ne peut pas descendre sous le prix de la monture et des produits.",
     "confirm": "Accorder la remise",
     "done": "Remise de {amount} accordée"
   },
@@ -1139,6 +1141,7 @@
     "minShort": "min {min}",
     "threshold": {
       "edit": "Modifier le seuil de {category}",
+      "editValue": "Seuil {min} · modifier le seuil de {category}",
       "saved": "Seuil enregistré : {min}",
       "cleared": "Seuil supprimé : plus d'alerte",
       "hint": "Laissez vide pour ne pas recevoir d'alerte."

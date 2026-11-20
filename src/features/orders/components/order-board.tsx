@@ -67,7 +67,7 @@ function Column({ status, count, highlight, children }: { status: OrderStatus; c
       aria-label={t(`status.${status}`)}
       data-testid={`column-${status}`}
       className={cn(
-        "flex w-[82vw] max-w-[320px] shrink-0 snap-center flex-col rounded-2xl bg-muted/50 p-2 transition-colors sm:w-72 xl:w-auto xl:max-w-none xl:min-w-[208px] xl:flex-1 xl:shrink",
+        "flex w-[82vw] max-w-[320px] shrink-0 snap-center flex-col rounded-2xl bg-muted/50 p-2 transition-colors sm:w-72 xl:w-auto xl:max-w-none xl:min-w-0 xl:flex-1 xl:basis-0 xl:shrink",
         highlight === "valid" && "bg-accent outline-2 outline-offset-2 outline-primary/50 outline-dashed",
         highlight === "valid" && isOver && "outline-primary outline-solid",
         highlight === "invalid" && isOver && "outline-2 outline-destructive/40 outline-dashed",

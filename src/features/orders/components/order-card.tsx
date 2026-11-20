@@ -23,7 +23,7 @@ export interface OrderCardProps extends HTMLAttributes<HTMLDivElement> {
   handle?: ReactNode;
 }
 
-/** Board card (demo): number, client, total, balance badge, days in status, WhatsApp, next step on phones. */
+/** Board card (demo): number, client, total, balance badge, days in status, WhatsApp, next-step button (all screens). */
 export const OrderCard = forwardRef<HTMLDivElement, OrderCardProps>(function OrderCard(
   { row, lateAfter, showStore, showStatus, onAdvance, dragging, handle, className, ...rest },
   ref,
@@ -45,7 +45,7 @@ export const OrderCard = forwardRef<HTMLDivElement, OrderCardProps>(function Ord
       <div className="flex items-center gap-2">
         <Link
           href={`/orders/${row.id}`}
-          className="num text-sm font-semibold text-primary after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring"
+          className="num shrink-0 text-sm font-semibold whitespace-nowrap text-primary after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-ring"
           draggable={false}
         >
           {row.displayNumber}
@@ -58,7 +58,7 @@ export const OrderCard = forwardRef<HTMLDivElement, OrderCardProps>(function Ord
         </span>
       </div>
       <p className="mt-1.5 truncate font-medium">{row.clientName || "—"}</p>
-      <div className="mt-2 flex items-center justify-between gap-2">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <span className="num text-sm text-muted-foreground">{f.money(row.total)}</span>
         {row.status !== "cancelled" && <ResteBadge reste={row.balance} />}
       </div>
@@ -78,7 +78,7 @@ export const OrderCard = forwardRef<HTMLDivElement, OrderCardProps>(function Ord
           type="button"
           variant="secondary"
           size="sm"
-          className="relative z-10 mt-3 w-full justify-between md:hidden"
+          className="relative z-10 mt-3 h-auto min-h-8 w-full justify-between py-1.5 text-left whitespace-normal"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

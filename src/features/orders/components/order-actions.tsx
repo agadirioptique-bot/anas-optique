@@ -47,7 +47,8 @@ interface OrderActions {
   stepBack: (row: OrderRow) => void;
   collect: (row: OrderRow, opts?: { deliver?: boolean }) => void;
   cancel: (row: OrderRow) => void;
-  discount: (row: OrderRow) => void;
+  /** max = what the discount may reach: the balance, and never below the frame + products price. */
+  discount: (row: OrderRow, max: number) => void;
 }
 
 const Ctx = createContext<OrderActions | null>(null);
@@ -264,13 +265,19 @@ function CancelDialog({ row, methods, reasons, onClose }: { row: OrderRow; metho
   );
 }
 
-function DiscountDialog({ row, onClose }: { row: OrderRow; onClose: () => void }) {
+function DiscountDialog({ row, max, onClose }: { row: OrderRow; max: number; onClose: () => void }) {
   const t = useTranslations();
   const f = useFormat();
   const run = useRun();
   const [amount, setAmount] = useState<number | undefined>(undefined);
   const [pending, setPending] = useState(false);
-  const error = amount !== undefined && amount > row.balance ? t("discount.tooHigh", { amount: f.money(row.balance) }) : null;
+  // The server checks both rules too (AMOUNT_TOO_HIGH, DISCOUNT_TOO_HIGH); say which one limits.
+  const error =
+    amount !== undefined && amount > max
+      ? max < row.balance
+        ? t("discount.tooHighProducts", { amount: f.money(max) })
+        : t("discount.tooHigh", { amount: f.money(row.balance) })
+      : null;
   return (
     <ResponsiveDialog
       open
@@ -301,7 +308,7 @@ function DiscountDialog({ row, onClose }: { row: OrderRow; onClose: () => void }
       <div className="space-y-2">
         <Label htmlFor="free-discount">{t("discount.amount")}</Label>
         <MoneyInput id="free-discount" size="lg" value={amount} onChange={setAmount} invalid={!!error} />
-        {error ? <p className="text-sm text-destructive">{error}</p> : <p className="text-sm text-muted-foreground">{t("discount.hint", { amount: f.money(row.balance) })}</p>}
+        {error ? <p className="text-sm text-destructive">{error}</p> : <p className="text-sm text-muted-foreground">{t("discount.hint", { amount: f.money(max) })}</p>}
       </div>
     </ResponsiveDialog>
   );
@@ -310,7 +317,7 @@ function DiscountDialog({ row, onClose }: { row: OrderRow; onClose: () => void }
 type Dialog =
   | { kind: "collect"; row: OrderRow; deliver: boolean }
   | { kind: "cancel"; row: OrderRow }
-  | { kind: "discount"; row: OrderRow }
+  | { kind: "discount"; row: OrderRow; max: number }
   | { kind: "back"; row: OrderRow }
   | { kind: "notify"; row: OrderRow };
 
@@ -368,7 +375,7 @@ export function OrderActionsProvider({
       stepBack: (row) => setDialog({ kind: "back", row }),
       collect: (row, opts) => setDialog({ kind: "collect", row, deliver: !!opts?.deliver }),
       cancel: (row) => setDialog({ kind: "cancel", row }),
-      discount: (row) => setDialog({ kind: "discount", row }),
+      discount: (row, max) => setDialog({ kind: "discount", row, max }),
     }),
     [isSuperAdmin, advance],
   );
@@ -384,7 +391,7 @@ export function OrderActionsProvider({
       )}
       {dialog?.kind === "collect" && <CollectDialog key={dialog.row.id} row={dialog.row} deliver={dialog.deliver} methods={methods} onClose={close} />}
       {dialog?.kind === "cancel" && <CancelDialog row={dialog.row} methods={methods} reasons={reasons} onClose={close} />}
-      {dialog?.kind === "discount" && <DiscountDialog row={dialog.row} onClose={close} />}
+      {dialog?.kind === "discount" && <DiscountDialog row={dialog.row} max={dialog.max} onClose={close} />}
       <ConfirmDialog
         open={dialog?.kind === "back" && !!back}
         onOpenChange={(o) => !o && close()}

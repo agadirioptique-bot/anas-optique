@@ -345,7 +345,7 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 
 **Shell**: remove DEMO switcher / Reset demo / Settings › Demo. Top bar: store selector (super admin: All stores / each store / lab, persisted in a cookie; it filters Orders, Workshop, the Stock tab and is the default Dashboard store filter; secretary: fixed pill with her store), global search (Ctrl K → `search_global`), notifications bell (Realtime), avatar menu (language FR/EN, theme, sign out).
 
-**Orders** (both roles) — keep as in demo: Board (5 columns + drag & drop + "Next step" button) / List, search, "Balance due > 0", "Show cancelled". Card shows display number `CNT-00832`.
+**Orders** (both roles) — keep as in demo: Board (5 columns + drag & drop + "Next step" button) / List, search, "Balance due > 0", "Show cancelled". The list shows the newest 500 matches with the real total; its search runs on the server (name, phone, N° in any form) so the 2021–2023 history is found too. Card shows display number `CNT-00832`.
 
 **New order** (3 steps, sticky summary on the right):
 1. *Client*: store (secretary: fixed), **"N° du bon" (required, integer, shows the prefix before the input: `CNT-` [00832])**, existing client search (name/phone) or new client (name, phone required + unique, WhatsApp toggle). Loyal client → yellow banner; pending discount → banner "Remise approuvée : 10 %" with "Appliquer".

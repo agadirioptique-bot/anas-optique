@@ -2,7 +2,7 @@
 
 import { KanbanSquare, List, Plus, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ResteBadge, StatusBadge, WhatsAppIcon } from "@/components/shared/badges";
 import { DataTable, type Column } from "@/components/shared/data-table";
 import { EmptyState, PageHeader } from "@/components/shared/page";
@@ -53,8 +53,21 @@ function matches(row: OrderRow, q: string): boolean {
   return false;
 }
 
+/** URL query of the orders page: the board has none; the list keeps its filters and search. */
+function listQuery(filters: OrderListFilters): Record<string, string> {
+  const query: Record<string, string> = {};
+  if (filters.view === "list") {
+    query.view = "list";
+    if (filters.status !== "all") query.status = filters.status;
+    if (filters.period !== "any") query.period = filters.period;
+    if (filters.q) query.q = filters.q;
+  }
+  return query;
+}
+
 export function OrdersPage({
   rows,
+  total,
   filters,
   isSuperAdmin,
   showStore,
@@ -64,6 +77,8 @@ export function OrdersPage({
   reasons,
 }: {
   rows: OrderRow[];
+  /** List view: every order matching the filters (rows holds the newest 500 at most). */
+  total: number;
   filters: OrderListFilters;
   isSuperAdmin: boolean;
   showStore: boolean;
@@ -76,22 +91,30 @@ export function OrdersPage({
   const f = useFormat();
   const router = useRouter();
   const pathname = usePathname();
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(filters.q);
   const [resteDue, setResteDue] = useState(false);
   const [showCancelled, setShowCancelled] = useState(false);
 
+  // Board: filtered here. List: filtered here at once, then searched on the server (all orders).
   const filtered = useMemo(() => rows.filter((r) => matches(r, q) && (!resteDue || (r.balance > 0 && r.status !== "cancelled"))), [rows, q, resteDue]);
 
   const setFilters = (patch: Partial<OrderListFilters>) => {
-    const next = { ...filters, ...patch };
-    const query: Record<string, string> = {};
-    if (next.view === "list") {
-      query.view = "list";
-      if (next.status !== "all") query.status = next.status;
-      if (next.period !== "any") query.period = next.period;
-    }
-    router.replace({ pathname, query }, { scroll: false });
+    router.replace({ pathname, query: listQuery({ ...filters, q: q.trim(), ...patch }) }, { scroll: false });
   };
+
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    if (filters.view !== "list" || q.trim() === filters.q) return;
+    searchTimer.current = setTimeout(() => router.replace({ pathname, query: listQuery({ ...filters, q: q.trim() }) }, { scroll: false }), 350);
+    return () => clearTimeout(searchTimer.current);
+  }, [q, filters, router, pathname]);
+  // Leaving the field (e.g. to open an order) sends the search at once, so it never lands after that click.
+  const flushSearch = () => {
+    clearTimeout(searchTimer.current);
+    if (filters.view === "list" && q.trim() !== filters.q) router.replace({ pathname, query: listQuery({ ...filters, q: q.trim() }) }, { scroll: false });
+  };
+
+  const truncated = filters.view === "list" && total > rows.length && filtered.length === rows.length;
 
   const columns: Column<OrderRow>[] = [
     {
@@ -161,7 +184,7 @@ export function OrdersPage({
         </Tabs>
         <div className="relative flex-1 lg:max-w-xs">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("orders.searchPlaceholder")} aria-label={t("orders.searchPlaceholder")} className="pl-9" type="search" data-testid="orders-search" />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} onBlur={flushSearch} placeholder={t("orders.searchPlaceholder")} aria-label={t("orders.searchPlaceholder")} className="pl-9" type="search" data-testid="orders-search" />
         </div>
       </div>
 
@@ -203,7 +226,11 @@ export function OrdersPage({
             {t("orders.showCancelled")}
           </FilterToggle>
         )}
-        {filters.view === "list" && <span className="num ml-auto text-sm text-muted-foreground">{t("orders.count", { count: filtered.length })}</span>}
+        {filters.view === "list" && (
+          <span className="num ml-auto text-sm text-muted-foreground" data-testid="orders-count">
+            {truncated ? t("orders.countTruncated", { shown: rows.length, total }) : t("orders.count", { count: filtered.length })}
+          </span>
+        )}
       </div>
 
       {filters.view === "board" ? (
@@ -221,7 +248,13 @@ export function OrdersPage({
             initialSort={{ id: "date", desc: true }}
             onRowClick={(r) => router.push(`/orders/${r.id}`)}
             caption={t("orders.title")}
-            empty={<EmptyState illustration="search" title={rows.length ? t("common.noResults") : t("orders.noOrders")} body={rows.length ? t("common.noResultsBody") : t("orders.noOrdersBody")} />}
+            empty={
+              rows.length || filters.q || filters.status !== "all" || filters.period !== "any" ? (
+                <EmptyState illustration="search" title={t("common.noResults")} body={t("common.noResultsBody")} />
+              ) : (
+                <EmptyState illustration="orders" title={t("orders.noOrders")} body={t("orders.noOrdersBody")} />
+              )
+            }
             mobileCard={(r) => (
               <Link href={`/orders/${r.id}`} className="flex items-center gap-3 px-4 py-3 active:bg-muted">
                 <div className="min-w-0 flex-1">

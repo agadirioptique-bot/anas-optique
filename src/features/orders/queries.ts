@@ -4,6 +4,7 @@ import type { OrderStatus } from "@/lib/orders";
 import type { Database } from "@/types/database";
 import type { Labeled } from "./new/data";
 import type { OrderListFilters } from "./schemas";
+import { orderSearchFilter } from "./search";
 
 /** One order on the board / in lists (order_overview, RLS-scoped). */
 export interface OrderRow {
@@ -75,16 +76,24 @@ export async function getBoardOrders(storeId: string | null): Promise<OrderRow[]
 
 const PERIOD_DAYS: Record<string, number> = { "7": 7, "30": 30, "90": 90, "365": 365 };
 
-/** List view: newest first, server-side status / period / store filters (search runs in the browser). */
-export async function getOrderList(storeId: string | null, filters: OrderListFilters): Promise<OrderRow[]> {
+const LIST_LIMIT = 500;
+
+/**
+ * List view: newest first, server-side status / period / store filters and search (so the
+ * 2021–2023 history is found too). Shows at most LIST_LIMIT rows; `total` counts every match.
+ */
+export async function getOrderList(storeId: string | null, filters: OrderListFilters): Promise<{ rows: OrderRow[]; total: number }> {
   const db = await createClient();
-  let query = db.from("order_overview").select(COLUMNS).order("created_at", { ascending: false }).limit(500);
+  let query = db.from("order_overview").select(COLUMNS, { count: "exact" }).order("created_at", { ascending: false }).limit(LIST_LIMIT);
   if (storeId) query = query.eq("store_id", storeId);
   if (filters.status !== "all") query = query.eq("status", filters.status);
   if (filters.period !== "any") query = query.gte("created_at", new Date(Date.now() - PERIOD_DAYS[filters.period] * 86_400_000).toISOString());
-  const { data, error } = await query;
+  const search = orderSearchFilter(filters.q);
+  if (search) query = query.or(search);
+  const { data, error, count } = await query;
   if (error) throw new Error("order_overview failed");
-  return (data as Partial<OverviewRow>[]).map(toOrderRow);
+  const rows = (data as Partial<OverviewRow>[]).map(toOrderRow);
+  return { rows, total: count ?? rows.length };
 }
 
 export interface OrderReference {
