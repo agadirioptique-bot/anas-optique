@@ -46,6 +46,8 @@ export function NotifyAdminDialog({ open, onOpenChange, step, order }: { open: b
       paid: f.money(order.paid),
       balance: f.money(order.balance),
       hasBalance: order.balance > 0 ? "yes" : "no",
+      discount: f.money(order.discountAmount ?? 0),
+      hasDiscount: (order.discountAmount ?? 0) > 0 ? "yes" : "no",
     });
 
   return (

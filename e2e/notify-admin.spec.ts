@@ -137,4 +137,19 @@ test("secretary: prompt after a new order, then after « Arrivée en succursale 
   await page.getByTestId("notify-admin-open").click();
   await expect(page.getByTestId("notify-admin").getByTestId("notify-admin-link").filter({ hasText: ADMIN_NAME })).toBeVisible();
   await page.screenshot({ path: "test-results/screens/notify-admin-phone.png", caret: "initial", animations: "disabled" });
+  await page.getByTestId("notify-admin-later").click();
+
+  // Delivery: the secretary collects the rest and delivers; the prompt opens with the « livrée » message.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.getByTestId("collect").click();
+  await page.getByTestId("collect-confirm").click();
+  await expect(page.getByTestId("order-status")).toContainText("Livrée");
+  const delivered = (await adminLink(page)).replace(/ /g, " "); // money has no-break spaces
+  expect(delivered).toContain(`la commande ${number}`);
+  expect(delivered).toContain("a été livrée");
+  expect(delivered).toContain("total 1 200 DH, payé 1 200 DH.");
+  await shot(page, "notify-admin-delivered");
+  await page.getByTestId("notify-admin-later").click();
+  // The delivered order keeps the button.
+  await expect(page.getByTestId("notify-admin-open")).toBeVisible();
 });

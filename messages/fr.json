@@ -179,7 +179,8 @@
     "button": "Prévenir l'admin",
     "title": {
       "confirmed": "Prévenir l'admin : commande confirmée",
-      "in_store": "Prévenir l'admin : arrivée en succursale"
+      "in_store": "Prévenir l'admin : arrivée en succursale",
+      "delivered": "Prévenir l'admin : commande livrée"
     },
     "description": "Commande {number} · {client}",
     "hint": "WhatsApp s'ouvre avec le message prêt : il ne reste qu'à l'envoyer.",
@@ -190,7 +191,8 @@
     "noAdmins": "Aucun admin n'a de numéro WhatsApp. Demandez à l'opticien de l'ajouter dans Paramètres › Utilisateurs.",
     "messages": {
       "confirmed": "Bonjour {admin}, nouvelle commande {number} confirmée à {store} : {client}, total {total}, acompte {paid}.",
-      "in_store": "Bonjour {admin}, la commande {number} ({client}) est arrivée à {store}.{hasBalance, select, yes { Reste à payer : {balance}.} other {}}"
+      "in_store": "Bonjour {admin}, la commande {number} ({client}) est arrivée à {store}.{hasBalance, select, yes { Reste à payer : {balance}.} other {}}",
+      "delivered": "Bonjour {admin}, la commande {number} ({client}) a été livrée à {store} : total {total}, payé {paid}.{hasDiscount, select, yes { Remise : {discount}.} other {}}"
     }
   },
   "unauthorized": {
@@ -394,7 +396,7 @@
       "you": "vous",
       "whatsapp": "WhatsApp",
       "whatsappPlaceholder": "06 12 34 56 78",
-      "whatsappHint": "Les secrétaires l'utilisent pour vous prévenir sur WhatsApp (commande confirmée, arrivée en succursale).",
+      "whatsappHint": "Les secrétaires l'utilisent pour vous prévenir sur WhatsApp (commande confirmée, arrivée en succursale, livrée).",
       "whatsappSaved": "Numéro WhatsApp de {name} enregistré",
       "whatsappCleared": "Numéro WhatsApp de {name} retiré"
     },

@@ -104,8 +104,8 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
   const legacy = order.legacy;
   const active = !legacy && row.status !== "cancelled" && row.status !== "delivered";
   const canCollect = !legacy && row.status !== "cancelled" && row.balance > 0;
-  // A secretary tells the optician about a confirmed or arrived order (SPEC §8).
-  const notifyStep = isSuperAdmin ? null : adminNotifyStep(row.status);
+  // A secretary tells the optician about a confirmed, arrived or delivered order (SPEC §8); never on imported history.
+  const notifyStep = isSuperAdmin || legacy ? null : adminNotifyStep(row.status);
   // Free discount: at most the balance, and the total never goes below the frame + products price.
   const maxDiscount = Math.max(0, Math.round(Math.min(row.balance, row.total - order.frameRevenue) * 100) / 100);
   const canDiscount = isSuperAdmin && active && maxDiscount > 0 && order.discountSource !== "client_pending";

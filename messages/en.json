@@ -179,7 +179,8 @@
     "button": "Notify the admin",
     "title": {
       "confirmed": "Notify the admin: order confirmed",
-      "in_store": "Notify the admin: arrived in store"
+      "in_store": "Notify the admin: arrived in store",
+      "delivered": "Notify the admin: order delivered"
     },
     "description": "Order {number} · {client}",
     "hint": "WhatsApp opens with the message ready: you just have to send it.",
@@ -190,7 +191,8 @@
     "noAdmins": "No admin has a WhatsApp number. Ask the optician to add it in Settings › Users.",
     "messages": {
       "confirmed": "Hello {admin}, new order {number} confirmed at {store}: {client}, total {total}, deposit {paid}.",
-      "in_store": "Hello {admin}, order {number} ({client}) has arrived at {store}.{hasBalance, select, yes { Balance due: {balance}.} other {}}"
+      "in_store": "Hello {admin}, order {number} ({client}) has arrived at {store}.{hasBalance, select, yes { Balance due: {balance}.} other {}}",
+      "delivered": "Hello {admin}, order {number} ({client}) was delivered at {store}: total {total}, paid {paid}.{hasDiscount, select, yes { Discount: {discount}.} other {}}"
     }
   },
   "unauthorized": {
@@ -394,7 +396,7 @@
       "you": "you",
       "whatsapp": "WhatsApp",
       "whatsappPlaceholder": "06 12 34 56 78",
-      "whatsappHint": "Secretaries use it to notify you on WhatsApp (order confirmed, arrived in store).",
+      "whatsappHint": "Secretaries use it to notify you on WhatsApp (order confirmed, arrived in store, delivered).",
       "whatsappSaved": "{name}'s WhatsApp number saved",
       "whatsappCleared": "{name}'s WhatsApp number removed"
     },
