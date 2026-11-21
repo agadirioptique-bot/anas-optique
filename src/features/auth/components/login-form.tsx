@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { PasswordInput } from "@/components/shared/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -59,7 +60,7 @@ export function LoginForm({ initialError }: { initialError?: ErrorCode }) {
         />
       </FormField>
       <FormField id="password" label={t("password")} error={errors.password?.message}>
-        <Input type="password" autoComplete="current-password" {...fieldAria("password", errors.password?.message)} {...form.register("password")} />
+        <PasswordInput autoComplete="current-password" {...fieldAria("password", errors.password?.message)} {...form.register("password")} />
       </FormField>
       <div className="flex justify-end">
         <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">

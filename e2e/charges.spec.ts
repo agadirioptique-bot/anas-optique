@@ -43,7 +43,7 @@ async function signIn(page: Page, who: "secretary" | "admin") {
   await page.goto("/fr/login");
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(password);
-  await page.locator("form").getByRole("button").click();
+  await page.locator("form button[type=submit]").click();
   await expect(page).toHaveURL(who === "admin" ? /\/fr\/dashboard$/ : /\/fr\/orders$/, { timeout: 60_000 });
 }
 

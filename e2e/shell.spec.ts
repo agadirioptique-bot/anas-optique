@@ -30,7 +30,7 @@ async function signInAs(page: Page, role: Role, locale: "fr" | "en" = "fr") {
   await page.goto(`/${locale}/login`);
   await page.locator("#email").fill(email!);
   await page.locator("#password").fill(password!);
-  await page.locator("form").getByRole("button").click();
+  await page.locator("form button[type=submit]").click();
   await expect(page).toHaveURL(role === "super_admin" ? /\/dashboard$/ : /\/orders$/, { timeout: 60_000 });
 }
 
@@ -46,6 +46,13 @@ test("wrong credentials show an error", async ({ page }) => {
   await page.goto("/fr/login");
   await page.locator("#email").fill("nobody@example.com");
   await page.locator("#password").fill("not-the-password");
+  // The eye shows the password, then hides it again.
+  const eye = page.getByRole("button", { name: "Afficher le mot de passe" });
+  await eye.click();
+  await expect(page.locator("#password")).toHaveAttribute("type", "text");
+  await expect(eye).toHaveAttribute("aria-pressed", "true");
+  await eye.click();
+  await expect(page.locator("#password")).toHaveAttribute("type", "password");
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page.getByRole("main").getByRole("alert")).toHaveText("E-mail ou mot de passe incorrect.");
 });

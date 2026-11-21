@@ -44,7 +44,7 @@ async function session(who, viewport = { width: 1440, height: 900 }) {
   if (who) {
     await page.locator("#email").fill(accounts[who].email);
     await page.locator("#password").fill(accounts[who].password);
-    await page.locator("form").getByRole("button").click();
+    await page.locator("form button[type=submit]").click();
     await page.waitForURL(new RegExp(`/${LOCALE}/(dashboard|orders)$`), { timeout: 90_000 });
   }
   return page;

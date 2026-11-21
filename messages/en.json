@@ -234,6 +234,7 @@
     "emailRequired": "Enter your email.",
     "emailInvalid": "This email is not valid.",
     "password": "Password",
+    "showPassword": "Show password",
     "passwordRequired": "Enter your password.",
     "submit": "Sign in",
     "forgotLink": "Forgot password?",

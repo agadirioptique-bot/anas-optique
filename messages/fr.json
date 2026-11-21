@@ -234,6 +234,7 @@
     "emailRequired": "Saisissez votre e-mail.",
     "emailInvalid": "Cet e-mail n’est pas valide.",
     "password": "Mot de passe",
+    "showPassword": "Afficher le mot de passe",
     "passwordRequired": "Saisissez votre mot de passe.",
     "submit": "Se connecter",
     "forgotLink": "Mot de passe oublié ?",
