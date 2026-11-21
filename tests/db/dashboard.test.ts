@@ -91,19 +91,16 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     const antiReflet = await item("treatments", "anti_reflective");
     const blue = await item("treatments", "blue_light");
     const cash = f.ids.cash;
-    const client = async (phone: string, name: string, loyal: boolean) =>
-      (
-        await one(
-          s
-            .from("clients")
-            .upsert(
-              { phone_e164: phone, full_name: name, is_loyal: loyal, loyal_since: loyal ? "2000-12-27T10:00:00Z" : null },
-              { onConflict: "phone_e164" },
-            )
-            .select("id")
-            .single(),
-        )
-      ).id;
+    // Find-or-create by phone: a phone is no longer unique once the history import is in (families share one).
+    const client = async (phone: string, name: string, loyal: boolean) => {
+      const row = { phone_e164: phone, full_name: name, is_loyal: loyal, loyal_since: loyal ? "2000-12-27T10:00:00Z" : null };
+      const found = await one(s.from("clients").select("id").eq("phone_e164", phone).limit(1));
+      if (found.length) {
+        await one(s.from("clients").update(row).eq("id", found[0].id).select("id"));
+        return found[0].id;
+      }
+      return (await one(s.from("clients").insert(row).select("id").single())).id;
+    };
     const c1 = await client("+212699000001", "KPI Client Fidèle", true);
     const c2 = await client("+212699000002", "KPI Client Régulier", false);
     const c3 = await client("+212699000003", "KPI Client Annulé", false);
