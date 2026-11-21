@@ -20,6 +20,7 @@ import { useFormat } from "@/lib/use-format";
 import { readyMessage, whatsappLink } from "@/lib/whatsapp";
 import { addOrderPayment, applyFreeDiscount, cancelOrder, changeOrderStatus, deliverOrder } from "../actions";
 import type { Labeled } from "../new/data";
+import type { AdminNotifyStep } from "../notify";
 import type { OrderRow } from "../queries";
 import { NotifyAdminDialog } from "./notify-admin";
 
@@ -91,7 +92,25 @@ function MethodPicker({ methods, value, onChange }: { methods: Labeled[]; value:
   );
 }
 
-function CollectDialog({ row, deliver, methods, onClose }: { row: OrderRow; deliver: boolean; methods: Labeled[]; onClose: () => void }) {
+/** The order as it stands once delivered: fully paid (delivery needs a zero balance). */
+function deliveredRow(row: OrderRow): OrderRow {
+  return { ...row, status: "delivered", paid: row.total, balance: 0 };
+}
+
+function CollectDialog({
+  row,
+  deliver,
+  methods,
+  onClose,
+  onDelivered,
+}: {
+  row: OrderRow;
+  deliver: boolean;
+  methods: Labeled[];
+  onClose: () => void;
+  /** Called instead of onClose once the order is delivered (opens the secretary's WhatsApp prompt). */
+  onDelivered?: (row: OrderRow) => void;
+}) {
   const t = useTranslations();
   const f = useFormat();
   const run = useRun();
@@ -121,7 +140,9 @@ function CollectDialog({ row, deliver, methods, onClose }: { row: OrderRow; deli
           : toast.success(t("collect.done", { amount: f.money(amount) })),
     );
     setPending(false);
-    if (done) onClose();
+    if (!done) return;
+    if (deliver && onDelivered) onDelivered(deliveredRow(row));
+    else onClose();
   };
 
   return (
@@ -319,7 +340,7 @@ type Dialog =
   | { kind: "cancel"; row: OrderRow }
   | { kind: "discount"; row: OrderRow; max: number }
   | { kind: "back"; row: OrderRow }
-  | { kind: "notify"; row: OrderRow };
+  | { kind: "notify"; step: AdminNotifyStep; row: OrderRow };
 
 export function OrderActionsProvider({
   children,
@@ -345,7 +366,13 @@ export function OrderActionsProvider({
           setDialog({ kind: "collect", row, deliver: true });
           return false;
         }
-        return run(() => deliverOrder({ orderId: row.id, payment: null }), () => toast.success(t("collect.delivered", { number: row.displayNumber })));
+        return run(
+          () => deliverOrder({ orderId: row.id, payment: null }),
+          () => {
+            toast.success(t("collect.delivered", { number: row.displayNumber }));
+            if (!isSuperAdmin) setDialog({ kind: "notify", step: "delivered", row: deliveredRow(row) });
+          },
+        );
       }
       return run(
         () => changeOrderStatus({ orderId: row.id, to: next }),
@@ -355,7 +382,7 @@ export function OrderActionsProvider({
             return;
           }
           // A secretary tells the optician the glasses have arrived (she can skip it).
-          if (!isSuperAdmin) setDialog({ kind: "notify", row: { ...row, status: next } });
+          if (!isSuperAdmin) setDialog({ kind: "notify", step: "in_store", row: { ...row, status: next } });
           const href = readyWhatsAppHref({ ...row, status: next });
           toast.success(t("orders.readyToast", { number: row.displayNumber }), {
             duration: 12000,
@@ -387,9 +414,19 @@ export function OrderActionsProvider({
     <Ctx.Provider value={value}>
       {children}
       {dialog?.kind === "notify" && (
-        <NotifyAdminDialog open onOpenChange={(o) => !o && close()} step="in_store" order={dialog.row} />
+        <NotifyAdminDialog open onOpenChange={(o) => !o && close()} step={dialog.step} order={dialog.row} />
       )}
-      {dialog?.kind === "collect" && <CollectDialog key={dialog.row.id} row={dialog.row} deliver={dialog.deliver} methods={methods} onClose={close} />}
+      {dialog?.kind === "collect" && (
+        <CollectDialog
+          key={dialog.row.id}
+          row={dialog.row}
+          deliver={dialog.deliver}
+          methods={methods}
+          onClose={close}
+          // A secretary tells the optician the pair was delivered (she can skip it).
+          onDelivered={isSuperAdmin ? undefined : (row) => setDialog({ kind: "notify", step: "delivered", row })}
+        />
+      )}
       {dialog?.kind === "cancel" && <CancelDialog row={dialog.row} methods={methods} reasons={reasons} onClose={close} />}
       {dialog?.kind === "discount" && <DiscountDialog row={dialog.row} max={dialog.max} onClose={close} />}
       <ConfirmDialog
