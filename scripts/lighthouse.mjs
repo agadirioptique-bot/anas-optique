@@ -27,7 +27,7 @@ try {
   await page.goto(`${BASE}/fr/login`);
   await page.locator("#email").fill(admin.email);
   await page.locator("#password").fill(admin.password);
-  await page.locator("form").getByRole("button").click();
+  await page.locator("form button[type=submit]").click();
   await page.waitForURL(/\/fr\/dashboard$/, { timeout: 90_000 });
   // Warm both pages once so the first audit doesn't measure a cold server.
   for (const path of PAGES) await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
