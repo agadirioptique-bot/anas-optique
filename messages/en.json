@@ -188,12 +188,13 @@
     "later": "Later",
     "close": "Close",
     "loading": "Loading…",
-    "noAdmins": "No admin has a WhatsApp number. Ask the optician to add it in Settings › Users.",
-    "messages": {
-      "confirmed": "Hello {admin}, new order {number} confirmed at {store}: {client}, total {total}, deposit {paid}.",
-      "in_store": "Hello {admin}, order {number} ({client}) has arrived at {store}.{hasBalance, select, yes { Balance due: {balance}.} other {}}",
-      "delivered": "Hello {admin}, order {number} ({client}) was delivered at {store}: total {total}, paid {paid}.{hasDiscount, select, yes { Discount: {discount}.} other {}}"
-    }
+    "noAdmins": "No admin has a WhatsApp number. Ask the optician to add it in Settings › Users."
+  },
+  "whatsappMessages": {
+    "confirmed": "Hello {admin}, new order {numero} confirmed at {magasin}: {client}, total {total}, deposit {avance}.",
+    "in_store": "Hello {admin}, order {numero} ({client}) has arrived at {magasin}. Balance due: {reste}.",
+    "delivered": "Hello {admin}, order {numero} ({client}) was delivered at {magasin}. Order total: {total} · Deposit: {avance} · Paid today: {paye_aujourdhui}.",
+    "client_ready": "Bonjour {prenom}, vos lunettes (commande {numero}) sont prêtes à la {magasin}. Reste à payer : {reste}. À bientôt !"
   },
   "unauthorized": {
     "title": "Access denied",
@@ -359,7 +360,41 @@
       "chargeLocations": "Charge locations",
       "loyalty": "Loyalty",
       "notifications": "Notifications",
+      "whatsapp": "WhatsApp messages",
       "roles": "Roles and permissions"
+    },
+    "whatsapp": {
+      "title": "WhatsApp messages",
+      "description": "The texts that open in WhatsApp, ready to send. Nothing is sent by itself: the person taps Send.",
+      "items": {
+        "confirmed": { "title": "Admin · new order confirmed", "hint": "The secretary sends it to you after « Confirm order »." },
+        "in_store": { "title": "Admin · arrived in store", "hint": "The secretary sends it to you when the order arrives in store." },
+        "delivered": { "title": "Admin · order delivered", "hint": "The secretary sends it to you right after the delivery." },
+        "client_ready": { "title": "Client · glasses ready", "hint": "« Notify on WhatsApp » button when the order is in store." }
+      },
+      "vars": {
+        "admin": "Admin's first name",
+        "numero": "Order number",
+        "client": "Client's name",
+        "prenom": "Client's first name",
+        "magasin": "Store",
+        "total": "Order total",
+        "avance": "Deposit",
+        "paye_aujourdhui": "Paid today",
+        "reste": "Balance due",
+        "remise": "Discount"
+      },
+      "insert": "Insert a value",
+      "insertOne": "Insert « {label} »",
+      "preview": "Preview",
+      "previewHint": "Example: a 1,200 DH order, 360 DH deposit, 840 DH paid at delivery.",
+      "sampleClient": "Fatima El Idrissi",
+      "sampleStore": "Succursale Centre",
+      "custom": "Edited",
+      "default": "Default text",
+      "reset": "Back to the default text",
+      "tooLong": "1,000 characters at most.",
+      "saved": "WhatsApp messages saved"
     },
     "users": {
       "title": "Users",

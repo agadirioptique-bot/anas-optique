@@ -1,10 +1,10 @@
-import { Award, Bell, Building2, FormInput, ListChecks, MapPin, Package, ShieldCheck, Users, type LucideIcon } from "lucide-react";
+import { Award, Bell, Building2, FormInput, ListChecks, MapPin, MessageCircle, Package, ShieldCheck, Users, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 /** Settings sub-pages (SPEC §8), in display order. */
-export const SETTINGS_TABS = ["lists", "products", "fields", "stores", "users", "chargeLocations", "loyalty", "notifications", "roles"] as const;
+export const SETTINGS_TABS = ["lists", "products", "fields", "stores", "users", "chargeLocations", "loyalty", "notifications", "whatsapp", "roles"] as const;
 export type SettingsTab = (typeof SETTINGS_TABS)[number];
 
 const ICONS: Record<SettingsTab, LucideIcon> = {
@@ -16,6 +16,7 @@ const ICONS: Record<SettingsTab, LucideIcon> = {
   chargeLocations: MapPin,
   loyalty: Award,
   notifications: Bell,
+  whatsapp: MessageCircle,
   roles: ShieldCheck,
 };
 

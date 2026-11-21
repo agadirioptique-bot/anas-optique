@@ -188,12 +188,13 @@
     "later": "Plus tard",
     "close": "Fermer",
     "loading": "Chargement…",
-    "noAdmins": "Aucun admin n'a de numéro WhatsApp. Demandez à l'opticien de l'ajouter dans Paramètres › Utilisateurs.",
-    "messages": {
-      "confirmed": "Bonjour {admin}, nouvelle commande {number} confirmée à {store} : {client}, total {total}, acompte {paid}.",
-      "in_store": "Bonjour {admin}, la commande {number} ({client}) est arrivée à {store}.{hasBalance, select, yes { Reste à payer : {balance}.} other {}}",
-      "delivered": "Bonjour {admin}, la commande {number} ({client}) a été livrée à {store} : total {total}, payé {paid}.{hasDiscount, select, yes { Remise : {discount}.} other {}}"
-    }
+    "noAdmins": "Aucun admin n'a de numéro WhatsApp. Demandez à l'opticien de l'ajouter dans Paramètres › Utilisateurs."
+  },
+  "whatsappMessages": {
+    "confirmed": "Bonjour {admin}, nouvelle commande {numero} confirmée à {magasin} : {client}, total {total}, avance {avance}.",
+    "in_store": "Bonjour {admin}, la commande {numero} ({client}) est arrivée à {magasin}. Reste à payer : {reste}.",
+    "delivered": "Bonjour {admin}, la commande {numero} ({client}) a été livrée à {magasin}. Total de la commande : {total} · Avance : {avance} · Payé aujourd'hui : {paye_aujourdhui}.",
+    "client_ready": "Bonjour {prenom}, vos lunettes (commande {numero}) sont prêtes à la {magasin}. Reste à payer : {reste}. À bientôt !"
   },
   "unauthorized": {
     "title": "Accès non autorisé",
@@ -359,7 +360,41 @@
       "chargeLocations": "Lieux de charges",
       "loyalty": "Fidélité",
       "notifications": "Notifications",
+      "whatsapp": "Messages WhatsApp",
       "roles": "Rôles et permissions"
+    },
+    "whatsapp": {
+      "title": "Messages WhatsApp",
+      "description": "Les textes qui s'ouvrent dans WhatsApp, prêts à envoyer. Rien ne part tout seul : la personne appuie sur Envoyer.",
+      "items": {
+        "confirmed": { "title": "Admin · nouvelle commande confirmée", "hint": "La secrétaire vous l'envoie après « Valider la commande »." },
+        "in_store": { "title": "Admin · arrivée en succursale", "hint": "La secrétaire vous l'envoie quand la commande arrive en succursale." },
+        "delivered": { "title": "Admin · commande livrée", "hint": "La secrétaire vous l'envoie juste après la livraison." },
+        "client_ready": { "title": "Client · lunettes prêtes", "hint": "Bouton « Prévenir sur WhatsApp » quand la commande est en succursale." }
+      },
+      "vars": {
+        "admin": "Prénom de l'admin",
+        "numero": "N° de commande",
+        "client": "Nom du client",
+        "prenom": "Prénom du client",
+        "magasin": "Succursale",
+        "total": "Total de la commande",
+        "avance": "Avance",
+        "paye_aujourdhui": "Payé aujourd'hui",
+        "reste": "Reste à payer",
+        "remise": "Remise"
+      },
+      "insert": "Insérer une valeur",
+      "insertOne": "Insérer « {label} »",
+      "preview": "Aperçu",
+      "previewHint": "Exemple : commande de 1 200 DH, avance 360 DH, 840 DH payés à la livraison.",
+      "sampleClient": "Fatima El Idrissi",
+      "sampleStore": "Succursale Centre",
+      "custom": "Modifié",
+      "default": "Texte par défaut",
+      "reset": "Remettre le texte par défaut",
+      "tooLong": "1 000 caractères au maximum.",
+      "saved": "Messages WhatsApp enregistrés"
     },
     "users": {
       "title": "Utilisateurs",

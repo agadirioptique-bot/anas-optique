@@ -17,11 +17,11 @@ import { localized } from "@/lib/localized";
 import { ORDER_FLOW, type OrderStatus } from "@/lib/orders";
 import { formatPhone } from "@/lib/phone";
 import { useFormat } from "@/lib/use-format";
-import { readyMessage, whatsappLink } from "@/lib/whatsapp";
 import { addOrderPayment, applyFreeDiscount, cancelOrder, changeOrderStatus, deliverOrder } from "../actions";
 import type { Labeled } from "../new/data";
 import type { AdminNotifyStep } from "../notify";
 import type { OrderRow } from "../queries";
+import { useReadyWhatsAppHref } from "../use-whatsapp";
 import { NotifyAdminDialog } from "./notify-admin";
 
 type FlowStatus = (typeof ORDER_FLOW)[number];
@@ -34,11 +34,6 @@ export function nextStatus(status: OrderStatus): FlowStatus | null {
 export function previousStatus(status: OrderStatus): FlowStatus | null {
   const i = ORDER_FLOW.indexOf(status as (typeof ORDER_FLOW)[number]);
   return i > 0 && status !== "delivered" ? ORDER_FLOW[i - 1] : null;
-}
-
-export function readyWhatsAppHref(row: OrderRow): string | null {
-  if (!row.clientHasWhatsapp || !row.clientPhone) return null;
-  return whatsappLink(row.clientPhone, readyMessage({ clientName: row.clientName, displayNumber: row.displayNumber, storeName: row.storeName, balance: row.balance }));
 }
 
 interface OrderActions {
@@ -92,9 +87,9 @@ function MethodPicker({ methods, value, onChange }: { methods: Labeled[]; value:
   );
 }
 
-/** The order as it stands once delivered: fully paid (delivery needs a zero balance). */
-function deliveredRow(row: OrderRow): OrderRow {
-  return { ...row, status: "delivered", paid: row.total, balance: 0 };
+/** The order as it stands once delivered: fully paid (delivery needs a zero balance), `paidToday` collected at the delivery. */
+function deliveredRow(row: OrderRow, paidToday: number): OrderRow & { paidToday: number } {
+  return { ...row, status: "delivered", paid: row.total, balance: 0, paidToday };
 }
 
 function CollectDialog({
@@ -109,7 +104,7 @@ function CollectDialog({
   methods: Labeled[];
   onClose: () => void;
   /** Called instead of onClose once the order is delivered (opens the secretary's WhatsApp prompt). */
-  onDelivered?: (row: OrderRow) => void;
+  onDelivered?: (row: OrderRow & { paidToday: number }) => void;
 }) {
   const t = useTranslations();
   const f = useFormat();
@@ -141,7 +136,7 @@ function CollectDialog({
     );
     setPending(false);
     if (!done) return;
-    if (deliver && onDelivered) onDelivered(deliveredRow(row));
+    if (deliver && onDelivered) onDelivered(deliveredRow(row, amount));
     else onClose();
   };
 
@@ -340,7 +335,7 @@ type Dialog =
   | { kind: "cancel"; row: OrderRow }
   | { kind: "discount"; row: OrderRow; max: number }
   | { kind: "back"; row: OrderRow }
-  | { kind: "notify"; step: AdminNotifyStep; row: OrderRow };
+  | { kind: "notify"; step: AdminNotifyStep; row: OrderRow & { paidToday?: number } };
 
 export function OrderActionsProvider({
   children,
@@ -355,6 +350,7 @@ export function OrderActionsProvider({
 }) {
   const t = useTranslations();
   const run = useRun();
+  const readyHref = useReadyWhatsAppHref();
   const [dialog, setDialog] = useState<Dialog | null>(null);
 
   const advance = useCallback(
@@ -370,7 +366,7 @@ export function OrderActionsProvider({
           () => deliverOrder({ orderId: row.id, payment: null }),
           () => {
             toast.success(t("collect.delivered", { number: row.displayNumber }));
-            if (!isSuperAdmin) setDialog({ kind: "notify", step: "delivered", row: deliveredRow(row) });
+            if (!isSuperAdmin) setDialog({ kind: "notify", step: "delivered", row: deliveredRow(row, 0) });
           },
         );
       }
@@ -383,7 +379,7 @@ export function OrderActionsProvider({
           }
           // A secretary tells the optician the glasses have arrived (she can skip it).
           if (!isSuperAdmin) setDialog({ kind: "notify", step: "in_store", row: { ...row, status: next } });
-          const href = readyWhatsAppHref({ ...row, status: next });
+          const href = readyHref({ ...row, status: next });
           toast.success(t("orders.readyToast", { number: row.displayNumber }), {
             duration: 12000,
             description: href ? t("orders.readyToastBody", { client: row.clientName }) : t("orders.noWhatsapp", { phone: formatPhone(row.clientPhone) }),
@@ -392,7 +388,7 @@ export function OrderActionsProvider({
         },
       );
     },
-    [run, t, isSuperAdmin],
+    [run, t, isSuperAdmin, readyHref],
   );
 
   const value = useMemo<OrderActions>(

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { StoreSummary } from "@/features/auth/types";
-import { readyWhatsAppHref } from "@/features/orders/components/order-actions";
+import { useReadyWhatsAppHref } from "@/features/orders/use-whatsapp";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { localized } from "@/lib/localized";
 import { useFormat } from "@/lib/use-format";
@@ -206,6 +206,7 @@ function ListCard({ title, icon: Icon, href, count, children, testId }: { title:
 function PickupList({ data }: { data: DashboardData }) {
   const t = useTranslations();
   const f = useFormat();
+  const readyWhatsAppHref = useReadyWhatsAppHref();
   return (
     <ListCard title={t("dashboard.lists.pickup")} icon={Glasses} href="/orders?view=list" count={data.pickup.total} testId="widget-pickup">
       {data.pickup.rows.length === 0 ? (

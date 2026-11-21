@@ -18,7 +18,8 @@ import { cn } from "@/lib/utils";
 import type { OrderDetailData } from "../detail";
 import type { Labeled } from "../new/data";
 import { uploadPrescriptionPhoto } from "../lib/photo-upload";
-import { nextStatus, OrderActionsProvider, previousStatus, readyWhatsAppHref, useOrderActions } from "./order-actions";
+import { useReadyWhatsAppHref } from "../use-whatsapp";
+import { nextStatus, OrderActionsProvider, previousStatus, useOrderActions } from "./order-actions";
 import { adminNotifyStep } from "../notify";
 import { NotifyAdminButton } from "./notify-admin";
 import { PrescriptionTable } from "./prescription";
@@ -91,6 +92,17 @@ function PhotoCard({ data }: { data: OrderDetailData }) {
   );
 }
 
+/**
+ * What was collected at the delivery itself: deliver_order records the last payment and the
+ * « Livrée » step in one transaction, so they share the same time.
+ */
+function paidAtDelivery({ events, payments }: Pick<OrderDetailData, "events" | "payments">): number {
+  const delivered = events.findLast((e) => e.to === "delivered");
+  if (!delivered) return 0;
+  const at = new Date(delivered.at).getTime();
+  return Math.round(payments.filter((p) => new Date(p.at).getTime() >= at).reduce((sum, p) => sum + p.amount, 0) * 100) / 100;
+}
+
 function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: boolean }) {
   const t = useTranslations();
   const locale = useLocale();
@@ -99,7 +111,8 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
   const { row, order } = data;
   const next = nextStatus(row.status);
   const back = isSuperAdmin ? previousStatus(row.status) : null;
-  const whatsapp = row.status === "in_store" ? readyWhatsAppHref(row) : null;
+  const readyHref = useReadyWhatsAppHref();
+  const whatsapp = row.status === "in_store" ? readyHref(row) : null;
   // Imported history (SPEC §12): read only, no action at all.
   const legacy = order.legacy;
   const active = !legacy && row.status !== "cancelled" && row.status !== "delivered";
@@ -141,7 +154,7 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
         }
         actions={
           <>
-            {notifyStep && <NotifyAdminButton step={notifyStep} order={row} />}
+            {notifyStep && <NotifyAdminButton step={notifyStep} order={{ ...row, paidToday: notifyStep === "delivered" ? paidAtDelivery(data) : 0 }} />}
             {whatsapp && (
               <Button asChild variant="whatsapp">
                 <a href={whatsapp} target="_blank" rel="noopener noreferrer">
