@@ -3,6 +3,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import type { SessionUser, StoreSummary } from "@/features/auth/types";
 import type { NavKey } from "@/lib/permissions";
+import type { WhatsappTemplates } from "@/lib/whatsapp";
 
 export interface ShellValue {
   user: SessionUser;
@@ -14,6 +15,8 @@ export interface ShellValue {
   badges: Partial<Record<NavKey, number>>;
   /** Unread notifications when the page was rendered; the bell keeps it live (Realtime). */
   unreadNotifications: number;
+  /** WhatsApp texts saved in Settings (missing = default text), used by every "open WhatsApp" button. */
+  whatsappTemplates: WhatsappTemplates;
 }
 
 const ShellContext = createContext<ShellValue | null>(null);

@@ -60,6 +60,7 @@ test.afterAll(async () => {
   const admin = await db("admin");
   const { data: me } = await admin.from("profiles").select("id").eq("email", accounts!.admin.email).single();
   await admin.rpc("set_user_whatsapp", { p_user_id: me!.id, p_phone: null as unknown as string });
+  await admin.from("app_settings").delete().eq("key", "whatsapp_templates");
   if (orderId) {
     const { data: reason } = await admin.from("settings_list_items").select("id").eq("list_key", "cancel_reasons").eq("code", "other").single();
     await admin.rpc("cancel_order", { p_order_id: orderId, p_reason_id: reason!.id, p_note: "E2E notify-admin", p_refund_amount: 0 });
@@ -75,6 +76,43 @@ test("the admin saves his WhatsApp number in Settings › Users", async ({ page 
   await expect(page.getByText(`Numéro WhatsApp de ${ADMIN_NAME} enregistré`)).toBeVisible();
   await page.reload();
   await expect(page.getByTestId(`user-whatsapp-${accounts!.admin.email}`)).toHaveValue(ADMIN_PHONE);
+});
+
+test("the admin rewrites a WhatsApp message in Settings › Messages WhatsApp, then puts the default back", async ({ page }) => {
+  await signIn(page, "admin");
+  await page.goto("/fr/settings?tab=whatsapp");
+  const item = page.getByTestId("wa-template-delivered");
+  const text = page.getByTestId("wa-text-delivered");
+  await expect(text).toHaveValue(/Total de la commande : \{total\}/);
+  // Default preview on the example order.
+  await expect(page.getByTestId("wa-preview-delivered")).toContainText("Avance : 360 DH · Payé aujourd'hui : 840 DH");
+
+  // A slow dev server can still be hydrating: type again until the field holds exactly the text and the page reacts (« Modifié »).
+  await expect(async () => {
+    await text.fill("Livrée : {numero} — encaissé ");
+    await expect(text).toHaveValue("Livrée : {numero} — encaissé ", { timeout: 2_000 });
+    await expect(item.getByText("Modifié")).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 60_000 });
+  await item.getByRole("button", { name: "Insérer « Payé aujourd'hui »" }).click();
+  await expect(text).toHaveValue("Livrée : {numero} — encaissé {paye_aujourdhui}");
+  await expect(page.getByTestId("wa-preview-delivered")).toHaveText(/^Livrée : CNT-00832 — encaissé 840\sDH$/);
+  await expect(item.getByText("Modifié")).toBeVisible();
+  await page.getByTestId("wa-save").click();
+  await expect(page.getByText("Messages WhatsApp enregistrés")).toBeVisible();
+  await page.reload();
+  await expect(page.getByTestId("wa-text-delivered")).toHaveValue("Livrée : {numero} — encaissé {paye_aujourdhui}");
+  await shot(page, "settings-whatsapp");
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.screenshot({ path: "test-results/screens/settings-whatsapp-phone.png", caret: "initial", animations: "disabled" });
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  // Back to the default text: the secretary test below checks the default messages.
+  await page.getByTestId("wa-reset-delivered").click();
+  await expect(page.getByTestId("wa-text-delivered")).toHaveValue(/Total de la commande : \{total\}/);
+  await page.getByTestId("wa-save").click();
+  await expect(page.getByText("Messages WhatsApp enregistrés")).toBeVisible();
+  await page.reload();
+  await expect(page.getByTestId("wa-template-delivered").getByText("Texte par défaut")).toBeVisible();
 });
 
 test("secretary: prompt after a new order, then after « Arrivée en succursale »", async ({ page }) => {
@@ -104,7 +142,7 @@ test("secretary: prompt after a new order, then after « Arrivée en succursale 
   number = (await page.getByTestId("order-created").textContent())!.match(new RegExp(`${accounts!.storePrefix}-\\d+`))![0];
   const confirmed = await adminLink(page);
   expect(confirmed).toContain(`nouvelle commande ${number} confirmée`);
-  expect(confirmed).toContain("acompte");
+  expect(confirmed).toContain("avance");
   await shot(page, "notify-admin-confirmed");
   await page.getByTestId("notify-admin-later").click();
   await expect(page.getByTestId("notify-admin")).toBeHidden();
@@ -147,7 +185,7 @@ test("secretary: prompt after a new order, then after « Arrivée en succursale 
   const delivered = (await adminLink(page)).replace(/ /g, " "); // money has no-break spaces
   expect(delivered).toContain(`la commande ${number}`);
   expect(delivered).toContain("a été livrée");
-  expect(delivered).toContain("total 1 200 DH, payé 1 200 DH.");
+  expect(delivered).toContain("Total de la commande : 1 200 DH · Avance : 360 DH · Payé aujourd'hui : 840 DH.");
   await shot(page, "notify-admin-delivered");
   await page.getByTestId("notify-admin-later").click();
   // The delivered order keeps the button.

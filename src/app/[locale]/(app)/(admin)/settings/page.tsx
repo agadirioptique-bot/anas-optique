@@ -22,6 +22,8 @@ import { StuckDaysTab } from "@/features/settings/thresholds/components/stuck-da
 import { getLoyaltyData, getStuckDays } from "@/features/settings/thresholds/queries";
 import { UsersTab } from "@/features/settings/users/components/users-tab";
 import { listUsers } from "@/features/settings/users/queries";
+import { WhatsappTab } from "@/features/settings/whatsapp/components/whatsapp-tab";
+import { getWhatsappTemplates } from "@/features/settings/whatsapp/queries";
 
 export const generateMetadata = pageMetadata("settings");
 
@@ -59,6 +61,10 @@ async function NotificationsSection() {
   return <StuckDaysTab days={await getStuckDays()} />;
 }
 
+async function WhatsappSection() {
+  return <WhatsappTab saved={await getWhatsappTemplates()} />;
+}
+
 async function RolesSection() {
   return <RolesTab permissions={await getRolePermissions()} />;
 }
@@ -73,6 +79,7 @@ const SECTIONS: Record<SettingsTab, () => Promise<ReactNode>> = {
   chargeLocations: ChargeLocationsSection,
   loyalty: LoyaltySection,
   notifications: NotificationsSection,
+  whatsapp: WhatsappSection,
   roles: RolesSection,
 };
 

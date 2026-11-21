@@ -107,6 +107,8 @@ app_settings (key text primary key, value jsonb)
   -- 'loyalty_threshold'      → { "orders": 5 }
   -- 'stuck_order_days'       → { "confirmed": 3, "in_workshop": 5, "prepared": 3, "in_store": 10 }
   -- 'slip_number_padding'    → { "digits": 5 }
+  -- 'whatsapp_templates'     → { "confirmed"?, "in_store"?, "delivered"?, "client_ready"? } texts with {variables};
+  --                             missing = default text (messages/*.json › whatsappMessages)
 
 settings_list_items           -- every editable dropdown
   id, list_key text, code text null (unique per list_key; stable key, e.g. 'supplier_purchase'),
@@ -354,7 +356,9 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 
 **Order detail**: keep demo layout (timeline, prescription, products, client card, payments, additional info, history). **Remove the "Costs and margin" panel.** Super admin extra actions in "…" menu: cancel (dialog with reason + refund), move back one step, free discount (before delivery only).
 
-**Secretary → admin on WhatsApp** (2026-11-13; *Livrée* added 2026-11-21): when a secretary confirms a new order (wizard success), moves an order to *En succursale* (board, order page) or delivers it (with or without collecting the rest), a prompt offers "Prévenir {admin} sur WhatsApp" for each active super admin with a WhatsApp number; it opens `wa.me` with the message ready (number, client, store, total/deposit, balance due, or — once delivered — total, paid and the discount if any) and she taps Send. "Plus tard" skips it; a "Prévenir l'admin" button stays on the order page while the order is *Confirmée*, *En succursale* or *Livrée* (never on imported history). Nothing is sent automatically (that would need the paid WhatsApp Business API). Super admins never get the prompt.
+**Secretary → admin on WhatsApp** (2026-11-13; *Livrée* added 2026-11-21): when a secretary confirms a new order (wizard success), moves an order to *En succursale* (board, order page) or delivers it (with or without collecting the rest), a prompt offers "Prévenir {admin} sur WhatsApp" for each active super admin with a WhatsApp number; it opens `wa.me` with the message ready (number, client, store, total/deposit, balance due, or — once delivered — « Total de la commande · Avance · Payé aujourd'hui », where avance = paid before the delivery and payé aujourd'hui = collected at the delivery, so they add up to the total) and she taps Send. "Plus tard" skips it; a "Prévenir l'admin" button stays on the order page while the order is *Confirmée*, *En succursale* or *Livrée* (never on imported history). Nothing is sent automatically (that would need the paid WhatsApp Business API). Super admins never get the prompt.
+
+**Messages WhatsApp** (Settings tab, 2026-11-21): the super admin rewrites the 4 WhatsApp texts — admin: confirmed, in store, delivered; client: glasses ready (« Prévenir sur WhatsApp ») — with insert buttons for the variables (`{admin}`, `{numero}`, `{client}`, `{prenom}`, `{magasin}`, `{total}`, `{avance}`, `{paye_aujourdhui}`, `{reste}`, `{remise}`, each message offers its own subset), a live preview on an example order and « Remettre le texte par défaut ». Stored in `app_settings.whatsapp_templates` (RLS: everyone reads, super admin writes); an empty or default text is not stored, so it follows the default. A saved text is used as written, whatever the user's language; the defaults follow the UI language, except the client message, which stays in French. Texts have no conditions: « Reste à payer : {reste} » shows « 0 DH » when nothing is due.
 
 **Clients**: list with chips All / New / Regular / Loyal (counts = non-cancelled orders across all stores; Loyal = `is_loyal`; New = 0–1 order; Regular = 2..N−1), client file (orders across stores: secretary sees count — via `client_order_stats(client_id)` security definer RPC returning counts only — + only her store's rows), "Vision over time" chart, "New order for this client". Super admin: set/clear pending discount.
 
@@ -377,6 +381,7 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 - *Charge locations* (labels, archive)
 - *Loyalty* (number of delivered orders)
 - *Notifications* (stuck-order days per status)
+- *Messages WhatsApp* (the 4 WhatsApp texts, see « Messages WhatsApp » above)
 - *Roles and permissions* (read-only matrix in v1)
 
 ---

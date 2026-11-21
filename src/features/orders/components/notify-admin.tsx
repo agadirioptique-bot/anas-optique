@@ -8,9 +8,10 @@ import { ResponsiveDialog } from "@/components/shared/dialogs";
 import { Button } from "@/components/ui/button";
 import { formatPhone } from "@/lib/phone";
 import { useFormat } from "@/lib/use-format";
-import { whatsappLink } from "@/lib/whatsapp";
+import { fillTemplate, whatsappLink } from "@/lib/whatsapp";
+import { adminMessageVars, type AdminNotifyOrder, type AdminNotifyStep } from "../notify";
 import { loadAdminContacts, type AdminContact } from "../notify-actions";
-import type { AdminNotifyOrder, AdminNotifyStep } from "../notify";
+import { useWhatsappTemplate } from "../use-whatsapp";
 
 /**
  * Secretary → super admin on WhatsApp: one button per admin opens WhatsApp with the message ready
@@ -36,19 +37,9 @@ export function NotifyAdminDialog({ open, onOpenChange, step, order }: { open: b
     };
   }, [open, te]);
 
-  const message = (admin: AdminContact) =>
-    t(`messages.${step}`, {
-      admin: admin.name.trim().split(/\s+/)[0] ?? admin.name,
-      number: order.displayNumber,
-      client: order.clientName,
-      store: order.storeName,
-      total: f.money(order.total),
-      paid: f.money(order.paid),
-      balance: f.money(order.balance),
-      hasBalance: order.balance > 0 ? "yes" : "no",
-      discount: f.money(order.discountAmount ?? 0),
-      hasDiscount: (order.discountAmount ?? 0) > 0 ? "yes" : "no",
-    });
+  // The text saved in Settings › Messages WhatsApp, else the default.
+  const template = useWhatsappTemplate()(step);
+  const message = (admin: AdminContact) => fillTemplate(template, adminMessageVars(order, admin.name, f.money));
 
   return (
     <ResponsiveDialog

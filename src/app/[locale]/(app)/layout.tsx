@@ -3,6 +3,7 @@ import { requireUser } from "@/features/auth/guards";
 import { getVisibleStores } from "@/features/auth/session";
 import { getPendingChargeCount } from "@/features/charges/queries";
 import { getUnreadCount } from "@/features/notifications/queries";
+import { getWhatsappTemplates } from "@/features/settings/whatsapp/queries";
 import { getActiveStore } from "@/features/shell/store-scope";
 import { getWorkshopBadgeCount } from "@/features/workshop/queries";
 
@@ -20,7 +21,7 @@ export default async function AppLayout({ children }: LayoutProps<"/[locale]">) 
         }))
       : {};
 
-  const unreadNotifications = await getUnreadCount();
+  const [unreadNotifications, whatsappTemplates] = await Promise.all([getUnreadCount(), getWhatsappTemplates()]);
 
-  return <AppShell value={{ user, stores, activeStore, badges, unreadNotifications }}>{children}</AppShell>;
+  return <AppShell value={{ user, stores, activeStore, badges, unreadNotifications, whatsappTemplates }}>{children}</AppShell>;
 }
