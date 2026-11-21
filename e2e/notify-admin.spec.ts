@@ -87,7 +87,12 @@ test("the admin rewrites a WhatsApp message in Settings › Messages WhatsApp, t
   // Default preview on the example order.
   await expect(page.getByTestId("wa-preview-delivered")).toContainText("Avance : 360 DH · Payé aujourd'hui : 840 DH");
 
-  await text.fill("Livrée : {numero} — encaissé ");
+  // A slow dev server can still be hydrating: type again until the field holds exactly the text and the page reacts (« Modifié »).
+  await expect(async () => {
+    await text.fill("Livrée : {numero} — encaissé ");
+    await expect(text).toHaveValue("Livrée : {numero} — encaissé ", { timeout: 2_000 });
+    await expect(item.getByText("Modifié")).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 60_000 });
   await item.getByRole("button", { name: "Insérer « Payé aujourd'hui »" }).click();
   await expect(text).toHaveValue("Livrée : {numero} — encaissé {paye_aujourdhui}");
   await expect(page.getByTestId("wa-preview-delivered")).toHaveText(/^Livrée : CNT-00832 — encaissé 840\sDH$/);
