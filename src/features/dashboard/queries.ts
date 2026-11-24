@@ -1,6 +1,7 @@
 import "server-only";
 import { toOrderRow, type OrderRow } from "@/features/orders/queries";
 import { createClient } from "@/lib/supabase/server";
+import type { KpiActivity } from "./activity";
 import { comparisonRange, periodRange, type Range } from "./periods";
 import type { DashboardFilters } from "./schemas";
 
@@ -97,6 +98,8 @@ export interface DashboardData {
   series: KpiSeries;
   previousSeries: KpiSeries | null;
   breakdown: KpiBreakdown;
+  /** All stores and all time, whatever the filters (SPEC §9 « Calendrier d'activité et congés »). */
+  activity: KpiActivity;
   pickup: { rows: OrderRow[]; total: number };
   pendingCharges: PendingChargeRow[];
   lowStock: { rows: LowStockRow[]; total: number };
@@ -106,6 +109,12 @@ async function rpc<T>(db: Db, fn: "kpi_summary" | "kpi_timeseries" | "kpi_breakd
   const { data, error } = await db.rpc(fn, { p_from: range.from, p_to: range.to, p_store_id: storeId ?? undefined });
   if (error) throw new Error(`${fn} failed`);
   return data as T;
+}
+
+async function getActivity(db: Db): Promise<KpiActivity> {
+  const { data, error } = await db.rpc("kpi_activity");
+  if (error) throw new Error("kpi_activity failed");
+  return data as unknown as KpiActivity;
 }
 
 const PICKUP_COLUMNS =
@@ -176,15 +185,16 @@ export async function getDashboard(
   const range = periodRange(filters.period, today, { from: filters.from, to: filters.to });
   const previous = comparisonRange(range, filters.compare);
   const storeNames = new Map(stores.map((s) => [s.id, s.name]));
-  const [summary, previousSummary, series, previousSeries, breakdown, pickup, pendingCharges, lowStock] = await Promise.all([
+  const [summary, previousSummary, series, previousSeries, breakdown, activity, pickup, pendingCharges, lowStock] = await Promise.all([
     rpc<KpiSummary>(db, "kpi_summary", range, storeId),
     previous ? rpc<KpiSummary>(db, "kpi_summary", previous, storeId) : null,
     rpc<KpiSeries>(db, "kpi_timeseries", range, storeId),
     previous ? rpc<KpiSeries>(db, "kpi_timeseries", previous, storeId) : null,
     rpc<KpiBreakdown>(db, "kpi_breakdown", range, storeId),
+    getActivity(db),
     getPickup(db, storeId),
     getPendingCharges(db, storeId),
     getLowStock(db, storeId, storeNames),
   ]);
-  return { today, range, previous, storeId, summary, previousSummary, series, previousSeries, breakdown, pickup, pendingCharges, lowStock };
+  return { today, range, previous, storeId, summary, previousSummary, series, previousSeries, breakdown, activity, pickup, pendingCharges, lowStock };
 }

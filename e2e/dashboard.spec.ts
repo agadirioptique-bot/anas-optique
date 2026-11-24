@@ -46,6 +46,20 @@ test("super admin: filters in the URL, hero card, comparison, charts and widgets
   await expect(page.getByTestId("dashboard-range")).toContainText("comparé à");
   await expect(page.getByTestId("chart-revenue")).toBeVisible();
   for (const widget of ["widget-pickup", "widget-pending", "widget-low-stock", "kpi-more"]) await expect(page.getByTestId(widget)).toBeVisible();
+
+  // Activity calendar (all stores, all time): a year view, a day's tooltip, the leave advice
+  // (or "not enough history" on a database without a full year of orders).
+  const calendar = page.getByTestId("activity-calendar");
+  await calendar.scrollIntoViewIfNeeded();
+  await expect(page.getByText(/commandes? sur les 12 derniers mois/)).toBeVisible();
+  const year = page.getByRole("group", { name: "Période affichée" }).getByRole("button").nth(1);
+  const yearLabel = (await year.textContent())!.trim();
+  await year.click();
+  await expect(year).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText(new RegExp(`commandes? en ${yearLabel}`))).toBeVisible();
+  await calendar.locator("[data-d]").first().hover();
+  await expect(page.getByTestId("activity-tooltip")).toContainText(yearLabel);
+  await expect(page.getByTestId("activity-advice")).toContainText(/Bons moments pour un congé|Pas encore assez d'historique/);
   await shot(page, "dashboard");
 
   // Today: Montant encaissé becomes the hero card.
