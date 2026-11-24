@@ -29,6 +29,8 @@ const SegmentsChart = dynamic(() => import("./charts").then((m) => m.SegmentsCha
 const SalesMix = dynamic(() => import("./charts").then((m) => m.SalesMix), { ssr: false, loading: chartLoading });
 const HeatmapChart = dynamic(() => import("./charts").then((m) => m.HeatmapChart), { ssr: false, loading: chartLoading });
 const LeadTimesChart = dynamic(() => import("./charts").then((m) => m.LeadTimesChart), { ssr: false, loading: chartLoading });
+// Plain HTML, but its dates are only formatted in the browser (SPEC §11).
+const ActivityCalendar = dynamic(() => import("./activity-calendar").then((m) => m.ActivityCalendar), { ssr: false, loading: chartLoading });
 
 type CardKey = "revenue" | "collected" | "charges" | "net" | "orders" | "avgBasket" | "balance";
 
@@ -136,6 +138,7 @@ export function DashboardPage({ data, filters, stores, storeName }: { data: Dash
           <HeatmapChart breakdown={data.breakdown} />
           <LeadTimesChart breakdown={data.breakdown} />
         </div>
+        <ActivityCalendar activity={data.activity} />
 
         <div className="grid gap-6 lg:grid-cols-3">
           <PickupList data={data} />

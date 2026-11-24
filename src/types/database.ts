@@ -2490,6 +2490,7 @@ export type Database = {
       import_legacy_batch: { Args: { p: Json }; Returns: Json }
       is_super_admin: { Args: never; Returns: boolean }
       is_valid_diopter: { Args: { value: number }; Returns: boolean }
+      kpi_activity: { Args: { p_store_id?: string }; Returns: Json }
       kpi_breakdown: {
         Args: { p_from: string; p_store_id?: string; p_to: string }
         Returns: Json

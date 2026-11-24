@@ -33,6 +33,7 @@ const SUPER_ADMIN_ONLY: Record<string, Call> = {
   clear_client_discount: (_, c) => ({ p_client_id: c.client }),
   create_purchase: (f) => ({ payload: { supplier_id: f.ids.supplier, receive_store_id: f.storeA, lines: [] } }),
   create_transfer: (f) => ({ p_from_store_id: f.storeA, p_to_store_id: f.storeB, p_lines: [], p_note: null }),
+  kpi_activity: () => ({ p_store_id: null }),
   kpi_breakdown: () => ({ p_from: today, p_to: today, p_store_id: null }),
   kpi_summary: () => ({ p_from: today, p_to: today, p_store_id: null }),
   kpi_timeseries: () => ({ p_from: today, p_to: today, p_store_id: null }),

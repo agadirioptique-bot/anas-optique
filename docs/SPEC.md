@@ -407,7 +407,23 @@ Keep the demo's look, layout and interactions (see DESIGN.md). Behaviour changes
 | Workshop time | avg days confirmed → in_store, and confirmed → delivered |
 | Pending recurring charges | count + amount awaiting approval (dashboard widget with link) |
 
-Charts (reuse demo components): CA over time vs comparison, CA & NET by store (bar + table), client segments, top categories/treatments, busiest hours heatmap, workshop lead times. Bottom widgets: glasses waiting for pick-up, pending charges, low stock.
+Charts (reuse demo components): CA over time vs comparison, CA & NET by store (bar + table), client segments, top categories/treatments, busiest hours heatmap, workshop lead times, activity calendar and time-off advice (below). Bottom widgets: glasses waiting for pick-up, pending charges, low stock.
+
+**Calendrier d'activité et congés** (decided 2026-11-24): the optician wants to know when to take time off and when to be there 100 %. It's a full-width dashboard card, `kpi_activity(p_store_id)`, super admin only.
+- **Exception to the filters**: all stores and all time, whatever the period / store filters. Time off concerns the optician as a person, and the Excel history lives in the inactive store « Historique ». `p_store_id` exists for the DB tests only.
+- **Order counted**: not cancelled, app **and** legacy, on its business day (`business_date(created_at)`).
+- **Calendar** (GitHub style): one square per day, Monday → Sunday columns. Views: « 12 derniers mois » (default) or one calendar year among the years with orders.
+  - 5 shades of `--chart-1`: 0 = no order, then the quartiles of the days with orders in the view.
+  - Tooltip: count + date, plus « historique : date souvent estimée » on legacy days.
+  - Under the grid, a bar per week shows its seasonal level.
+  - The table view lists every week (start, orders, season).
+- **Reference years** = finished calendar years with orders in ≥ 10 months. Today that is 2021–2023 (history); empty years and the current year are left out. Without any reference year the card says there is not enough history yet.
+- **Index** of a month / ISO week = orders per day in it ÷ orders per day over the year, averaged over the reference years (1 = ordinary). ISO week 53 joins week 52.
+- **Level**: calm (« congé possible ») = in the lowest 25 % (`percent_rank`) **and** index < 1; busy (« présence à 100 % ») = in the highest 25 % **and** index > 1; otherwise normal. Ties share a level.
+- **Advice**:
+  - by month: the next 12 months, each with its level and its difference from an ordinary month;
+  - by week: the 52 weeks from the current Monday, consecutive calm (or busy) weeks merged into periods.
+  - The card notes that Ramadan and Eid move every year; there is no special rule for them.
 
 Implement KPIs as SQL functions (`kpi_summary(from, to, store_id)`, `kpi_timeseries(...)`, …) returning JSON; heavy ones may use materialized views refreshed by pg_cron. Never compute money totals in JS.
 
@@ -515,7 +531,7 @@ Phase 11 — Dashboard (2026-11-04):
 - Store filter (URL `store`, default = top-bar store): orders, payments, stock movements by `store_id`; charges by `charge_locations.store_id`; **Général and other non-store locations only under All stores**; the lab keeps its own charges.
 - Interpretations of §9: owed to suppliers = all time, by the purchase's receive location when a store is selected; loyal clients / repeat rate = among clients served in the period (repeat = ≥ 2 delivered orders, all time, all stores); workshop time = average days created → first `in_store` and created → `delivered` for orders of the period; discounts and damaged frames count non-cancelled orders / frame types only; pending charges = all months.
 - Hero card = CA, or Montant encaissé when the period is Today. Second row: discounts, cancellation rate, owed to suppliers, damaged frames, loyal clients + repeat rate, workshop time. Demo margin cards, "orders without costs" and stock value are dropped.
-- Tests: `tests/db/dashboard.test.ts` checks every formula on a fixed dataset in store TSK dated Dec 2000 – Feb 2001 (exact even under All stores). The fixture is rebuilt before and removed after each run (TSK stays inactive), except its one purchase, whose supplier-payment charge is read-only.
+- Tests: `tests/db/dashboard.test.ts` checks every formula on a fixed dataset in store TSK dated Dec 2000 – Feb 2001 (exact even under All stores). The fixture is rebuilt before and removed after each run (TSK stays inactive), except its one purchase, whose supplier-payment charge is read-only. `kpi_activity` is checked on extra TSK orders dated 1996–1999 (reference years 1997–1999).
 
 Phase 12 — Notifications (2026-11-04):
 - "Once" per kind and recipient: `client_became_loyal` once per client (dedupe); `low_stock` once per crossing down to ≤ min (a refill and a new crossing notify again); `order_stuck` once per order + status (dedupe, the daily job can run any number of times); `duplicate_slip_blocked` once per blocked attempt, super admins only; `recurring_charges_pending` once per day (dedupe); `clients_became_loyal` once per threshold change that makes clients loyal. Checked in `tests/db/notifications.test.ts` (+ `rules.test.ts` for loyalty).
@@ -562,7 +578,7 @@ The optician's sheet (one tab: DATE, NOM et PRENOM, N : BON, TELEPHONE, OD, OG, 
 - **Dates**: the 90 dated lines are exact; the others are estimated on the slip number between the dated lines, from 2021-01-01 (first slip) to 2023-12-31 (last slip), 12:00 Casablanca; `orders.legacy.date_exact = false` and the order page says « date estimée ».
 - **Read only**: trigger `legacy_read_only` refuses any change to a legacy order and any payment / item / treatment / history row on it (`OPTICOR:LEGACY_READ_ONLY`), except inside the import (transaction-local flag). Every signed-in user (secretaries included) reads the history; the order page shows a « Commande historique » banner and the original values, without actions.
 - **Loyalty**: `finish_legacy_import` sets `is_loyal` / `loyal_since` (date of the Nth delivered order) for clients reaching the threshold, without notification.
-- **KPIs**: imported orders count in revenue, payments and client segments of their (2021–2023) periods; they are left out of the workshop times and of the busiest-hours heatmap (made-up hours).
+- **KPIs**: imported orders count in revenue, payments and client segments of their (2021–2023) periods; they are left out of the workshop times and of the busiest-hours heatmap (made-up hours). They do count in the activity calendar and the time-off advice (weeks and months are close enough; legacy days say « date souvent estimée »).
 - **Running it**: `import_legacy_batch(jsonb)` and `finish_legacy_import(text)` are callable from the SQL editor only (execute revoked from anon / authenticated). The generated files start with a guard: `--target prod` stops on the DEV database (test stores TSA/TSB exist), `--target dev` stops anywhere else and carries anonymised names and phones (no patient data on DEV). Re-running a batch skips what is already imported (`clients.legacy_key`, `orders.legacy->>'key'`).
 
 ## 13. Later (design for it, don't build it)

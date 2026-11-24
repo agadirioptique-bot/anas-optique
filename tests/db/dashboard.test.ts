@@ -22,6 +22,9 @@ type OrderInsert = Omit<Database["public"]["Tables"]["orders"]["Insert"], "store
  *   O8 C2 10 Feb total 400, deposit 150 (10 Feb), CANCELLED 12 Feb WITHOUT refund (the shop keeps 150);
  *   O9 C2 20 Feb total 300, paid 300 (20 Feb), CANCELLED 2 Mar with a full refund −300 (2 Mar).
  * C1 is loyal and has 2 delivered orders (O1, O7); C2 has 1 (O5); C3 none.
+ * Activity calendar (kpi_activity), C1 at TSK, delivered: 1997–1999 one order on the 10th of every
+ * month + 4 more on 10 Sep (reference years); 1996 Jan–Mar only (not a reference year);
+ * one CANCELLED order on 20 Mar 1997 (not counted).
  * Purchase received at TSK (created once, kept): 2 × 100, paid 50 → owed 150.
  */
 describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
@@ -47,13 +50,16 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
    */
   async function removeFixture() {
     const s = f.service;
-    const old = ((await s.from("orders").select("id").eq("store_id", tsk)).data ?? []).map((o) => o.id);
-    if (old.length) {
+    // By batches of 200 until none is left: the ids go in the URL (length limit), reads stop at 1000 rows.
+    for (let round = 0; ; round++) {
+      const ids = ((await s.from("orders").select("id").eq("store_id", tsk).limit(200)).data ?? []).map((o) => o.id);
+      if (!ids.length) break;
+      if (round === 100) throw new Error("TSK still has orders after 20 000 deletions");
       for (const table of ["payments", "order_status_history", "order_items", "order_treatments"] as const) {
-        const { error } = await s.from(table).delete().in("order_id", old);
+        const { error } = await s.from(table).delete().in("order_id", ids);
         if (error) throw error;
       }
-      const { error } = await s.from("orders").delete().in("id", old);
+      const { error } = await s.from("orders").delete().in("id", ids);
       if (error) throw error;
     }
     await s.from("stock_movements").delete().eq("store_id", tsk).eq("kind", "damage");
@@ -122,6 +128,18 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     const o8 = await order({ client_id: c2, subtotal: 400, status: "cancelled", created_at: "2001-02-10T10:00:00Z", cancelled_at: "2001-02-12T10:00:00Z" });
     const o9 = await order({ client_id: c2, subtotal: 300, status: "cancelled", created_at: "2001-02-20T10:00:00Z", cancelled_at: "2001-03-02T10:00:00Z" });
     ids = { o1, o2, o3, o4 };
+
+    // --- activity calendar: 1996–1999 (see the header) ---
+    const at = (y: number, m: number, d = 10) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}T12:00:00Z`;
+    const delivered = (created_at: string) => ({ store_id: tsk, slip_number: ++slip, client_id: c1, subtotal: 100, status: "delivered" as const, created_at, delivered_at: created_at });
+    await one(s.from("orders").insert([
+      ...[1997, 1998, 1999].flatMap((y) => [
+        ...Array.from({ length: 12 }, (_, i) => delivered(at(y, i + 1))),
+        ...Array.from({ length: 4 }, () => delivered(at(y, 9))),
+      ]),
+      ...[1, 2, 3].map((m) => delivered(at(1996, m))),
+      { store_id: tsk, slip_number: ++slip, client_id: c1, subtotal: 100, status: "cancelled" as const, created_at: at(1997, 3, 20), cancelled_at: at(1997, 3, 21) },
+    ]).select("id"));
 
     await one(s.from("order_items").insert([
       { order_id: o1, category_id: catA, qty: 1, unit_price: 400 },
@@ -195,9 +213,13 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
 
   afterAll(async () => {
     if (!tsk || !f) return;
-    await removeFixture();
-    await restoreTsk?.();
-    await f.cleanup();
+    // TSK is put back as found (inactive) even if the clean-up fails.
+    try {
+      await removeFixture();
+    } finally {
+      await restoreTsk?.();
+      await f.cleanup();
+    }
   });
 
   describe("store TSK, January 2001", () => {
@@ -321,11 +343,65 @@ describe.skipIf(!hasDbEnv)("dashboard KPIs", () => {
     expect(b.lead_times).toEqual([{ name: "Test KPI", to_in_store: 3, to_delivered: 7, measured: 2 }]);
   });
 
+  describe("activity calendar and leave advice (kpi_activity)", () => {
+    type Level = "calm" | "normal" | "busy";
+    let a: {
+      today: string;
+      days: { d: string; n: number; legacy: boolean }[];
+      years: number[];
+      months: { month: number; index: number; level: Level }[];
+      weeks: { week: number; index: number; level: Level }[];
+      upcoming: { start: string; week: number; index: number; level: Level }[];
+    };
+    beforeAll(async () => {
+      const { data, error } = await f.admin.rpc("kpi_activity", { p_store_id: tsk });
+      if (error) throw error;
+      a = data as typeof a;
+    });
+
+    it("days: non-cancelled orders per business day, all time", () => {
+      const day = (d: string) => a.days.find((x) => x.d === d);
+      expect(day("1997-09-10")).toEqual({ d: "1997-09-10", n: 5, legacy: false });
+      expect(day("1996-02-10")).toMatchObject({ n: 1 });
+      expect(day("2001-01-15")).toMatchObject({ n: 1 });
+      expect(day("1997-03-20")).toBeUndefined(); // cancelled
+      expect(day("2001-01-22")).toBeUndefined(); // O4, cancelled
+    });
+
+    it("reference years: finished years with orders in at least 10 months", () => expect(a.years).toEqual([1997, 1998, 1999]));
+
+    it("months: index = orders per day ÷ the year's orders per day; calm = lowest 25 % below 1, busy = highest 25 % above 1", () => {
+      const month = (k: number) => a.months.find((m) => m.month === k);
+      expect(a.months).toHaveLength(12);
+      expect(month(9)).toEqual({ month: 9, index: 3.8, level: "busy" }); // 5 orders in 30 days vs 16 in 365
+      expect(month(1)).toEqual({ month: 1, index: 0.74, level: "calm" }); // 1 in 31 days (tied with the other 31-day months)
+      expect(month(2)).toEqual({ month: 2, index: 0.81, level: "normal" });
+      expect(month(4)).toEqual({ month: 4, index: 0.76, level: "normal" });
+    });
+
+    it("ISO weeks (53 joins 52): busy around 10 Sep, calm without orders", () => {
+      expect(a.weeks).toHaveLength(52);
+      expect(a.weeks.find((w) => w.week === 37)).toEqual({ week: 37, index: 10.86, level: "busy" }); // 10 Sep 1997 and 1998
+      expect(a.weeks.find((w) => w.week === 30)).toEqual({ week: 30, index: 0, level: "calm" });
+    });
+
+    it("upcoming: the 52 weeks from the Monday of the current week, with their ISO week's level", () => {
+      expect(a.upcoming).toHaveLength(52);
+      const monday = Date.parse(`${a.upcoming[0].start}T00:00:00Z`);
+      expect(new Date(monday).getUTCDay()).toBe(1);
+      const back = (Date.parse(`${a.today}T00:00:00Z`) - monday) / 86_400_000;
+      expect(back).toBeGreaterThanOrEqual(0);
+      expect(back).toBeLessThan(7);
+      for (const u of a.upcoming) expect(u.level).toBe(a.weeks.find((w) => w.week === u.week)?.level);
+    });
+  });
+
   it("rejects a reversed range and every role but the super admin", async () => {
     expectDbError((await f.admin.rpc("kpi_summary", { p_from: "2001-02-01", p_to: "2001-01-01" })).error, "INVALID_INPUT");
     for (const fn of ["kpi_summary", "kpi_timeseries", "kpi_breakdown"] as const) {
       expectDbError((await f.secretary.rpc(fn, { p_from: JAN.from, p_to: JAN.to })).error, "FORBIDDEN");
     }
+    expectDbError((await f.secretary.rpc("kpi_activity", {})).error, "FORBIDDEN");
     expect(ids.o1).toBeTruthy();
   });
 });
