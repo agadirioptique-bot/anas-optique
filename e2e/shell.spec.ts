@@ -105,4 +105,14 @@ test.describe("phone width", () => {
     await expect(page.getByTestId("sidebar")).toBeHidden();
     await expect(page.getByTestId("mobile-nav").getByRole("link", { name: "Notifications" })).toBeVisible();
   });
+
+  test("new order: the wizard's bottom bar is not covered by the bottom nav", async ({ page }) => {
+    test.skip(!hasAccount("secretary"), "run `npm run e2e:accounts` first");
+    await signInAs(page, "secretary");
+    await page.goto("/fr/orders/new");
+    await expect(page.getByRole("heading", { level: 1, name: "Nouvelle commande" })).toBeVisible();
+    await expect(page.getByTestId("mobile-nav")).toHaveCount(0);
+    // A trial click fails if another element (the nav) would receive the tap.
+    await page.getByRole("button", { name: "Suivant" }).click({ trial: true });
+  });
 });

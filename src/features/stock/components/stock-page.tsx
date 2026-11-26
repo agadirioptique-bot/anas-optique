@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { ChoiceChips } from "@/components/shared/choice-chips";
 import { DataTable, type Column } from "@/components/shared/data-table";
 import { EmptyState, PageHeader, Stat } from "@/components/shared/page";
+import { ScrollRow } from "@/components/shared/scroll-row";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -197,7 +198,7 @@ export function StockPage({
 
       {isSuperAdmin && locations.length > 1 && (
         <Tabs value={locationId} onValueChange={changeLocation} className="mb-4">
-          <div className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+          <ScrollRow activeKey={locationId} className="-mx-4 px-4 pb-1 sm:mx-0 sm:px-0">
             <TabsList aria-label={t("stock.locations")}>
               {locations.map((l) => (
                 <TabsTrigger noPanel key={l.id} value={l.id} className="px-4">
@@ -205,7 +206,7 @@ export function StockPage({
                 </TabsTrigger>
               ))}
             </TabsList>
-          </div>
+          </ScrollRow>
         </Tabs>
       )}
 

@@ -335,7 +335,7 @@ export function ClientDetail({ file, isSuperAdmin, ownStoreId }: { file: ClientF
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
         <RxChart orders={orders} />
         <Card className="py-0">
           <CardHeader className="pt-5">

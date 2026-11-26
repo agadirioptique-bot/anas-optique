@@ -142,7 +142,7 @@ export function StoresTab({ stores }: { stores: StoreRow[] }) {
           <Plus />
           {t("add")}
         </Button>
-        <ul className="grid gap-4 md:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {stores.map((s) => {
             const Icon = s.kind === "lab" ? FlaskConical : Store;
             return (

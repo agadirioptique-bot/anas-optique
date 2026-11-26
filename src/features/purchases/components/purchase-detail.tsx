@@ -68,7 +68,7 @@ export function PurchaseDetail({
         }
       />
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="order-2 space-y-5 lg:order-1">
           <Card className="gap-0 py-0">
             <CardHeader className="border-b py-4">

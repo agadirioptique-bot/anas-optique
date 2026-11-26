@@ -162,7 +162,7 @@ export function TransferDialog({
       }
     >
       <div className="space-y-5">
-        <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
+        <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
           <div className="space-y-2">
             <Label htmlFor="transfer-from">{t("from")}</Label>
             <LocationSelect
@@ -205,7 +205,7 @@ export function TransferDialog({
             const taken = new Set(lines.filter((l) => l.key !== line.key).map((l) => l.categoryId));
             const have = line.categoryId ? (available.get(line.categoryId) ?? 0) : null;
             return (
-              <div key={line.key} className="grid gap-2 rounded-xl border p-3 sm:grid-cols-[1fr_11rem_auto] sm:items-start sm:border-0 sm:p-0">
+              <div key={line.key} className="grid grid-cols-1 gap-2 rounded-xl border p-3 sm:grid-cols-[1fr_11rem_auto] sm:items-start sm:border-0 sm:p-0">
                 <div className="space-y-1">
                   <Label htmlFor={`transfer-cat-${line.key}`} className="sr-only">
                     {t("category")} {i + 1}

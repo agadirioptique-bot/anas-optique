@@ -108,7 +108,7 @@ export function ListsTab({ items }: { items: ListItemRow[] }) {
               handleLabel={(i) => t("drag", { label: name(i) })}
               onReorder={(ids) => reorder(ids, () => run(() => reorderRows({ table: "settings_list_items", ids }), t("reordered")))}
               renderItem={(i) => (
-                <div className={cn("grid gap-2 py-2 md:grid-cols-[1fr_1fr_11rem_8rem] md:items-center", i.isArchived && "rounded-lg bg-muted/60")}>
+                <div className={cn("grid grid-cols-1 gap-2 py-2 md:grid-cols-[1fr_1fr_11rem_8rem] md:items-center", i.isArchived && "rounded-lg bg-muted/60")}>
                   <LabelInput value={i.labelFr} label={`${t("labelFr")} · ${i.labelFr}`} onSave={(v) => run(() => renameListItem({ id: i.id, labelFr: v, labelEn: i.labelEn }), t("renamed", { label: v }))} />
                   <LabelInput value={i.labelEn} label={`${t("labelEn")} · ${i.labelFr}`} onSave={(v) => run(() => renameListItem({ id: i.id, labelFr: i.labelFr, labelEn: v }), t("renamed", { label: v }))} />
                   <span className="num flex items-center gap-1.5 text-xs text-muted-foreground">

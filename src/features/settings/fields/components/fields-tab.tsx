@@ -75,7 +75,7 @@ function FieldDialog({ field, onClose }: { field?: FieldRow; onClose: () => void
       }
     >
       <div className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="cf-fr">{t("labelFr")}</Label>
             <Input id="cf-fr" value={labelFr} maxLength={80} onChange={(e) => setLabelFr(e.target.value)} aria-invalid={touched && !labelFr.trim()} placeholder={t("labelPlaceholder")} />
@@ -98,7 +98,7 @@ function FieldDialog({ field, onClose }: { field?: FieldRow; onClose: () => void
           )}
         </div>
         {showOptions && (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="cf-ofr">{t("optionsFr")}</Label>
               <Textarea id="cf-ofr" rows={4} value={optionsFr} onChange={(e) => setOptionsFr(e.target.value)} aria-invalid={touched && !optionsOk} />
@@ -129,7 +129,7 @@ export function FieldsTab({ data }: { data: FieldsData }) {
   const withOptions = (f: FieldRow) => (f.key === "vision_type" ? { ...f, options: data.visionTypes } : f);
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
       <Card>
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
@@ -148,8 +148,9 @@ export function FieldsTab({ data }: { data: FieldsData }) {
               handleLabel={(f) => t("drag", { label: name(f) })}
               onReorder={(ids) => reorder(ids, () => run(() => reorderRows({ table: "custom_fields", ids }), tc("saved")))}
               renderItem={(f) => (
-                <div className={cn("flex flex-wrap items-center gap-3 py-2.5", f.visibility === "hidden" && "rounded-lg bg-muted/60")}>
-                  <div className="min-w-0 flex-1">
+                <div className={cn("flex flex-wrap items-center gap-x-3 gap-y-2 py-2.5", f.visibility === "hidden" && "rounded-lg bg-muted/60")}>
+                  {/* At least 11rem for the name: on a phone the controls move to a second line instead of squeezing it. */}
+                  <div className="min-w-44 flex-1">
                     <p className="flex items-center gap-1.5 truncate font-medium">
                       {f.isBuiltin && <Lock className="size-3.5 shrink-0 text-muted-foreground" aria-label={t("builtin")} />}
                       {name(f)}

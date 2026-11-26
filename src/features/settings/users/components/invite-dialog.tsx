@@ -88,7 +88,7 @@ export function InviteDialog({ stores, onClose, onInvited }: { stores: StoreSumm
             <Input id="inv-email" type="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={touched && !emailOk} placeholder={ta("emailPlaceholder")} autoComplete="off" />
             {touched && !emailOk && <p className="text-sm text-destructive">{ta("emailInvalid")}</p>}
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="inv-role">{t("role")}</Label>
               <Select value={role} onValueChange={(v) => setRole(v as AppRole)}>

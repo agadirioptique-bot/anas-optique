@@ -1,5 +1,6 @@
 import { Award, Bell, Building2, FormInput, ListChecks, MapPin, MessageCircle, Package, ShieldCheck, Users, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { ScrollRow } from "@/components/shared/scroll-row";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -24,33 +25,35 @@ export function isSettingsTab(value: unknown): value is SettingsTab {
   return typeof value === "string" && (SETTINGS_TABS as readonly string[]).includes(value);
 }
 
-/** Left sub-nav on desktop, horizontal scroller on phones (demo settings layout). */
+/** Left sub-nav on desktop, horizontal scroller on phones (demo settings layout), current tab kept in view. */
 export function SettingsNav({ current }: { current: SettingsTab }) {
   const t = useTranslations("settings.tabs");
   return (
-    <nav aria-label={t("label")} className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 lg:sticky lg:top-24">
-      <ul className="flex w-max gap-1 lg:w-full lg:flex-col">
-        {SETTINGS_TABS.map((tab) => {
-          const Icon = ICONS[tab];
-          const active = tab === current;
-          return (
-            <li key={tab}>
-              <Link
-                href={{ pathname: "/settings", query: { tab } }}
-                scroll={false}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "flex h-10 items-center gap-2 rounded-xl px-3 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground pointer-coarse:h-11 [&_svg]:size-4",
-                  active && "bg-card text-foreground shadow-soft",
-                )}
-              >
-                <Icon aria-hidden="true" />
-                {t(tab)}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+    <nav aria-label={t("label")} className="lg:sticky lg:top-24">
+      <ScrollRow activeKey={current} className="-mx-4 px-4 pb-1 sm:mx-0 sm:px-0">
+        <ul className="flex w-max gap-1 lg:w-full lg:flex-col">
+          {SETTINGS_TABS.map((tab) => {
+            const Icon = ICONS[tab];
+            const active = tab === current;
+            return (
+              <li key={tab}>
+                <Link
+                  href={{ pathname: "/settings", query: { tab } }}
+                  scroll={false}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "flex h-10 items-center gap-2 rounded-xl px-3 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground pointer-coarse:h-11 [&_svg]:size-4",
+                    active && "bg-card text-foreground shadow-soft",
+                  )}
+                >
+                  <Icon aria-hidden="true" />
+                  {t(tab)}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </ScrollRow>
     </nav>
   );
 }

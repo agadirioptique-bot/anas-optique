@@ -137,7 +137,7 @@ export function UsersTab({ users, stores, currentUserId }: { users: UserRow[]; s
             const self = u.id === currentUserId;
             const busy = busyId === u.id;
             return (
-              <li key={u.id} className={cn("grid gap-3 p-4 lg:grid-cols-[minmax(0,1.4fr)_12rem_14rem_9rem_auto] lg:items-center", !u.isActive && "bg-muted/40")}>
+              <li key={u.id} className={cn("grid grid-cols-1 gap-3 p-4 lg:grid-cols-[minmax(0,1.4fr)_12rem_14rem_9rem_auto] lg:items-center", !u.isActive && "bg-muted/40")}>
                 <div className="flex min-w-0 items-center gap-3">
                   <Avatar className="size-10">
                     <AvatarFallback className={cn("text-sm font-semibold", u.isActive ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground")}>

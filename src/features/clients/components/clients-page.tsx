@@ -157,9 +157,11 @@ export function ClientsPage({ data, filters }: { data: ClientDirectory; filters:
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">{initials(r.full_name)}</span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-medium">{r.full_name}</span>
-                <span className="num flex items-center gap-1 text-xs text-muted-foreground">
+                {/* The phone and "N commandes" never break inside themselves on a narrow phone. */}
+                <span className="num flex flex-wrap items-center gap-x-1 text-xs text-muted-foreground">
                   {r.has_whatsapp && <WhatsAppIcon className="size-3.5 text-whatsapp" />}
-                  {formatPhone(r.phone_e164)} · {t("wizard.ordersCount", { count: r.orders })}
+                  <span className="whitespace-nowrap">{formatPhone(r.phone_e164)}</span>
+                  <span className="whitespace-nowrap">· {t("wizard.ordersCount", { count: r.orders })}</span>
                 </span>
               </span>
               <SegmentBadge segment={r.segment} />

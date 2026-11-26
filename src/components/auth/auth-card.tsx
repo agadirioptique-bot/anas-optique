@@ -44,7 +44,7 @@ function HeroArt() {
 export function AuthCard({ title, subtitle, children }: { title: string; subtitle: string; children?: ReactNode }) {
   const t = useTranslations("auth");
   return (
-    <div className="grid min-h-dvh lg:grid-cols-[1.05fr_1fr]">
+    <div className="grid grid-cols-1 min-h-dvh lg:grid-cols-[1.05fr_1fr]">
       <aside className="relative hidden flex-col justify-between overflow-hidden bg-[#0f4c5c] p-12 text-white lg:flex">
         <div className="pointer-events-none absolute -top-32 -right-32 size-96 rounded-full bg-white/5" />
         <div className="pointer-events-none absolute -bottom-40 -left-24 size-[28rem] rounded-full bg-[#e36414]/15" />

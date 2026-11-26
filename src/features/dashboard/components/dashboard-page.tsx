@@ -124,7 +124,7 @@ export function DashboardPage({ data, filters, stores, storeName }: { data: Dash
 
         <MoreKpis k={k} />
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <RevenueChart series={data.series} previousSeries={data.previousSeries} summary={k} previousSummary={p} period={period ?? ""} />
           </div>
@@ -134,13 +134,13 @@ export function DashboardPage({ data, filters, stores, storeName }: { data: Dash
           </div>
           <SalesMix breakdown={data.breakdown} />
         </div>
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <HeatmapChart breakdown={data.breakdown} />
           <LeadTimesChart breakdown={data.breakdown} />
         </div>
         <ActivityCalendar activity={data.activity} />
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <PickupList data={data} />
           <PendingChargesList data={data} />
           <LowStockList data={data} />

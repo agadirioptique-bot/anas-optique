@@ -109,7 +109,7 @@ export function PaymentDialog({ target, methods, onClose }: { target: PaymentTar
           )}
           {touched && errors.amount && <p className="text-sm text-destructive">{t("tooHigh", { amount: f.money(remaining) })}</p>}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="pay-method">{t("method")}</Label>
             <Select value={methodId} onValueChange={setMethodId}>

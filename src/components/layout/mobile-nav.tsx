@@ -22,6 +22,8 @@ export function MobileNav() {
   const badges = useNavBadges();
   const { unread } = useNotifications();
   const [moreOpen, setMoreOpen] = useState(false);
+  // The new-order wizard has its own bottom bar (Récapitulatif + Suivant): the nav would cover it.
+  if (pathname === "/orders/new") return null;
   const items = visibleNav(user.role);
   const overflow = items.length > 4;
   const primary = overflow ? items.slice(0, 3) : items;

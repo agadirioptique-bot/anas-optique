@@ -248,7 +248,7 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_420px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="min-w-0 space-y-6">
           <Card>
             <CardHeader>
@@ -294,7 +294,7 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
                   ))}
                 </ul>
               )}
-              <dl className="grid gap-3 sm:grid-cols-2">
+              <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <Info label={t("detail.lensType")}>{order.lensType ? localized(order.lensType, locale) : "—"}</Info>
                 <Info label={t("detail.treatments")}>{data.treatments.length ? data.treatments.map((tr) => localized(tr, locale)).join(" · ") : "—"}</Info>
                 {order.lensDetails && (
@@ -378,7 +378,7 @@ function Detail({ data, isSuperAdmin }: { data: OrderDetailData; isSuperAdmin: b
                 <CardTitle>{t("detail.customFields")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <dl className="grid gap-4 text-sm sm:grid-cols-2">
+                <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                   {custom.map((fd) => (
                     <Info key={fd.key} label={locale === "en" ? fd.labelEn : fd.labelFr}>
                       {customLabel(fd)}
