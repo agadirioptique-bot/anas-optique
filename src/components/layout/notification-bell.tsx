@@ -41,17 +41,20 @@ export function NotificationBell() {
     router.refresh();
   };
 
+  // The label says what the badge shows ("99+"), so the visible text is part of the button's name.
+  const shownCount = unread > 99 ? "99+" : String(unread);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative rounded-full" aria-label={t("bellLabel", { count: unread })} data-testid="notification-bell">
+        <Button variant="ghost" size="icon" className="relative rounded-full" aria-label={t("bellLabel", { count: unread, shown: shownCount })} data-testid="notification-bell">
           <Bell className="size-5" />
           {unread > 0 && (
             <span
               className="num absolute top-1 right-1 min-w-[18px] rounded-full bg-attention-strong px-1 text-center text-[10px] leading-[18px] font-bold text-attention-strong-foreground ring-2 ring-background motion-safe:animate-pop-in"
               data-testid="notification-count"
             >
-              {unread > 99 ? "99+" : unread}
+              {shownCount}
             </span>
           )}
         </Button>
