@@ -57,7 +57,7 @@ export function PageSkeleton({ variant = "list" }: { variant?: "list" | "board" 
         ))}
       </div>
       {variant === "board" ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-hidden="true">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-hidden="true">
           {Array.from({ length: 4 }, (_, col) => (
             <div key={col} className="space-y-3 rounded-2xl bg-muted/40 p-3">
               <Skeleton className="h-5 w-28" />
@@ -69,13 +69,13 @@ export function PageSkeleton({ variant = "list" }: { variant?: "list" | "board" 
         </div>
       ) : (
         <div className="space-y-5" aria-hidden="true">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {Array.from({ length: 4 }, (_, i) => (
               <Skeleton key={i} className={cn("rounded-2xl", variant === "dashboard" ? "h-36" : "h-24")} />
             ))}
           </div>
           {variant === "dashboard" ? (
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
               <Skeleton className="h-80 rounded-2xl lg:col-span-2" />
               <Skeleton className="h-80 rounded-2xl" />
             </div>

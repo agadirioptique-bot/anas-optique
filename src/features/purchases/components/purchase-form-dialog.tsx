@@ -164,7 +164,7 @@ export function PurchaseFormDialog({ open, reference, onClose }: { open: boolean
         }
       >
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="po-supplier">{t("supplier")}</Label>
               <div className="flex gap-2">
@@ -274,7 +274,7 @@ export function PurchaseFormDialog({ open, reference, onClose }: { open: boolean
               if (line.kind !== "lens") return null;
               const bad = touched && !complete(line);
               return (
-                <div key={line.key} className="grid gap-2 rounded-xl border p-3 sm:grid-cols-[1fr_8.5rem_auto] sm:items-center sm:border-0 sm:p-0">
+                <div key={line.key} className="grid grid-cols-1 gap-2 rounded-xl border p-3 sm:grid-cols-[1fr_8.5rem_auto] sm:items-center sm:border-0 sm:p-0">
                   <Input
                     value={line.description}
                     maxLength={200}
@@ -318,7 +318,7 @@ export function PurchaseFormDialog({ open, reference, onClose }: { open: boolean
               itemClassName="h-9 px-3 pointer-coarse:h-10"
             />
             {pay !== "none" && (
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="po-pay-amount">{t("payAmount")}</Label>
                   {pay === "custom" ? (

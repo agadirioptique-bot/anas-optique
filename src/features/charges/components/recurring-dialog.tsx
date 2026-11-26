@@ -100,7 +100,7 @@ export function RecurringDialog({
           <Input id="recurring-label" value={label} maxLength={120} onChange={(e) => setLabel(e.target.value)} placeholder={t("labelPlaceholder")} aria-invalid={touched && errors.label} />
           {touched && errors.label && <p className="text-sm text-destructive">{t("labelRequired")}</p>}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="recurring-amount">{t("amount")}</Label>
             <MoneyInput id="recurring-amount" value={amount} onChange={setAmount} invalid={touched && errors.amount} />

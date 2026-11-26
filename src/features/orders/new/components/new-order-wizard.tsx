@@ -241,7 +241,7 @@ function Wizard() {
           else void next();
         }}
         noValidate
-        className="grid gap-6 pb-24 md:pb-0 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_380px]"
+        className="grid grid-cols-1 gap-6 pb-24 md:pb-0 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_380px]"
       >
         <div className="min-w-0 space-y-5">
           <Stepper step={step} maxReached={maxReached} onGo={goTo} />

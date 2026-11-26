@@ -25,13 +25,13 @@ export function RolesTab({ permissions }: { permissions: Record<string, string[]
           {t("description")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-6">
+      <CardContent className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>{t("permission")}</TableHead>
               {ROLES.map((r) => (
-                <TableHead key={r} className="w-32 text-center">
+                <TableHead key={r} className="w-20 text-center whitespace-normal sm:w-32">
                   {tr(r)}
                 </TableHead>
               ))}
@@ -49,7 +49,8 @@ export function RolesTab({ permissions }: { permissions: Record<string, string[]
                 </TableRow>,
                 ...keys.map((key) => (
                   <TableRow key={key}>
-                    <TableCell>{label(key)}</TableCell>
+                    {/* Wraps on a phone so the role columns stay on screen. */}
+                    <TableCell className="whitespace-normal">{label(key)}</TableCell>
                     {ROLES.map((r) => (
                       <TableCell key={r} className="text-center">
                         {permissions[r]?.includes(key) ? (

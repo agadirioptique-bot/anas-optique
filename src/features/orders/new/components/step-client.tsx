@@ -151,21 +151,23 @@ function SelectedClient() {
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-4 rounded-2xl border bg-accent/40 p-4" data-testid="selected-client">
         <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-base font-semibold text-primary-foreground">{initials(client.full_name)}</span>
-        <div className="min-w-0 flex-1">
+        {/* At least 10rem for the name and phone: on a phone « Changer » moves below instead of squeezing them. */}
+        <div className="min-w-40 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="truncate text-lg font-semibold">{client.full_name}</p>
             <SegmentBadge segment={segment} />
           </div>
-          <p className="num flex items-center gap-1.5 text-sm text-muted-foreground">
+          <p className="num flex flex-wrap items-center gap-x-1.5 text-sm text-muted-foreground">
             {client.has_whatsapp && <WhatsAppIcon className="text-whatsapp" />}
-            {formatPhone(client.phone_e164)}
+            <span className="whitespace-nowrap">{formatPhone(client.phone_e164)}</span>
             <span aria-hidden="true">·</span>
-            {t("ordersCount", { count: client.orders })}
+            <span className="whitespace-nowrap">{t("ordersCount", { count: client.orders })}</span>
           </p>
         </div>
         <Button
           type="button"
           variant="outline"
+          className="max-sm:w-full"
           onClick={() => {
             form.setValue("clientId", undefined);
             form.setValue("pendingDiscount", null);
@@ -342,7 +344,7 @@ function NewClientFields() {
   };
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div className="space-y-2 sm:col-span-2">
         <Label htmlFor="new-client-name">{t("fullName")}</Label>
         <Input

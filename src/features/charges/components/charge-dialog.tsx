@@ -177,7 +177,7 @@ export function ChargeDialog({
       }
     >
       <div className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="charge-amount">{t("amount")}</Label>
             <MoneyInput id="charge-amount" value={amount} onChange={setAmount} invalid={touched && errors.amount} size="lg" />

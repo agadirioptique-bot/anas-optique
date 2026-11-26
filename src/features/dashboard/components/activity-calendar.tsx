@@ -195,7 +195,7 @@ function Advice({ activity }: { activity: KpiActivity }) {
   const format = useFormatter();
   const months = upcomingMonths(activity.months, activity.today);
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <section aria-labelledby="activity-by-month">
         <h3 id="activity-by-month" className="text-sm font-semibold">
           {t("byMonth")}

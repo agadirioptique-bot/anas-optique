@@ -77,7 +77,7 @@ export function StepMeasures() {
       {fields.length > 0 && (
         <div className="space-y-3 border-t pt-5">
           <h3 className="text-sm font-semibold">{t("wizard.customFields")}</h3>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {fields.map((field) =>
               field.key === "prescription_photo" ? (
                 <PhotoPicker key={field.id} file={photo} onChange={setPhoto} required={field.visibility === "required"} />

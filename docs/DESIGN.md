@@ -67,6 +67,10 @@ When in doubt about a screen, open the live demo (or the screenshots in `docs/ui
 - (Demo-only "DEMO · Super admin" switcher is removed.)
 
 **Mobile (< md)**: sidebar hidden; bottom bar with Orders, Clients, big round **+** (new order), Stock, Notifications. Board columns swipe horizontally; each card has a "Next step" button (shown on desktop too since 2026-11-20, where the five columns share the width from `xl`).
+- The bottom bar is hidden on **New order**: the wizard has its own fixed bar (Summary + Next/Validate), which the nav used to cover (fixed 2026-11-26).
+- Rows of tabs that don't fit (Settings sections, Stock locations) scroll sideways: the current tab is scrolled into view and the edge that hides more tabs fades out.
+- Charts: per-store bars turn horizontal on phones (names on the left); store names are shortened to fit, full name on hover. The busiest-hours grid shrinks to the width, no hidden hours.
+- Layout rule: a grid that only sets columns from a breakpoint (`sm:grid-cols-2`…) also gets `grid-cols-1`, so wide content (inputs, tables, button rows) can never push it past the screen.
 
 **Page header**: H1 (bold, ~28px) + muted subtitle (e.g. "Orders of Succursale Centre."), primary action top-right.
 

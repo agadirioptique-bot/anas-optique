@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Area, Bar, BarChart, CartesianGrid, Cell, ComposedChart, Line, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AXIS_TICK, ChartCard, GRID, MUTED_SERIES, SERIES, TooltipCard, type TipPayload } from "@/components/charts/chart-kit";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { localized } from "@/lib/localized";
 import { useFormat } from "@/lib/use-format";
 import { cn } from "@/lib/utils";
@@ -124,9 +125,48 @@ export function RevenueChart({
 
 // ─── CA & NET by store ───────────────────────────────────────────────────────
 
+/** Store name cut to fit its room (≈ 7 px per character at 12 px), full name on hover. */
+const shortName = (name: string, room: number) => {
+  const max = Math.max(4, Math.floor(room / 7));
+  return name.length > max ? `${name.slice(0, max - 1).trimEnd()}…` : name;
+};
+
+interface TickProps {
+  x?: number | string;
+  y?: number | string;
+  width?: number | string;
+  visibleTicksCount?: number;
+  payload?: { value: string };
+}
+
+/** Phone (horizontal bars): names on the left axis, 112 px wide. */
+function StoreTickLeft({ x, y, payload }: TickProps) {
+  const name = payload?.value ?? "";
+  return (
+    <text x={Number(x)} y={Number(y)} dy={4} textAnchor="end" fontSize={AXIS_TICK.fontSize} fill={AXIS_TICK.fill}>
+      <title>{name}</title>
+      {shortName(name, 84)}
+    </text>
+  );
+}
+
+/** Desktop (vertical bars): names under the bars, cut to the width of one store's band. */
+function StoreTickBottom({ x, y, width, visibleTicksCount, payload }: TickProps) {
+  const name = payload?.value ?? "";
+  const band = Number(width) / Math.max(1, visibleTicksCount ?? 1);
+  return (
+    <text x={Number(x)} y={Number(y)} dy="0.71em" textAnchor="middle" fontSize={AXIS_TICK.fontSize} fill={AXIS_TICK.fill}>
+      <title>{name}</title>
+      {Number.isFinite(band) && band > 0 ? shortName(name, band - 8) : name}
+    </text>
+  );
+}
+
 export function StoresChart({ breakdown }: { breakdown: KpiBreakdown }) {
   const t = useTranslations("dashboard.charts");
   const f = useFormat();
+  // On a phone the store names don't fit under vertical bars: one horizontal row per store instead.
+  const mobile = useIsMobile();
   const rows = breakdown.stores.map((s) => ({ ...s, label: s.name }));
   const hasData = rows.some((r) => r.revenue !== 0 || r.charges !== 0);
   return (
@@ -145,12 +185,21 @@ export function StoresChart({ breakdown }: { breakdown: KpiBreakdown }) {
       {!hasData ? (
         <Empty />
       ) : (
-        <div className="h-72" data-testid="chart-stores">
+        <div className={mobile ? undefined : "h-72"} style={mobile ? { height: 48 + rows.length * 52 } : undefined} data-testid="chart-stores">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barGap={4}>
-              <CartesianGrid stroke={GRID} vertical={false} />
-              <XAxis dataKey="label" tick={AXIS_TICK} tickLine={false} axisLine={{ stroke: GRID }} interval={0} />
-              <YAxis tick={AXIS_TICK} tickLine={false} axisLine={false} width={64} tickFormatter={(v: number) => f.moneyCompact(v)} />
+            <BarChart data={rows} layout={mobile ? "vertical" : "horizontal"} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barGap={mobile ? 2 : 4}>
+              <CartesianGrid stroke={GRID} vertical={mobile} horizontal={!mobile} />
+              {mobile ? (
+                <>
+                  <XAxis type="number" tick={AXIS_TICK} tickLine={false} axisLine={{ stroke: GRID }} tickCount={4} tickFormatter={(v: number) => f.moneyCompact(v)} />
+                  <YAxis type="category" dataKey="label" tick={<StoreTickLeft />} tickLine={false} axisLine={false} width={112} interval={0} />
+                </>
+              ) : (
+                <>
+                  <XAxis dataKey="label" tick={<StoreTickBottom />} tickLine={false} axisLine={{ stroke: GRID }} interval={0} />
+                  <YAxis tick={AXIS_TICK} tickLine={false} axisLine={false} width={64} tickFormatter={(v: number) => f.moneyCompact(v)} />
+                </>
+              )}
               <Tooltip
                 cursor={{ fill: "var(--muted)", opacity: 0.5 }}
                 content={({ active, payload }) => {
@@ -169,8 +218,8 @@ export function StoresChart({ breakdown }: { breakdown: KpiBreakdown }) {
                   );
                 }}
               />
-              <Bar dataKey="revenue" fill={SERIES[0]} radius={[4, 4, 0, 0]} isAnimationActive={false} maxBarSize={40} />
-              <Bar dataKey="net" fill={SERIES[1]} radius={[4, 4, 0, 0]} isAnimationActive={false} maxBarSize={40} />
+              <Bar dataKey="revenue" fill={SERIES[0]} radius={mobile ? [0, 4, 4, 0] : [4, 4, 0, 0]} isAnimationActive={false} maxBarSize={mobile ? 16 : 40} />
+              <Bar dataKey="net" fill={SERIES[1]} radius={mobile ? [0, 4, 4, 0] : [4, 4, 0, 0]} isAnimationActive={false} maxBarSize={mobile ? 16 : 40} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -305,12 +354,13 @@ export function HeatmapChart({ breakdown }: { breakdown: KpiBreakdown }) {
         <Empty />
       ) : (
         <div className="overflow-x-auto rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring/50" tabIndex={0} data-testid="chart-heatmap">
-          <table className="w-full border-separate border-spacing-0.5 text-xs">
+          {/* Fixed layout: on a phone the cells shrink to fit (no hidden hours on the right). */}
+          <table className="w-full table-fixed border-separate border-spacing-0.5 text-xs">
             <thead>
               <tr>
-                <th className="w-10" />
+                <th className="w-9 sm:w-10" />
                 {range.map((h) => (
-                  <th key={h} scope="col" className="num px-0.5 text-center font-normal text-muted-foreground">
+                  <th key={h} scope="col" className="num overflow-visible px-0 text-center font-normal whitespace-nowrap text-muted-foreground sm:px-0.5">
                     {h % 2 === 0 ? h : ""}
                   </th>
                 ))}
@@ -328,7 +378,7 @@ export function HeatmapChart({ breakdown }: { breakdown: KpiBreakdown }) {
                       <td
                         key={h}
                         title={`${t(`weekdays.${d}`)} ${t("hour", { hour: String(h).padStart(2, "0") })} · ${v}`}
-                        className={cn("h-6 min-w-5 rounded-[4px]", v === 0 && "bg-muted/60")}
+                        className={cn("h-6 rounded-[4px] sm:min-w-5", v === 0 && "bg-muted/60")}
                         style={v ? { background: `color-mix(in oklab, var(--chart-1) ${20 + (v / max) * 80}%, transparent)` } : undefined}
                       />
                     );

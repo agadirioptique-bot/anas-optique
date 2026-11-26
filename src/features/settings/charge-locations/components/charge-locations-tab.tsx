@@ -61,7 +61,7 @@ export function ChargeLocationsTab({ locations }: { locations: ChargeLocationRow
           handleLabel={(l) => t("drag", { label: name(l) })}
           onReorder={(ids) => reorder(ids, () => run(() => reorderRows({ table: "charge_locations", ids }), tc("saved")))}
           renderItem={(l) => (
-            <div className={cn("grid gap-2 py-2 md:grid-cols-[1fr_1fr_7rem_8rem] md:items-center", l.isArchived && "rounded-lg bg-muted/60")}>
+            <div className={cn("grid grid-cols-1 gap-2 py-2 md:grid-cols-[1fr_1fr_7rem_8rem] md:items-center", l.isArchived && "rounded-lg bg-muted/60")}>
               <LabelInput value={l.labelFr} label={`${t("labelFr")} · ${l.labelFr}`} onSave={(v) => run(() => renameChargeLocation({ id: l.id, labelFr: v, labelEn: l.labelEn }), tc("saved"))} />
               <LabelInput value={l.labelEn} label={`${t("labelEn")} · ${l.labelFr}`} onSave={(v) => run(() => renameChargeLocation({ id: l.id, labelFr: l.labelFr, labelEn: v }), tc("saved"))} />
               <span>

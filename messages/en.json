@@ -133,7 +133,7 @@
     "title": "Notifications",
     "empty": "All caught up",
     "emptyBody": "No notifications for now.",
-    "bellLabel": "{count, plural, =0 {Notifications} one {Notifications, # unread} other {Notifications, # unread}}",
+    "bellLabel": "{count, plural, =0 {Notifications} one {Notifications, {shown} unread} other {Notifications, {shown} unread}}",
     "newCount": "{count, plural, =0 {none new} one {# new} other {# new}}",
     "seeAll": "See all notifications",
     "markAllRead": "Mark all as read",

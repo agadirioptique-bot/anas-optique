@@ -135,7 +135,7 @@ export function ListSkeleton({ rows = 6, className }: { rows?: number; className
 
 export function CardsSkeleton({ count = 4, className }: { count?: number; className?: string }) {
   return (
-    <div className={cn("grid gap-4 sm:grid-cols-2 xl:grid-cols-4", className)} aria-hidden="true">
+    <div className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4", className)} aria-hidden="true">
       {Array.from({ length: count }, (_, i) => (
         <Skeleton key={i} className="h-32 rounded-2xl" />
       ))}

@@ -80,7 +80,7 @@ function ProductsPicker() {
             />
           </label>
           {!ownFrame && (
-            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" role="radiogroup" aria-label={t("frame")}>
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3" role="radiogroup" aria-label={t("frame")}>
               {categories.map((c) => {
                 const stock = stockOf(c.id);
                 const selected = frameCategoryId === c.id;
@@ -209,7 +209,7 @@ function PaymentSection() {
 
   return (
     <Section title={t("payment")}>
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="order-total">{t("total")}</Label>
           <MoneyInput id="order-total" size="lg" value={v.total} onChange={(n) => setMoney("total", n)} invalid={!!errors.total} aria-describedby="order-total-msg" />
